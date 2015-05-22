@@ -25,7 +25,7 @@ Acknowledgements
 ----------------
 *   Christoph Gohlke from providing the czifily.py.
 *   The Cellprofiler team for providing python-bioformats
-*   The OME people for creating BioFormats and ist readers                                                                                 
+*   The OME people for creating BioFormats                                                                                 
 
 References
 ----------
