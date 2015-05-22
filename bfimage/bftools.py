@@ -5,10 +5,6 @@
 File: bftools.py
 Date: 18.05.2015
 Version. 1.4
-
-The code is partially based on the project lesion by Juan Nunez-Iglesias:
-
-https://github.com/jni/lesion
 """
 
 
