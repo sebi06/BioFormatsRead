@@ -4,7 +4,7 @@ import matplotlib.colors as mc
 import os
 import numpy as np
 
-filename = r'r'C:\Python_ZEN_Output\Testdata\CZI_Read\XYZCT_Z=15_C=2_T=20.czi'
+filename = r'C:\Python_ZEN_Output\Testdata\CZI_Read\XYZCT_Z=15_C=2_T=20.czi'
 
 imgbase = os.path.basename(filename)
 imgdir = os.path.dirname(filename)
