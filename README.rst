@@ -14,7 +14,7 @@ Requirements
 ------------
 * `CPython 2.7 <http://www.python.org>`_
 * `Numpy 1.8.2 <http://www.numpy.org>`_
-* `CellProfiler.bioformats <https://github.com/CellProfiler/python-bioformats>`_
+* `python-bioformats <https://github.com/CellProfiler/python-bioformats>`_
 * `czifile <http://www.lfd.uci.edu/~gohlke/code/czifile.py.html>`_
 
 Notes
