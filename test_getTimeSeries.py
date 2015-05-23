@@ -1,4 +1,4 @@
-import bfimage as cz
+import bfimage as bf
 from matplotlib import pyplot as plt, cm
 import matplotlib.colors as mc
 import os
@@ -9,7 +9,7 @@ filename = r'testdata\T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
 imgbase = os.path.basename(filename)
 imgdir = os.path.dirname(filename)
 ## get image meta-information
-MetaInfo = cz.bftools.get_relevant_metainfo_wrapper(filename)
+MetaInfo = bf.bftools.get_relevant_metainfo_wrapper(filename)
 
 seriesID = 0
 timepoint = 2
@@ -17,7 +17,7 @@ channel = 1
 zplane = 2
 
 #get the actual time series from the data set
-tseries = cz.bftools.get_timeseries(filename, MetaInfo['Sizes'], seriesID, zplane)
+tseries = bf.bftools.get_timeseries(filename, MetaInfo['Sizes'], seriesID, zplane)
 
 ## show relevant image Meta-Information
 print '\n'

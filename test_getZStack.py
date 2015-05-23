@@ -1,4 +1,4 @@
-import bfimage as cz
+import bfimage as bf
 from matplotlib import pyplot as plt, cm
 import os
 import numpy as np
@@ -8,14 +8,14 @@ filename = r'testdata\Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
 imgbase = os.path.basename(filename)
 imgdir = os.path.dirname(filename)
 ## get image meta-information
-MetaInfo = cz.bftools.get_relevant_metainfo_wrapper(filename)
+MetaInfo = bf.bftools.get_relevant_metainfo_wrapper(filename)
 
 seriesID = 0
 timepoint = 0
 channel = 0
 
 # get the actual z-stack from the data set
-zstack = cz.bftools.get_zstack(filename, MetaInfo['Sizes'], seriesID, timepoint)
+zstack = bf.bftools.get_zstack(filename, MetaInfo['Sizes'], seriesID, timepoint)
 
 # get plane with the brightest pixel
 zplane = (zstack == zstack.max()).nonzero()[0][0]
