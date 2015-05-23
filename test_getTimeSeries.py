@@ -4,13 +4,20 @@ import matplotlib.colors as mc
 import os
 import numpy as np
 
-filename = r'C:\Python_ZEN_Output\Testdata\CZI_Read\XYZCT_Z=15_C=2_T=20.czi'
+filename = r'testdata\T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
 
 imgbase = os.path.basename(filename)
 imgdir = os.path.dirname(filename)
 ## get image meta-information
 MetaInfo = cz.bftools.get_relevant_metainfo_wrapper(filename)
 
+seriesID = 0
+timepoint = 2
+channel = 1
+zplane = 2
+
+#get the actual time series from the data set
+tseries = cz.bftools.get_timeseries(filename, MetaInfo['Sizes'], seriesID, zplane)
 
 ## show relevant image Meta-Information
 print '\n'
@@ -29,18 +36,13 @@ print 'Detector Name        : ', MetaInfo['DetName']
 print 'Ex. Wavelengths [nm] : ', MetaInfo['WLEx']
 print 'Em. Wavelengths [nm] : ', MetaInfo['WLEm']
 print 'Channel Description  : ', MetaInfo['ChDesc']
-
-seriesID = 0
-timepoint = 14
-channel = 1
-zplane = 4
-
-tseries = cz.bftools.get_timeseries(filename, MetaInfo['Sizes'], seriesID, zplane)
+print '============================================================='
 print 'Shape Time Series    : ', np.shape(tseries)
+
 img2show = tseries[timepoint, channel, :, :]
 fig1 = plt.figure(figsize=(10, 8), dpi=100)
 ax1 = fig1.add_subplot(111)
-cax = ax1.imshow(img2show, interpolation='nearest', cmap=cm.gray, aspect='equal', vmin=119, vmax=1407)
+cax = ax1.imshow(img2show, interpolation='nearest', cmap=cm.gray, aspect='equal')
 ax1.set_title('T=' + str(timepoint+1) + ' Z=' + str(zplane+1) + ' CH=' + str(channel+1), fontsize=12)
 ax1.set_xlabel('X-dimension [pixel]', fontsize=10)
 ax1.set_ylabel('Y-dimension [pixel]', fontsize=10)

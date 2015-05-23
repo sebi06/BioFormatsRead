@@ -36,6 +36,7 @@ print 'Detector Name        : ', MetaInfo['DetName']
 print 'Ex. Wavelengths [nm] : ', MetaInfo['WLEx']
 print 'Em. Wavelengths [nm] : ', MetaInfo['WLEm']
 print 'Channel Description  : ', MetaInfo['ChDesc']
+print '============================================================='
 print 'Shape Z-Stack        : ', np.shape(zstack)
 
 img2show = zstack[zplane, channel, :, :]
