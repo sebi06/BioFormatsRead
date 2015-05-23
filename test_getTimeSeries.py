@@ -1,6 +1,5 @@
 import bfimage as bf
 from matplotlib import pyplot as plt, cm
-import matplotlib.colors as mc
 import os
 import numpy as np
 
