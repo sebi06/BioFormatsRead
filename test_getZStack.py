@@ -3,16 +3,24 @@ from matplotlib import pyplot as plt, cm
 import os
 import numpy as np
 
-#filename = r'C:\Python_ZEN_Output\XYZCT_Z=15_C=2_T=20.czi'
+filename = r'testdata\Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
 
 imgbase = os.path.basename(filename)
 imgdir = os.path.dirname(filename)
 ## get image meta-information
 MetaInfo = cz.bftools.get_relevant_metainfo_wrapper(filename)
 
+seriesID = 0
+timepoint = 0
+channel = 0
+
+# get the actual z-stack from the data set
+zstack = cz.bftools.get_zstack(filename, MetaInfo['Sizes'], seriesID, timepoint)
+
+# get plane with the brightest pixel
+zplane = (zstack == zstack.max()).nonzero()[0][0]
 
 ## show relevant image Meta-Information
-print '\n'
 print 'Image Directory      : ', imgdir
 print 'Image Filename       : ', imgbase
 print 'Images Dim Sizes     : ', MetaInfo['Sizes']
@@ -28,14 +36,8 @@ print 'Detector Name        : ', MetaInfo['DetName']
 print 'Ex. Wavelengths [nm] : ', MetaInfo['WLEx']
 print 'Em. Wavelengths [nm] : ', MetaInfo['WLEm']
 print 'Channel Description  : ', MetaInfo['ChDesc']
-
-seriesID = 0
-timepoint = 10
-channel = 0
-zplane = 6
-
-zstack = cz.bftools.get_zstack(filename, MetaInfo['Sizes'], seriesID, timepoint)
 print 'Shape Z-Stack        : ', np.shape(zstack)
+
 img2show = zstack[zplane, channel, :, :]
 fig1 = plt.figure(figsize=(10, 8), dpi=100)
 ax1 = fig1.add_subplot(111)
