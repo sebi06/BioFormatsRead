@@ -2,13 +2,13 @@ import numpy as np
 import os
 import bfimage as bf
 
-filename = r'C:\Python_ZEN_Output\Experiment-454.czi'
+filename = r'testdata\Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
 
 imgbase = os.path.basename(filename)
 imgdir = os.path.dirname(filename)
 ## get image meta-information
 MetaInfo = bf.bftools.get_relevant_metainfo_wrapper(filename)
-img6d = bf.bftools.getImage6D(filename, MetaInfo['Sizes'])
+img6d = bf.bftools.get_image6d(filename, MetaInfo['Sizes'])
 
 ## show relevant image Meta-Information
 print '\n'
