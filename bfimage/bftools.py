@@ -40,6 +40,9 @@ def start_jvm(max_heap_size='4G'):
         The maximum memory usage by the virtual machine. Valid strings
         include '256M', '64k', and '2G'. Expect to need a lot.
     """
+
+    # TODO - include check for the OS, so that the file paths are always working
+
     path = r'bfimage\bioformats_package.jar'
     jars = jv.JARS + [path]
     jv.start_vm(class_path=jars, max_heap_size=max_heap_size)
