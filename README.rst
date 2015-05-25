@@ -15,12 +15,15 @@ Requirements
 * `CPython 2.7 <http://www.python.org>`_
 * `Numpy 1.8.2 <http://www.numpy.org>`_
 * `python-bioformats <https://github.com/CellProfiler/python-bioformats>`_
+* `BioFormats package <https://http://downloads.openmicroscopy.org/bio-formats/>`_
 * `javabridge <https://pypi.python.org/pypi/javabridge>`_
 * `czifile <http://www.lfd.uci.edu/~gohlke/code/czifile.py.html>`_
 
 Notes
 -----
 The package is still under development and was mainly tested with CZI files.
+
+The python-bioformats package includes loci_tool.jar but it is also possible to use the latest bioformats_package.jar.
 
 Acknowledgements
 ----------------
