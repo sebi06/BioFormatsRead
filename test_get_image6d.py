@@ -2,8 +2,8 @@ import numpy as np
 import os
 import bfimage as bf
 
-#filename = r'testdata\Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
-filename = r'testdata\T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
+#filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
+filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
 
 imgbase = os.path.basename(filename)
 imgdir = os.path.dirname(filename)
