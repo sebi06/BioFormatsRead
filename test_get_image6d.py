@@ -7,6 +7,10 @@ filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
 
 imgbase = os.path.basename(filename)
 imgdir = os.path.dirname(filename)
+
+# specify bioformats_package.jar to use if required
+#bf.set_bfpath(insert path to bioformats_packe.jar here)
+
 ## get image meta-information
 MetaInfo = bf.bftools.get_relevant_metainfo_wrapper(filename)
 img6d = bf.bftools.get_image6d(filename, MetaInfo['Sizes'])

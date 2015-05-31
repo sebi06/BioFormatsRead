@@ -16,6 +16,8 @@ import os
 
 VM_STARTED = False
 VM_KILLED = False
+# define default path to bioformats_package.jar globally
+BFPATH = 'bioformats_package.jar'
 
 BF2NP_DTYPE = {
     0: np.int8,
@@ -28,6 +30,13 @@ BF2NP_DTYPE = {
     7: np.double
 }
 
+
+def set_bfpath(bfpackage_path='bioformats_package.jar'):
+    # this function can be used to set the path to the package individually
+    global BFPATH
+    BFPATH = bfpackage_path
+
+    return BFPATH
 
 def start_jvm(max_heap_size='4G'):
 
@@ -43,8 +52,7 @@ def start_jvm(max_heap_size='4G'):
 
     # TODO - include check for the OS, so that the file paths are always working
 
-    path = r'bfimage/bioformats_package.jar'
-    jars = jv.JARS + [path]
+    jars = jv.JARS + [BFPATH]
     jv.start_vm(class_path=jars, max_heap_size=max_heap_size)
     VM_STARTED = True
 

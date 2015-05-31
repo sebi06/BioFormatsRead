@@ -7,6 +7,10 @@ filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
 
 imgbase = os.path.basename(filename)
 imgdir = os.path.dirname(filename)
+
+# specify bioformats_package.jar to use if required
+#bf.set_bfpath(insert path to bioformats_packe.jar here)
+
 ## get image meta-information
 MetaInfo = bf.bftools.get_relevant_metainfo_wrapper(filename)
 
