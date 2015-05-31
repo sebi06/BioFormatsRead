@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt, cm
 import os
 import numpy as np
 
-filename = r'testdata\T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
+filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
 
 imgbase = os.path.basename(filename)
 imgdir = os.path.dirname(filename)

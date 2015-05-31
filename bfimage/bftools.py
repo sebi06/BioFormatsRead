@@ -43,7 +43,7 @@ def start_jvm(max_heap_size='4G'):
 
     # TODO - include check for the OS, so that the file paths are always working
 
-    path = r'bfimage\bioformats_package.jar'
+    path = r'bfimage/bioformats_package.jar'
     jars = jv.JARS + [path]
     jv.start_vm(class_path=jars, max_heap_size=max_heap_size)
     VM_STARTED = True
