@@ -16,6 +16,7 @@ import os
 
 VM_STARTED = False
 VM_KILLED = False
+
 # define default path to bioformats_package.jar globally
 BFPATH = 'bioformats_package.jar'
 

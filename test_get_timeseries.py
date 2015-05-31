@@ -19,10 +19,10 @@ timepoint = 2
 channel = 1
 zplane = 2
 
-#get the actual time series from the data set
+# get the actual time series from the data set
 tseries = bf.bftools.get_timeseries(filename, MetaInfo['Sizes'], seriesID, zplane)
 
-## show relevant image Meta-Information
+# show relevant image Meta-Information
 print '\n'
 print 'Image Directory      : ', imgdir
 print 'Image Filename       : ', imgbase
