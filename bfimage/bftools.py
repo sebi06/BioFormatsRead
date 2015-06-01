@@ -32,7 +32,7 @@ BF2NP_DTYPE = {
 }
 
 
-def set_bfpath(bfpackage_path='bioformats_package.jar'):
+def set_bfpath(bfpackage_path=BFPATH):
     # this function can be used to set the path to the package individually
     global BFPATH
     BFPATH = bfpackage_path
