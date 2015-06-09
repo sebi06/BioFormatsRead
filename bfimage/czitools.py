@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: czitools.py
-Date: 18.05.2015
-Version. 0.7
+Date: 09.06.2015
+Version. 0.8
 """
 
 import misctools as misc
@@ -36,7 +36,6 @@ def get_metainfo_channel_description(filename):
 
     return chdescript
 
-
 def writexml_czi(filename):
 
     # write xml file to disk
@@ -49,7 +48,6 @@ def writexml_czi(filename):
     print 'XML metadata : ', xmlfile
 
     czi.close()
-
 
 def get_objective_name_cziread(filename):
 
@@ -67,8 +65,6 @@ def get_objective_name_cziread(filename):
 
     return objname
 
-
-
 def read_dimensions_czi(filename):
 
     # Read the dimensions of the image stack and their order
@@ -79,6 +75,23 @@ def read_dimensions_czi(filename):
 
     return czishape, cziorder
 
+def get_shapeinfo_cziread(filename):
+    # get CZI shape and dimension order using czifile.py
+
+    try:
+        czi = CziFile(filename)
+        czishape = czi.shape
+        cziorder = czi.axes
+
+        czi.close()
+
+    except:
+
+        print 'czifile.py did not detect an CZI file.'
+        czishape = 'unknown'
+        cziorder = 'unknown'
+
+    return czishape, cziorder
 
 def get_metainfo_cziread(filename):
 
@@ -92,8 +105,6 @@ def get_metainfo_cziread(filename):
 
     try:
         czi = CziFile(filename)
-        czishape = czi.shape
-        cziorder = czi.axes
 
         # Iterate over the metadata
         for elem in czi.metadata.getiterator():
@@ -115,6 +126,8 @@ def get_metainfo_cziread(filename):
 
             if elem.tag == 'TotalMagnification':
                 totalMag = np.float(elem.text)
+                if totalMag == 0:
+                    totalMag == 'n.a.'
 
         czi.close()
 
@@ -124,8 +137,7 @@ def get_metainfo_cziread(filename):
         czishape = 'unknown'
         cziorder = 'unknown'
 
-    return objNA, objMag, objName, objImm, CamName, totalMag, czishape, cziorder
-
+    return objNA, objMag, objName, objImm, CamName, totalMag
 
 def get_metainfo_cziread_camera(filename):
 
@@ -140,7 +152,6 @@ def get_metainfo_cziread_camera(filename):
     czi.close()
 
     return CamName
-
 
 def convert_dimension_string(cziorder):
     """
