@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: bftools.py
-Date: 18.05.2015
-Version. 1.4
+Date: 09.06.2015
+Version. 1.5
 """
 
 
@@ -153,31 +153,40 @@ def get_metainfo_scaling(jmd):
 
 def get_metainfo_objective(jmd, filename):
 
+    try:
+        # get the correct objective ID (the objective that was used to acquire the image)
+        instrumentID = np.int(jmd.getInstrumentID(0)[-1])
+        objID = np.int(jmd.getObjectiveSettingsID(instrumentID)[-1])
+    except:
+        print 'No suitable instrument and objective ID found.'
+
     # try to get immersion type -  # get the first objective record in the first Instrument record
     try:
-        objimm = jmd.getObjectiveImmersion(0, 0).getValue()
+        objimm = jmd.getObjectiveImmersion(instrumentID, objID).getValue()
     except:
         objimm = 'n.a'
 
     # try to get objective Lens NA
     try:
-        objna = np.round(jmd.getObjectiveLensNA(0, 0).floatValue(), 2)
+        objna = np.round(jmd.getObjectiveLensNA(instrumentID, objID).floatValue(), 2)
     except:
         objna = 'n.a.'
 
     # try to get objective magnification
     try:
-        objmag = np.round(jmd.getObjectiveNominalMagnification(0, 0).floatValue(), 0)
+        objmag = np.round(jmd.getObjectiveNominalMagnification(instrumentID, objID).floatValue(), 0)
     except:
         objmag = 'n.a.'
 
     # try to get objective model
     try:
-        objmodel = jmd.getObjectiveModel(0, 0).getValue()
+        objmodel = jmd.getObjectiveModel(instrumentID, objID).getValue()
     except:
         # this is a fallback option --> use cziread.py to get the information
-        objmodel = czt.get_objective_name_cziread(filename)
-
+        if filename[-4:] == '.czi':
+            objmodel = czt.get_objective_name_cziread(filename)
+        else:
+            objmodel = 'n.a.'
 
     return objimm, objna, objmag, objmodel
 
@@ -441,10 +450,18 @@ def get_relevant_metainfo_wrapper(filename):
     # get dimension information and MetaInfo
     MetaInfo = get_metainfo_dimension(jmd, MetaInfo)
 
-    # get objective information
-    MetaInfo['NA'], MetaInfo['ObjMag'], MetaInfo['ObjModel'],MetaInfo['Immersion'],\
-        MetaInfo['DetName'], MetaInfo['TotalMag'], MetaInfo['ShapeCZI'], MetaInfo['OrderCZI'] = czt.get_metainfo_cziread(
-        filename)
+    if filename[-4:] == '.czi':
+        # get objective information using cziread
+        print 'Using czifile.py to get CZI Shape info.'
+
+        MetaInfo['ShapeCZI'], MetaInfo['OrderCZI'] = czt.get_shapeinfo_cziread(filename)
+        # currently not used any more --> trust BioFormtas instead
+        #MetaInfo['NA'], MetaInfo['ObjMag'], MetaInfo['ObjModel'],MetaInfo['Immersion'],\
+        #    MetaInfo['DetName'], MetaInfo['TotalMag'] = czt.get_metainfo_cziread(filename)
+
+    # use bioformats to get the objective informations
+    print 'Using BioFormats to get MetaInfo.'
+    MetaInfo['Immersion'], MetaInfo['NA'], MetaInfo['ObjMag'], MetaInfo['ObjModel'] = get_metainfo_objective(jmd, filename)
 
     # get scaling information
     MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale'] = get_metainfo_scaling(jmd)
