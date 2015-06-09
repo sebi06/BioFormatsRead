@@ -157,6 +157,10 @@ def get_metainfo_objective(jmd, filename):
         # get the correct objective ID (the objective that was used to acquire the image)
         instrumentID = np.int(jmd.getInstrumentID(0)[-1])
         objID = np.int(jmd.getObjectiveSettingsID(instrumentID)[-1])
+        # error handling --> sometime only one objective is there with ID > 0
+        numobj = jmd.getObjectiveCount(instrumentID)
+        if numobj == 1:
+            objID = 0
     except:
         print 'No suitable instrument and objective ID found.'
 
@@ -168,9 +172,10 @@ def get_metainfo_objective(jmd, filename):
 
     # try to get objective Lens NA
     try:
-        objna = np.round(jmd.getObjectiveLensNA(instrumentID, objID).floatValue(), 2)
+        objna = np.round(jmd.getObjectiveLensNA(instrumentID, objID).floatValue(), 3)
     except:
         objna = 'n.a.'
+
 
     # try to get objective magnification
     try:
