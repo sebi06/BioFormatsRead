@@ -221,6 +221,7 @@ def get_metainfo_numscenes(filename):
 
     return numscenes
 
+
 def get_metainfo_wavelengths(jmd):
 
     SizeC = np.int(jmd.getPixelsSizeC(IMAGEID).getValue().floatValue())
@@ -273,7 +274,6 @@ def get_dimension_only(imagefile):
 
     return sizes
 
-
 def get_image6d(imagefile, sizes):
     """
     This function will read the image data and store them into a 6D numpy array.
@@ -301,7 +301,6 @@ def get_image6d(imagefile, sizes):
 
     return img6d
 
-
 def get_image2d(imagefile, sizes, seriesindex, channel, zplane, timepoint):
     """
     This will just read a single plane from an image data set.
@@ -317,7 +316,6 @@ def get_image2d(imagefile, sizes, seriesindex, channel, zplane, timepoint):
     rdr.close()
 
     return img2d
-
 
 def get_zstack(imagefile, sizes, seriesID, timepoint):
     """
@@ -342,7 +340,6 @@ def get_zstack(imagefile, sizes, seriesID, timepoint):
 
     return imgZStack
 
-
 def get_timeseries(imagefile, sizes, seriesID, zplane):
     """
     This will read a single Time Lapse from an image data set.
@@ -366,7 +363,6 @@ def get_timeseries(imagefile, sizes, seriesID, zplane):
 
     return imgTimeSeries
 
-
 def get_imageseries(imagefile, sizes, seriesID=0):
 
     if not VM_STARTED:
@@ -388,7 +384,6 @@ def get_imageseries(imagefile, sizes, seriesID=0):
     rdr.close()
 
     return imgseries
-
 
 def get_series_from_well(imagefile, sizes, seriesseq):
     """
@@ -416,8 +411,8 @@ def get_series_from_well(imagefile, sizes, seriesseq):
 
     return img6dwell
 
+def create_metainfo_dict(filename):
 
-def get_relevant_metainfo_wrapper(filename):
     """
     A Python dictionary will be created to hold the relevant Metadata.
     """
@@ -447,6 +442,12 @@ def get_relevant_metainfo_wrapper(filename):
                 'ChDesc': 'n.a.',
                 'Sizes': 0}
 
+    return MetaInfo
+
+def get_relevant_metainfo_wrapper(filename):
+
+    MetaInfo = create_metainfo_dict(filename)
+
     # get JavaMetaDataStore and SeriesCount
     jmd, MetaInfo['TotalSeries'], IMAGEID = get_java_metadata_store(filename)
 
@@ -461,6 +462,8 @@ def get_relevant_metainfo_wrapper(filename):
         # currently not used any more --> trust BioFormtas instead
         #MetaInfo['NA'], MetaInfo['ObjMag'], MetaInfo['ObjModel'],MetaInfo['Immersion'],\
         #    MetaInfo['DetName'], MetaInfo['TotalMag'] = czt.get_metainfo_cziread(filename)
+
+    #TODO: Put everything back in one function to make it faster?
 
     # use bioformats to get the objective informations
     print 'Using BioFormats to get MetaInfo.'
@@ -481,14 +484,12 @@ def get_relevant_metainfo_wrapper(filename):
 
     return MetaInfo
 
-
 def calc_series_range(total_series, scenes, sceneID):
 
     sps = total_series / scenes  # series_per_scence = sps
     series_seq = range(sceneID * sps - sps, sps * sceneID)
 
     return series_seq
-
 
 def calc_series_range_well(wellnumber, imgperwell):
     """
