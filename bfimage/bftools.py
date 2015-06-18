@@ -411,14 +411,14 @@ def get_series_from_well(imagefile, sizes, seriesseq):
 
     return img6dwell
 
-def create_metainfo_dict(filename):
+def create_metainfo_dict():
 
     """
     A Python dictionary will be created to hold the relevant Metadata.
     """
 
-    MetaInfo = {'Directory': os.path.dirname(filename),
-                'Filename': os.path.basename(filename),
+    MetaInfo = {'Directory': '',
+                'Filename': '',
                 'TotalSeries': 0,
                 'SizeX': 0,
                 'SizeY': 0,
@@ -446,7 +446,10 @@ def create_metainfo_dict(filename):
 
 def get_relevant_metainfo_wrapper(filename):
 
-    MetaInfo = create_metainfo_dict(filename)
+    MetaInfo = create_metainfo_dict()
+
+    MetaInfo['Directory'] = os.path.dirname(filename)
+    MetaInfo['Filename'] = os.path.basename(filename)
 
     # get JavaMetaDataStore and SeriesCount
     jmd, MetaInfo['TotalSeries'], IMAGEID = get_java_metadata_store(filename)
