@@ -38,6 +38,7 @@ print 'Objective Name       : ', MetaInfo['ObjModel']
 print 'Detector Name        : ', MetaInfo['DetName']
 print 'Ex. Wavelengths [nm] : ', MetaInfo['WLEx']
 print 'Em. Wavelengths [nm] : ', MetaInfo['WLEm']
+print 'Dyes                 : ', MetaInfo['Dyes']
 print 'Channel Description  : ', MetaInfo['ChDesc']
 print '============================================================='
 print 'Shape Time Series    : ', np.shape(tseries)
