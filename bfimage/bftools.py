@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: bftools.py
-Date: 09.06.2015
-Version. 1.5
+Date: 18.06.2015
+Version. 1.6
 """
 
 
@@ -31,6 +31,8 @@ BF2NP_DTYPE = {
     7: np.double
 }
 
+# global default imageID
+IMAGEID = 0
 
 def set_bfpath(bfpackage_path=BFPATH):
     # this function can be used to set the path to the package individually
@@ -47,8 +49,8 @@ def start_jvm(max_heap_size='4G'):
     Parameters
     ----------
     max_heap_size : string, optional
-        The maximum memory usage by the virtual machine. Valid strings
-        include '256M', '64k', and '2G'. Expect to need a lot.
+    The maximum memory usage by the virtual machine. Valid strings
+    include '256M', '64k', and '2G'. Expect to need a lot.
     """
 
     # TODO - include check for the OS, so that the file paths are always working
@@ -108,9 +110,12 @@ def get_java_metadata_store(imagefile):
     # rdr.rdr is the actual BioFormats reader. rdr handles its lifetime
     jmd = jv.JWrapper(rdr.rdr.getMetadataStore())
 
+    imagecount = jmd.getImageCount()
+    IMAGEID = imagecount - 1
+
     rdr.close()
 
-    return jmd, totalseries
+    return jmd, totalseries, IMAGEID
 
 
 def get_metainfo_dimension(jmd, MetaInfo):
@@ -120,13 +125,13 @@ def get_metainfo_dimension(jmd, MetaInfo):
     dimension order is returned as a string.
     """
 
-    MetaInfo['SizeC'] = np.int(jmd.getPixelsSizeC(0).getValue().floatValue())
-    MetaInfo['SizeT'] = np.int(jmd.getPixelsSizeT(0).getValue().floatValue())
-    MetaInfo['SizeZ'] = np.int(jmd.getPixelsSizeZ(0).getValue().floatValue())
-    MetaInfo['SizeX'] = np.int(jmd.getPixelsSizeX(0).getValue().floatValue())
-    MetaInfo['SizeY'] = np.int(jmd.getPixelsSizeY(0).getValue().floatValue())
+    MetaInfo['SizeC'] = np.int(jmd.getPixelsSizeC(IMAGEID).getValue().floatValue())
+    MetaInfo['SizeT'] = np.int(jmd.getPixelsSizeT(IMAGEID).getValue().floatValue())
+    MetaInfo['SizeZ'] = np.int(jmd.getPixelsSizeZ(IMAGEID).getValue().floatValue())
+    MetaInfo['SizeX'] = np.int(jmd.getPixelsSizeX(IMAGEID).getValue().floatValue())
+    MetaInfo['SizeY'] = np.int(jmd.getPixelsSizeY(IMAGEID).getValue().floatValue())
     # get dimension order string from BioFormats library
-    MetaInfo['DimOrder BF'] = jmd.getPixelsDimensionOrder(0).getValue()
+    MetaInfo['DimOrder BF'] = jmd.getPixelsDimensionOrder(IMAGEID).getValue()
 
     print 'T: ', MetaInfo['SizeT'],  'Z: ', MetaInfo['SizeZ'],  'C: ', MetaInfo['SizeC'],  'X: ',\
         MetaInfo['SizeX'],  'Y: ', MetaInfo['SizeY']
@@ -137,13 +142,13 @@ def get_metainfo_dimension(jmd, MetaInfo):
 def get_metainfo_scaling(jmd):
 
     # get scaling for XYZ in micron
-    xscale = np.round(jmd.getPixelsPhysicalSizeX(0).value().floatValue(), 3)
-    yscale = np.round(jmd.getPixelsPhysicalSizeY(0).value().floatValue(), 3)
+    xscale = np.round(jmd.getPixelsPhysicalSizeX(IMAGEID).value().floatValue(), 3)
+    yscale = np.round(jmd.getPixelsPhysicalSizeY(IMAGEID).value().floatValue(), 3)
 
     # check if there is only one z-plane
-    SizeZ = jmd.getPixelsSizeZ(0).getValue().floatValue()
+    SizeZ = jmd.getPixelsSizeZ(IMAGEID).getValue().floatValue()
     if SizeZ > 1:
-        zscale = np.round(jmd.getPixelsPhysicalSizeZ(0).value().floatValue(), 3)
+        zscale = np.round(jmd.getPixelsPhysicalSizeZ(IMAGEID).value().floatValue(), 3)
     else:
         # set z spacing equal to xy, if there is only one z-plane existing
         zscale = xscale
@@ -155,7 +160,7 @@ def get_metainfo_objective(jmd, filename):
 
     try:
         # get the correct objective ID (the objective that was used to acquire the image)
-        instrumentID = np.int(jmd.getInstrumentID(0)[-1])
+        instrumentID = np.int(jmd.getInstrumentID(IMAGEID)[-1])
         objID = np.int(jmd.getObjectiveSettingsID(instrumentID)[-1])
         # error handling --> sometime only one objective is there with ID > 0
         numobj = jmd.getObjectiveCount(instrumentID)
@@ -166,7 +171,8 @@ def get_metainfo_objective(jmd, filename):
 
     # try to get immersion type -  # get the first objective record in the first Instrument record
     try:
-        objimm = jmd.getObjectiveImmersion(instrumentID, objID).getValue()
+        #objimm = jmd.getObjectiveImmersion(instrumentID, objID).getValue()
+        objimm = jmd.getObjectiveImmersion(instrumentID, objID)
     except:
         objimm = 'n.a'
 
@@ -176,7 +182,6 @@ def get_metainfo_objective(jmd, filename):
     except:
         objna = 'n.a.'
 
-
     # try to get objective magnification
     try:
         objmag = np.round(jmd.getObjectiveNominalMagnification(instrumentID, objID).floatValue(), 0)
@@ -185,7 +190,10 @@ def get_metainfo_objective(jmd, filename):
 
     # try to get objective model
     try:
-        objmodel = jmd.getObjectiveModel(instrumentID, objID).getValue()
+        objmodel = jmd.getObjectiveModel(instrumentID, objID)
+        if len(objmodel) == 0:
+            objmodel = 'n.a'
+            print 'No objective model name found in metadata.'
     except:
         # this is a fallback option --> use cziread.py to get the information
         if filename[-4:] == '.czi':
@@ -213,38 +221,28 @@ def get_metainfo_numscenes(filename):
 
     return numscenes
 
-
 def get_metainfo_wavelengths(jmd):
 
-    SizeC = np.int(jmd.getPixelsSizeC(0).getValue().floatValue())
+    SizeC = np.int(jmd.getPixelsSizeC(IMAGEID).getValue().floatValue())
 
     # initialize arrays for excitation and emission wavelength
     wl_excitation = np.zeros(SizeC)
     wl_emission = np.zeros(SizeC)
+    dyes = []
 
     for i in range(0, SizeC):
 
         try:
             # new from bioformats_package.jar >= 5.1.1
-            wl_excitation[i] = jmd.getChannelExcitationWavelength(0, i).value().floatValue()
-            wl_emission[i] = jmd.getChannelEmissionWavelength(0, i).value().floatValue()
+            wl_excitation[i] = np.round(jmd.getChannelExcitationWavelength(IMAGEID, i).value().floatValue(),0)
+            wl_emission[i] = np.round(jmd.getChannelEmissionWavelength(IMAGEID, i).value().floatValue(),0)
+            dyes.append(str(jmd.getChannelFluor(IMAGEID, i)))
         except:
             wl_excitation[i] = 0
             wl_emission[i] = 0
+            dyes.append('n.a')
 
-    return wl_excitation, wl_emission
-
-
-def get_objective_model(jmd):
-
-    # try to get the objective model
-    try:
-        objmodel = jmd.getObjectiveModel(0, 0).getValue()
-    except:
-        objmodel = 'n.a.'
-
-    return objmodel
-
+    return wl_excitation, wl_emission, dyes
 
 def get_dimension_only(imagefile):
 
@@ -258,7 +256,7 @@ def get_dimension_only(imagefile):
 
     # get dimensions for CTZXY
     md = bioformats.OMEXML(new_omexml)
-    pixels = md.image(0).Pixels
+    pixels = md.image(IMAGEID).Pixels
     SizeC = pixels.SizeC
     SizeT = pixels.SizeT
     SizeZ = pixels.SizeZ
@@ -436,7 +434,6 @@ def get_relevant_metainfo_wrapper(filename):
                 'Immersion': 'n.a.',
                 'NA': 0,
                 'ObjMag': 0,
-                'TotalMag': 0,
                 'ObjModel': 'n.a.',
                 'ShapeCZI': 0,
                 'OrderCZI': 0,
@@ -446,11 +443,12 @@ def get_relevant_metainfo_wrapper(filename):
                 'ZScale': 0,
                 'WLEx': 0,
                 'WLEm': 0,
+                'Dyes': [],
                 'ChDesc': 'n.a.',
                 'Sizes': 0}
 
     # get JavaMetaDataStore and SeriesCount
-    jmd, MetaInfo['TotalSeries'] = get_java_metadata_store(filename)
+    jmd, MetaInfo['TotalSeries'], IMAGEID = get_java_metadata_store(filename)
 
     # get dimension information and MetaInfo
     MetaInfo = get_metainfo_dimension(jmd, MetaInfo)
@@ -471,8 +469,8 @@ def get_relevant_metainfo_wrapper(filename):
     # get scaling information
     MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale'] = get_metainfo_scaling(jmd)
 
-    # get wavelengths information
-    MetaInfo['WLEx'], MetaInfo['WLEm'] = get_metainfo_wavelengths(jmd)
+    # get wavelengths and dyes information
+    MetaInfo['WLEx'], MetaInfo['WLEm'], MetaInfo['Dyes'] = get_metainfo_wavelengths(jmd)
 
     # get channel description
     MetaInfo['ChDesc'] = czt.get_metainfo_channel_description(filename)
