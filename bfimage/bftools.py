@@ -473,8 +473,6 @@ def get_relevant_metainfo_wrapper(filename):
         #MetaInfo['NA'], MetaInfo['ObjMag'], MetaInfo['ObjModel'],MetaInfo['Immersion'],\
         #    MetaInfo['DetName'], MetaInfo['TotalMag'] = czt.get_metainfo_cziread(filename)
 
-    #TODO: Put everything back in one function to make it faster?
-
     # use bioformats to get the objective informations
     print 'Using BioFormats to get MetaInfo.'
     MetaInfo['Immersion'], MetaInfo['NA'], MetaInfo['ObjMag'], MetaInfo['ObjModel'] = get_metainfo_objective(jmd, filename)

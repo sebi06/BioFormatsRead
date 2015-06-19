@@ -51,20 +51,6 @@ def writexml_czi(filename):
 
 def get_objective_name_cziread(filename):
 
-    # objname = 'n.a.'
-    # czi = CziFile(filename)
-    # # get root tree of CZI metadata (uses ElementTree)
-    # tree = czi.metadata.getroottree()
-    # # Iterate over the metadata
-    # for elem in czi.metadata.getiterator():
-    #
-    #     if elem.tag == 'ObjectiveName':
-    #         objname = elem.text
-    #
-    # czi.close()
-    #
-    # return objname
-
     czi = CziFile(filename)
     namelst = []
     valuelst = []

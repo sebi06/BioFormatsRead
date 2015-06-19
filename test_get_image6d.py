@@ -32,5 +32,6 @@ print 'Detector Name        : ', MetaInfo['DetName']
 print 'Ex. Wavelengths [nm] : ', MetaInfo['WLEx']
 print 'Em. Wavelengths [nm] : ', MetaInfo['WLEm']
 print 'Dyes                 : ', MetaInfo['Dyes']
+print 'Channels             : ', MetaInfo['Channels']
 print 'Channel Description  : ', MetaInfo['ChDesc']
 print 'Array Shape 6D       : ', np.shape(img6d)
