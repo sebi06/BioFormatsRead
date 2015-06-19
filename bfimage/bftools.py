@@ -233,20 +233,23 @@ def get_metainfo_wavelengths(jmd):
     wl_excitation = np.zeros(SizeC)
     wl_emission = np.zeros(SizeC)
     dyes = []
+    channels = []
 
     for i in range(0, SizeC):
 
         try:
             # new from bioformats_package.jar >= 5.1.1
-            wl_excitation[i] = np.round(jmd.getChannelExcitationWavelength(IMAGEID, i).value().floatValue(),0)
-            wl_emission[i] = np.round(jmd.getChannelEmissionWavelength(IMAGEID, i).value().floatValue(),0)
+            wl_excitation[i] = np.round(jmd.getChannelExcitationWavelength(IMAGEID, i).value().floatValue(), 0)
+            wl_emission[i] = np.round(jmd.getChannelEmissionWavelength(IMAGEID, i).value().floatValue() ,0)
             dyes.append(str(jmd.getChannelFluor(IMAGEID, i)))
+            channels.append(str(jmd.getChannelName(IMAGEID, i)))
         except:
             wl_excitation[i] = 0
             wl_emission[i] = 0
             dyes.append('n.a')
+            channels.append('n.a.')
 
-    return wl_excitation, wl_emission, dyes
+    return wl_excitation, wl_emission, dyes, channels
 
 def get_dimension_only(imagefile):
 
@@ -442,6 +445,7 @@ def create_metainfo_dict():
                 'WLEx': 0,
                 'WLEm': 0,
                 'Dyes': [],
+                'Channels': [],
                 'ChDesc': 'n.a.',
                 'Sizes': 0}
 
@@ -479,7 +483,7 @@ def get_relevant_metainfo_wrapper(filename):
     MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale'] = get_metainfo_scaling(jmd)
 
     # get wavelengths and dyes information
-    MetaInfo['WLEx'], MetaInfo['WLEm'], MetaInfo['Dyes'] = get_metainfo_wavelengths(jmd)
+    MetaInfo['WLEx'], MetaInfo['WLEm'], MetaInfo['Dyes'], MetaInfo['Channels'] = get_metainfo_wavelengths(jmd)
 
     # get channel description
     MetaInfo['ChDesc'] = czt.get_metainfo_channel_description(filename)
