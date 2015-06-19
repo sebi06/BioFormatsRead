@@ -9,7 +9,7 @@ imgbase = os.path.basename(filename)
 imgdir = os.path.dirname(filename)
 
 # specify bioformats_package.jar to use if required
-#bf.set_bfpath(insert path to bioformats_packe.jar here)
+#bf.set_bfpath(insert path to bioformats_package.jar here)
 
 # get image meta-information
 MetaInfo = bf.bftools.get_relevant_metainfo_wrapper(filename)
