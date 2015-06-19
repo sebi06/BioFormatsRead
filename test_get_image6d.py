@@ -13,7 +13,7 @@ imgdir = os.path.dirname(filename)
 
 # get image meta-information
 MetaInfo = bf.bftools.get_relevant_metainfo_wrapper(filename)
-#img6d = bf.bftools.get_image6d(filename, MetaInfo['Sizes'])
+img6d = bf.bftools.get_image6d(filename, MetaInfo['Sizes'])
 
 ## show relevant image Meta-Information
 print '\n'
@@ -33,4 +33,4 @@ print 'Ex. Wavelengths [nm] : ', MetaInfo['WLEx']
 print 'Em. Wavelengths [nm] : ', MetaInfo['WLEm']
 print 'Dyes                 : ', MetaInfo['Dyes']
 print 'Channel Description  : ', MetaInfo['ChDesc']
-#print 'Array Shape 6D       : ', np.shape(img6d)
+print 'Array Shape 6D       : ', np.shape(img6d)
