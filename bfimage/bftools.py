@@ -195,9 +195,12 @@ def get_metainfo_objective(jmd, filename):
             objmodel = 'n.a'
             print 'No objective model name found in metadata.'
     except:
+        print 'Try to read objective name via czifile.py'
         # this is a fallback option --> use cziread.py to get the information
         if filename[-4:] == '.czi':
             objmodel = czt.get_objective_name_cziread(filename)
+            if objmodel == None:
+                objmodel = 'n.a.'
         else:
             objmodel = 'n.a.'
 
