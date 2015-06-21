@@ -15,7 +15,7 @@ Requirements
 * `CPython 2.7 <http://www.python.org>`_
 * `Numpy 1.8.2 <http://www.numpy.org>`_
 * `python-bioformats <https://github.com/CellProfiler/python-bioformats>`_
-* `BioFormats package <https://http://downloads.openmicroscopy.org/bio-formats/>`_
+* `BioFormats package <http://downloads.openmicroscopy.org/bio-formats/>`_
 * `javabridge <https://pypi.python.org/pypi/javabridge>`_
 * `czifile <http://www.lfd.uci.edu/~gohlke/code/czifile.py.html>`_
 
