@@ -285,7 +285,7 @@ def get_dimension_only(imagefile):
 def get_image6d(imagefile, sizes):
     """
     This function will read the image data and store them into a 6D numpy array.
-    The 6D array has the following dimension order: [Series, T, Z, C, X, X].
+    The 6D array has the following dimension order: [Series, T, Z, C, X, Y].
     """
     if not VM_STARTED:
         start_jvm()
