@@ -45,6 +45,8 @@ def start_jvm(max_heap_size='4G'):
 
     """
     Start the Java Virtual Machine, enabling BioFormats IO.
+    Optional: Specify the path to the bioformats_package.jar to your needs by calling.
+    set_bfpath before staring to read the image data
 
     Parameters
     ----------
