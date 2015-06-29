@@ -3,7 +3,7 @@ bfimage
 ===============================
 
 This package can be used to read image data using BioFormats into numpy arrays.
-It was initially created to read CZI image files, but should work with many more
+It was initially created to simplify reading CZI image files, but should work with many more
 image data files thanks to BioFormats.
 
 :Author: Sebastian Rhode
