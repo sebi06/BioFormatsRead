@@ -11,3 +11,4 @@ __author__ = 'M1SRH'
 from czitools import *
 from bftools import *
 from misctools import *
+from dispvalues import *

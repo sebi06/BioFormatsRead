@@ -52,6 +52,7 @@ ax1.set_title('T=' + str(timepoint+1) + ' Z=' + str(zplane+1) + ' CH=' + str(cha
 ax1.set_xlabel('X-dimension [pixel]', fontsize=10)
 ax1.set_ylabel('Y-dimension [pixel]', fontsize=10)
 cbar = fig1.colorbar(cax)
+ax1.format_coord = bf.Formatter(cax)
 # show plots
 plt.show()
 
