@@ -3,7 +3,7 @@ bfimage
 ===============================
 
 This package can be used to read image data using BioFormats into numpy arrays.
-It was initially created to read CZI image files, but should work with many more
+It was initially created to simplify reading CZI image files, but should work with many more
 image data files thanks to BioFormats.
 
 :Author: Sebastian Rhode
@@ -15,7 +15,7 @@ Requirements
 * `CPython 2.7 <http://www.python.org>`_
 * `Numpy 1.8.2 <http://www.numpy.org>`_
 * `python-bioformats <https://github.com/CellProfiler/python-bioformats>`_
-* `BioFormats package <https://http://downloads.openmicroscopy.org/bio-formats/>`_
+* `BioFormats package <http://downloads.openmicroscopy.org/bio-formats/>`_
 * `javabridge <https://pypi.python.org/pypi/javabridge>`_
 * `czifile <http://www.lfd.uci.edu/~gohlke/code/czifile.py.html>`_
 

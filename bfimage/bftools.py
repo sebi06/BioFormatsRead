@@ -45,6 +45,8 @@ def start_jvm(max_heap_size='4G'):
 
     """
     Start the Java Virtual Machine, enabling BioFormats IO.
+    Optional: Specify the path to the bioformats_package.jar to your needs by calling.
+    set_bfpath before staring to read the image data
 
     Parameters
     ----------
@@ -283,7 +285,7 @@ def get_dimension_only(imagefile):
 def get_image6d(imagefile, sizes):
     """
     This function will read the image data and store them into a 6D numpy array.
-    The 6D array has the following dimension order: [Series, T, Z, C, X, X].
+    The 6D array has the following dimension order: [Series, T, Z, C, X, Y].
     """
     if not VM_STARTED:
         start_jvm()
