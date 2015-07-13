@@ -114,7 +114,11 @@ except ImportError:
 import numpy
 from scipy.ndimage.interpolation import zoom
 
-from tifffile import FileHandle, decodelzw, lazyattr, stripnull
+
+try:
+    from tifffile import FileHandle, decodelzw, lazyattr, stripnull
+except:
+    from tifffile.tifffile import FileHandle, decodelzw, lazyattr, stripnull
 
 try:
     import _czifile
