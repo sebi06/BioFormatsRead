@@ -1,4 +1,15 @@
-__author__ = 'M1SRH'
+# -*- coding: utf-8 -*-
+"""
+@author: Sebi
+
+File: dispvalues.py
+Date: 13.07.2015
+Version. 0.1
+
+This file just holds a class used to display the pixel values under the cursor.
+I found this somewhere on the internet.
+"""
+
 
 class Formatter(object):
 

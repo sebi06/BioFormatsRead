@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: bftools.py
-Date: 18.06.2015
-Version. 1.6
+Date: 13.07.2015
+Version. 1.7
 """
 
 
@@ -253,6 +253,7 @@ def get_metainfo_wavelengths(jmd):
 
     return wl_excitation, wl_emission, dyes, channels
 
+
 def get_dimension_only(imagefile):
 
     # get OME-XML and change the encoding to UTF-8
@@ -282,6 +283,7 @@ def get_dimension_only(imagefile):
 
     return sizes
 
+
 def get_image6d(imagefile, sizes):
     """
     This function will read the image data and store them into a 6D numpy array.
@@ -309,6 +311,7 @@ def get_image6d(imagefile, sizes):
 
     return img6d
 
+
 def get_image2d(imagefile, sizes, seriesindex, channel, zplane, timepoint):
     """
     This will just read a single plane from an image data set.
@@ -324,6 +327,7 @@ def get_image2d(imagefile, sizes, seriesindex, channel, zplane, timepoint):
     rdr.close()
 
     return img2d
+
 
 def get_zstack(imagefile, sizes, seriesID, timepoint):
     """
@@ -348,6 +352,7 @@ def get_zstack(imagefile, sizes, seriesID, timepoint):
 
     return imgZStack
 
+
 def get_timeseries(imagefile, sizes, seriesID, zplane):
     """
     This will read a single Time Lapse from an image data set.
@@ -371,6 +376,7 @@ def get_timeseries(imagefile, sizes, seriesID, zplane):
 
     return imgTimeSeries
 
+
 def get_imageseries(imagefile, sizes, seriesID=0):
 
     if not VM_STARTED:
@@ -392,6 +398,7 @@ def get_imageseries(imagefile, sizes, seriesID=0):
     rdr.close()
 
     return imgseries
+
 
 def get_series_from_well(imagefile, sizes, seriesseq):
     """
@@ -418,6 +425,7 @@ def get_series_from_well(imagefile, sizes, seriesseq):
     rdr.close()
 
     return img6dwell
+
 
 def create_metainfo_dict():
 
@@ -452,6 +460,7 @@ def create_metainfo_dict():
                 'Sizes': 0}
 
     return MetaInfo
+
 
 def get_relevant_metainfo_wrapper(filename):
 
@@ -494,12 +503,14 @@ def get_relevant_metainfo_wrapper(filename):
 
     return MetaInfo
 
+
 def calc_series_range(total_series, scenes, sceneID):
 
     sps = total_series / scenes  # series_per_scence = sps
     series_seq = range(sceneID * sps - sps, sps * sceneID)
 
     return series_seq
+
 
 def calc_series_range_well(wellnumber, imgperwell):
     """

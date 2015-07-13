@@ -2,8 +2,8 @@
 @author: Sebastian Rhode
 
 File: __init__.py
-Version: 0.1
-Date: 18.05.2015
+Version: 0.2
+Date: 13.07.2015
 """
 
 __author__ = 'M1SRH'

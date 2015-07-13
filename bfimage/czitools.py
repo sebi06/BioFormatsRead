@@ -36,6 +36,7 @@ def get_metainfo_channel_description(filename):
 
     return chdescript
 
+
 def writexml_czi(filename):
 
     # write xml file to disk
@@ -48,6 +49,7 @@ def writexml_czi(filename):
     print 'XML metadata : ', xmlfile
 
     czi.close()
+
 
 def get_objective_name_cziread(filename):
 
@@ -70,6 +72,7 @@ def get_objective_name_cziread(filename):
 
     czi.close()
 
+
 def read_dimensions_czi(filename):
 
     # Read the dimensions of the image stack and their order
@@ -79,6 +82,7 @@ def read_dimensions_czi(filename):
     czi.close()
 
     return czishape, cziorder
+
 
 def get_shapeinfo_cziread(filename):
     # get CZI shape and dimension order using czifile.py
@@ -97,6 +101,7 @@ def get_shapeinfo_cziread(filename):
         cziorder = 'unknown'
 
     return czishape, cziorder
+
 
 def get_metainfo_cziread(filename):
 
@@ -144,6 +149,7 @@ def get_metainfo_cziread(filename):
 
     return objNA, objMag, objName, objImm, CamName, totalMag
 
+
 def get_metainfo_cziread_camera(filename):
 
     czi = CziFile(filename)
@@ -157,6 +163,7 @@ def get_metainfo_cziread_camera(filename):
     czi.close()
 
     return CamName
+
 
 def convert_dimension_string(cziorder):
     """
