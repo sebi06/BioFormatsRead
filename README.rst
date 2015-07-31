@@ -40,3 +40,10 @@ References
      http://www.openmicroscopy.org/site/support/file-formats/ome-tiff
 (3)  Read microscopy images to numpy array with python-bioformats.
      http://ilovesymposia.com/2014/08/10/read-microscopy-images-to-numpy-arrays-with-python-bioformats/
+
+Screenshots
+-----------
+
+.. figure:: images/BFRead_Test.png
+   :align: center
+   :alt:
