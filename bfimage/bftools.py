@@ -173,8 +173,8 @@ def get_metainfo_objective(jmd, filename):
 
     # try to get immersion type -  # get the first objective record in the first Instrument record
     try:
-        #objimm = jmd.getObjectiveImmersion(instrumentID, objID).getValue()
-        objimm = jmd.getObjectiveImmersion(instrumentID, objID)
+        objimm = jmd.getObjectiveImmersion(instrumentID, objID).getValue()
+        #objimm = jmd.getObjectiveImmersion(instrumentID, objID)
     except:
         objimm = 'n.a'
 
