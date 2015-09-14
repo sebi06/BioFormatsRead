@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # czifile.py
 
-# Copyright (c) 2013-2014, Christoph Gohlke
-# Copyright (c) 2013-2014, The Regents of the University of California
+# Copyright (c) 2013-2015, Christoph Gohlke
+# Copyright (c) 2013-2015, The Regents of the University of California
 # Produced at the Laboratory for Fluorescence Dynamics.
 # All rights reserved.
 #
@@ -42,19 +42,21 @@ microscopy experiments.
 :Organization:
   Laboratory for Fluorescence Dynamics, University of California, Irvine
 
-:Version: 2014.10.10
+:Version: 2015.08.17
 
 Requirements
 ------------
 * `CPython 2.7 or 3.4 <http://www.python.org>`_
 * `Numpy 1.8.2 <http://www.numpy.org>`_
-* `Scipy 0.14 <http://www.scipy.org>`_
-* `Tifffile.py 2014.10.10 <http://www.lfd.uci.edu/~gohlke/>`_
-* `Czifle.pyx 2013.12.04  <http://www.lfd.uci.edu/~gohlke/>`_
+* `Scipy 0.16 <http://www.scipy.org>`_
+* `Tifffile.py 2015.08.17 <http://www.lfd.uci.edu/~gohlke/>`_
+* `Czifle.pyx 2015.08.17  <http://www.lfd.uci.edu/~gohlke/>`_
   (for decoding JpegXrFile and JpgFile images)
 
 Revisions
 ---------
+2015.08.17
+    Require tifffile 2015.08.17.
 2014.10.10
     Read data into a memory mapped array (optional).
 2013.12.04
@@ -114,23 +116,22 @@ except ImportError:
 import numpy
 from scipy.ndimage.interpolation import zoom
 
+from tifffile import FileHandle, decode_lzw, lazyattr, stripnull
 
 try:
-    from tifffile import FileHandle, decodelzw, lazyattr, stripnull
-except:
-    from tifffile.tifffile import FileHandle, decodelzw, lazyattr, stripnull
-
-try:
-    import _czifile
+    if __package__:
+        from . import _czifile
+    else:
+        import _czifile
     _have_czifile = True
 except ImportError:
     _have_czifile = False
     warnings.warn(
         "failed to import the optional _czifile C extension module.\n"
-        "Decoding of JXR and JPG encoded images will not be available.\n"
+        "Decoding of JXR and JPEG encoded images will not be available.\n"
         "Czifile.pyx can be obtained at http://www.lfd.uci.edu/~gohlke/")
 
-__version__ = '2014.08.10'
+__version__ = '2015.08.17'
 __docformat__ = 'restructuredtext en'
 __all__ = 'imread', 'CziFile'
 
@@ -1084,7 +1085,7 @@ def match_filename(filename):
     return name, part
 
 
-def decodejxr(data):
+def decode_jxr(data):
     """Decode JXR data stream into ndarray via temporary file."""
     fd, filename = tempfile.mkstemp(suffix='.jxr')
     with os.fdopen(fd, 'wb') as fh:
@@ -1092,15 +1093,15 @@ def decodejxr(data):
     if isinstance(filename, unicode):
         filename = filename.encode('ascii')
     try:
-        out = _czifile.decodejxr(filename)
+        out = _czifile.decode_jxr(filename)
     finally:
         os.remove(filename)
     return out
 
 
-def decodejpg(data):
-    """Decode JPG data stream into ndarray."""
-    return _czifile.decodejpg(data)
+def decode_jpeg(data):
+    """Decode JPEG data stream into ndarray."""
+    return _czifile.decode_jpeg(data)
 
 
 # map Segment.sid to data reader
@@ -1175,12 +1176,12 @@ COMPRESSION = {
 # map DirectoryEntryDV.compression to decompression function
 DECOMPRESS = {
     0: lambda x: x,  # uncompressed
-    2: decodelzw,  # LZW
+    2: decode_lzw,  # LZW
 }
 
 if _have_czifile:
-    DECOMPRESS[1] = decodejpg
-    DECOMPRESS[4] = decodejxr
+    DECOMPRESS[1] = decode_jpeg
+    DECOMPRESS[4] = decode_jxr
 
 if sys.version_info[0] > 2:
     unicode = str
