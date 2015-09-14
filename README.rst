@@ -18,6 +18,7 @@ Requirements
 * `BioFormats package <http://downloads.openmicroscopy.org/bio-formats/>`_
 * `javabridge <https://pypi.python.org/pypi/javabridge>`_
 * `czifile <http://www.lfd.uci.edu/~gohlke/code/czifile.py.html>`_
+* `tifffile <http://www.lfd.uci.edu/~gohlke/code/tifffile.py.html>`_
 
 Notes
 -----

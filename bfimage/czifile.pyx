@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # czifile.pyx
 
-# Copyright (c) 2013-2014, Christoph Gohlke
-# Copyright (c) 2013-2014, The Regents of the University of California
+# Copyright (c) 2013-2015, Christoph Gohlke
+# Copyright (c) 2013-2015, The Regents of the University of California
 # Produced at the Laboratory for Fluorescence Dynamics.
 # All rights reserved.
 #
@@ -38,13 +38,13 @@
 :Organization:
   Laboratory for Fluorescence Dynamics, University of California, Irvine
 
-:Version: 2014.10.10
+:Version: 2015.08.17
 
 Requirements
 ------------
 * `CPython 2.7 or 3.4 <http://www.python.org>`_
-* `Numpy 1.8 <http://www.numpy.org>`_
-* `Cython 0.21 <http://cython.org/>`_  (build)
+* `Numpy 1.9.2 <http://www.numpy.org>`_
+* `Cython 0.23 <http://cython.org/>`_  (build)
 * `jpeglib v9 <http://www.ijg.org/>`_  (build)
 * `jxrlib 1.1 <https://jxrlib.codeplex.com/>`_  (build)
 * A Python distutils compatible C compiler  (build)
@@ -75,7 +75,7 @@ Use this Cython distutils setup script to build the extension module::
 
 """
 
-__version__ = "2014.10.10"
+__version__ = "2015.08.17"
 
 cimport cython
 from cython.operator cimport dereference as deref
@@ -192,7 +192,7 @@ class WmpError(Exception):
         Exception.__init__(self, msg)
 
 
-def decodejxr(char* filename):
+def decode_jxr(char* filename):
     """Return image data from JXR file as numpy array."""
     # TODO: create decoder from in memory byte stream
     cdef numpy.ndarray out
@@ -387,7 +387,7 @@ class JpgError(Exception):
     pass
 
 
-def decodejpg(data, tables=b''):
+def decode_jpeg(data, tables=b''):
     """Return image data from in memory JPG file as numpy array."""
     cdef numpy.ndarray out
     cdef int width
