@@ -1,3 +1,5 @@
+
+
 # -*- coding: utf-8 -*-
 # czifile.pyx
 
@@ -432,3 +434,4 @@ def decode_jpeg(data, tables=b''):
     jpeg_destroy_decompress(&cinfo)
 
     return out
+
