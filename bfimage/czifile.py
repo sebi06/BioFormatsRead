@@ -118,10 +118,7 @@ except ImportError:
 import numpy
 from scipy.ndimage.interpolation import zoom
 
-try:
-    from tifffile import FileHandle, decode_lzw, lazyattr, stripnull
-except:
-    from tifffile.tifffile import FileHandle, decode_lzw, lazyattr, stripnull
+from tifffile import FileHandle, decode_lzw, lazyattr, stripnull
 
 try:
     if __package__:
@@ -797,4 +794,403 @@ class AttachmentSegment(object):
 
         """
         self._fh.seek(self.data_offset)
-        cotype
+        cotype = self.attachment_entry.content_file_type
+        if not raw and cotype in CONTENT_FILE_TYPE:
+            return CONTENT_FILE_TYPE[cotype](self._fh, filesize=self.data_size)
+        else:
+            return self._fh.read(self.data_size)
+
+    def __str__(self):
+        return "AttachmentSegment\n %s" % self.attachment_entry
+
+
+class AttachmentEntryA1(object):
+    """AttachmentEntry - Schema A1."""
+
+    __slots__ = ('content_guid', 'content_file_type', 'name',
+                 'file_position', '_fh')
+
+    @staticmethod
+    def read_file_position(fh):
+        """Return file position of associated Attachment segment."""
+        schema_type, file_position = struct.unpack('<2s10xq', fh.read(20))
+        fh.seek(108, 1)
+        assert(schema_type == b'A1')
+        return file_position
+
+    def __init__(self, fh):
+        (shema_type,
+         reserved,
+         self.file_position,
+         file_part,  # reserved
+         content_guid,
+         content_file_type,
+         name
+         ) = struct.unpack('<2s10sqi16s8s80s', fh.read(128))
+
+        if shema_type != b'A1':
+            raise ValueError("not a AttachmentEntryA1")
+        self.content_guid = uuid.UUID(bytes=content_guid)
+        self.content_file_type = stripnull(content_file_type)
+        self.name = unicode(stripnull(name), 'utf-8')
+        self._fh = fh
+
+    @property
+    def filename(self):
+        """Return unique file name for attachment."""
+        return "%s@%i.%s" % (self.name, self.file_position,
+                             unicode(self.content_file_type, 'utf-8').lower())
+
+    def data_segment(self):
+        """Read and return AttachmentSegment at file_position."""
+        return Segment(self._fh, self.file_position).data()
+
+    def __str__(self):
+        return " ".join(str(i) for i in (
+            "AttachmentEntryA1", self.name, self.content_file_type,
+            self.content_guid))
+
+
+class AttachmentDirectorySegment(object):
+    """ZISRAWATTDIR segment data. Sequence of AttachmentEntryA1."""
+
+    __slots__ = 'entries',
+
+    SID = b'ZISRAWATTDIR'
+
+    @staticmethod
+    def file_positions(fh):
+        """Return list of file positions of associated Attachment segments."""
+        entry_count = struct.unpack('<i', fh.read(4))[0]
+        fh.seek(252, 1)
+        return tuple(AttachmentEntryA1.read_file_position(fh)
+                     for _ in range(entry_count))
+
+    def __init__(self, fh):
+        entry_count = struct.unpack('<i', fh.read(4))[0]
+        fh.seek(252, 1)
+        self.entries = tuple(AttachmentEntryA1(fh) for _ in range(entry_count))
+
+    def __len__(self):
+        return len(self.entries)
+
+    def __getitem__(self, key):
+        return self.entries[key]
+
+    def __iter__(self):
+        return iter(self.entries)
+
+    def __str__(self):
+        return "AttachmentDirectorySegment\n %s" % (
+            "\n ".join(str(i) for i in self.entries))
+
+
+class DeletedSegment(object):
+    """DELETED segment data. Ignore."""
+
+    __slots__ = ()
+
+    SID = b'DELETED'
+
+    def __init__(self, fh):
+        pass
+
+    def __str__(self):
+        return "DeletedSegment"
+
+
+class UnknownSegment(object):
+    """Unknown segment data. Ignore."""
+
+    __slots__ = ()
+
+    def __init__(self, fh):
+        pass
+
+    def __str__(self):
+        return "UnknownSegment"
+
+
+class TimeStamps(object):
+    """CZTIMS TimeStamps content schema.
+
+    Contains sequence of floting point numbers, i.e. seconds relative
+    to start time of acquisition.
+
+    """
+    __slots__ = 'time_stamps',
+
+    def __init__(self, fh, filesize=None):
+        size, number = struct.unpack('<ii', fh.read(8))
+        self.time_stamps = struct.unpack('<%id' % number, fh.read(8 * number))
+
+    def __len__(self):
+        return len(self.time_stamps)
+
+    def __getitem__(self, key):
+        return self.time_stamps[key]
+
+    def __iter__(self):
+        return iter(self.time_stamps)
+
+    def __str__(self):
+        return str(self.time_stamps)
+
+
+class FocusPositions(object):
+    """CZFOC FocusPositions content schema.
+
+    Contains sequence of floting point numbers, i.e. micrometers relative
+    to Z start position of acquisition.
+
+    """
+    __slots__ = 'positions',
+
+    def __init__(self, fh, filesize=None):
+        size, number = struct.unpack('<ii', fh.read(8))
+        self.positions = struct.unpack('<%id' % number, fh.read(8 * number))
+
+    def __len__(self):
+        return len(self.positions)
+
+    def __getitem__(self, key):
+        return self.positions[key]
+
+    def __iter__(self):
+        return iter(self.positions)
+
+    def __str__(self):
+        return str(self.positions)
+
+
+class EventList(object):
+    """CZEVL EventList content schema. Sequence of EventListEntry."""
+
+    __slots__ = 'events',
+
+    def __init__(self, fh, filesize=None):
+        size, number = struct.unpack('<ii', fh.read(8))
+        self.events = [EventListEntry(fh) for _ in range(number)]
+
+    def __len__(self):
+        return len(self.events)
+
+    def __getitem__(self, key):
+        return self.events[key]
+
+    def __iter__(self):
+        return iter(self.events)
+
+    def __str__(self):
+        return "\n ".join(str(event) for event in self.events)
+
+
+class EventListEntry(object):
+    """EventListEntry content schema."""
+
+    __slots__ = 'time', 'event_type', 'description'
+
+    EV_TYPE = {0: 'MARKER', 1: 'TIME_CHANGE', 2: 'BLEACH_START',
+               3: 'BLEACH_STOP', 4: 'TRIGGER'}
+
+    def __init__(self, fh):
+        (size,
+         self.time,
+         self.event_type,
+         description_size,
+         ) = struct.unpack('<idii', fh.read(20))
+        description = stripnull(fh.read(description_size))
+        self.description = unicode(description, 'utf-8')
+
+    def __str__(self):
+        return "%s @ %s (%s)" % (EventListEntry.EV_TYPE[self.event_type],
+                                 self.time, self.description)
+
+
+class LookupTables(object):
+    """CZLUT LookupTables content schema. Sequence of LookupTableEntry."""
+
+    __slots__ = 'lookup_tables',
+
+    def __init__(self, fh, filesize=None):
+        size, number = struct.unpack('<ii', fh.read(8))
+        self.lookup_tables = [LookupTableEntry(fh) for _ in range(number)]
+
+    def __len__(self):
+        return len(self.lookup_tables)
+
+    def __getitem__(self, key):
+        return self.lookup_tables[key]
+
+    def __iter__(self):
+        return iter(self.lookup_tables)
+
+    def __str__(self):
+        return "LookupTables\n %s" % str(self.lookup_tables)
+
+
+class LookupTableEntry(object):
+    """LookupTableEntry content schema. Sequence of ComponentEntry."""
+
+    __slots__ = 'identifier', 'components'
+
+    def __init__(self, fh):
+        size, identifier, number = struct.unpack('<i80si', fh.read(88))
+        self.identifier = unicode(stripnull(identifier), 'utf-8')
+        self.components = [ComponentEntry(fh) for _ in range(number)]
+
+    def __len__(self):
+        return len(self.components)
+
+    def __getitem__(self, key):
+        return self.components[key]
+
+    def __iter__(self):
+        return iter(self.components)
+
+    def __str__(self):
+        return "LookupTableEntry\n %s\n %s" % (
+            self.identifier, "\n ".join(str(i) for i in self.components))
+
+
+class ComponentEntry(object):
+    """ComponentEntry content schema."""
+
+    __slots__ = 'component_type', 'intensity'
+
+    CO_TYPE = {-1: 'RGB', 1: 'RED', 2: 'GREEN', 3: 'BLUE'}
+
+    def __init__(self, fh):
+        size, self.component_type, number = struct.unpack('<iii', fh.read(12))
+        self.intensity = fh.fromfile(dtype='<i2', count=number//2)
+        if self.component_type == -1:
+            self.intensity = self.intensity.reshape(-1, 3)
+
+    def __str__(self):
+        return "ComponentEntry %s %s" % (
+            ComponentEntry.CO_TYPE[self.component_type],
+            str(self.intensity.shape))
+
+
+def xml_reader(fh, filesize):
+    """Read XML from file and return as xml.ElementTree root Element."""
+    xml = unicode(stripnull(fh.read(filesize)), 'utf-8')
+    return etree.fromstring(xml)
+
+
+def match_filename(filename):
+    """Return master file name and file part number from CZI file name."""
+    match = re.search(r'(.*?)(?:\((\d+)\))?\.czi$',
+                      filename, re.IGNORECASE).groups()
+    name = match[0] + '.czi'
+    part = int(match[1]) if len(match) > 1 else 0
+    return name, part
+
+
+def decode_jxr(data):
+    """Decode JXR data stream into ndarray via temporary file."""
+    fd, filename = tempfile.mkstemp(suffix='.jxr')
+    with os.fdopen(fd, 'wb') as fh:
+        fh.write(data)
+    if isinstance(filename, unicode):
+        filename = filename.encode('ascii')
+    try:
+        out = _czifile.decode_jxr(filename)
+    finally:
+        os.remove(filename)
+    return out
+
+
+def decode_jpeg(data):
+    """Decode JPEG data stream into ndarray."""
+    return _czifile.decode_jpeg(data)
+
+
+# map Segment.sid to data reader
+SEGMENT_ID = {
+    FileHeaderSegment.SID: FileHeaderSegment,
+    SubBlockDirectorySegment.SID: SubBlockDirectorySegment,
+    SubBlockSegment.SID: SubBlockSegment,
+    MetadataSegment.SID: MetadataSegment,
+    AttachmentSegment.SID: AttachmentSegment,
+    AttachmentDirectorySegment.SID: AttachmentDirectorySegment,
+    DeletedSegment.SID: DeletedSegment,
+}
+
+# map AttachmentEntryA1.content_file_type to attachment reader.
+CONTENT_FILE_TYPE = {
+    b'CZI': CziFile,
+    b'ZISRAW': CziFile,
+    b'CZTIMS': TimeStamps,
+    b'CZEVL': EventList,
+    b'CZLUT': LookupTables,
+    b'CZFOC': FocusPositions,
+    b'CZEXP': xml_reader,  # Experiment
+    b'CZHWS': xml_reader,  # HardwareSetting
+    b'CZMVM': xml_reader,  # MultiviewMicroscopy
+    # b'CZPML': PalMoleculeList,  # undocumented
+    # b'ZIP'
+    # b'JPG'
+}
+
+# map DirectoryEntryDV.pixeltype to numpy dtypes
+PIXEL_TYPE = {
+    0: '<u1', 'Gray8': '<u1', '<u1': 'Gray8',
+    1: '<u2', 'Gray16': '<u2', '<u2': 'Gray16',
+    2: '<f4', 'Gray32Float': '<f4', '<f4': 'Gray32Float',
+    3: '<3u1', 'Bgr24': '<3u1', '<3u1': 'Bgr24',
+    4: '<3u2', 'Bgr48': '<3u2', '<3u2': 'Bgr48',
+    8: '<3f4', 'Bgr96Float': '<3f4', '<3f4': 'Bgr96Float',
+    9: '<4u1', 'Bgra32': '<4u1', '<4u1': 'Bgra32',
+    10: '<F8', 'Gray64ComplexFloat': '<F8', '<F8': 'Gray64ComplexFloat',
+    11: '<3F8', 'Bgr192ComplexFloat': '<3F8', '<3F8': 'Bgr192ComplexFloat',
+    12: '<i4', 'Gray32': '<i4', '<i4': 'Gray32',
+    13: '<i8', 'Gray64': '<i8', '<i8': 'Gray64',
+}
+
+
+# map dimension character to description
+DIMENSIONS = {
+    b'0': 'Sample',  # e.g. RGBA
+    b'X': 'Width',
+    b'Y': 'Height',
+    b'C': 'Channel',
+    b'Z': 'Slice',  # depth
+    b'T': 'Time',
+    b'R': 'Rotation',
+    b'S': 'Scene',
+    b'I': 'Illumination',  # direction
+    b'B': 'Block',  # acquisition
+    b'M': 'Mosaic',  # tile
+    b'H': 'Phase',
+    b'V': 'View',
+}
+
+# map DirectoryEntryDV.compression to description
+COMPRESSION = {
+    0: "Uncompressed",
+    1: "JpgFile",
+    2: "LZW",
+    4: "JpegXrFile",
+    # 100 and up: camera/system specific specific RAW data
+}
+
+# map DirectoryEntryDV.compression to decompression function
+DECOMPRESS = {
+    0: lambda x: x,  # uncompressed
+    2: decode_lzw,  # LZW
+}
+
+if _have_czifile:
+    DECOMPRESS[1] = decode_jpeg
+    DECOMPRESS[4] = decode_jxr
+
+if sys.version_info[0] > 2:
+    unicode = str
+    basestring = str, bytes
+
+if __name__ == "__main__":
+    import doctest
+    numpy.set_printoptions(suppress=True, precision=5)
+    doctest.testmod()
+
