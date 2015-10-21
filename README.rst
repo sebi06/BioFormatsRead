@@ -18,6 +18,7 @@ Requirements
 * `BioFormats package <http://downloads.openmicroscopy.org/bio-formats/>`_
 * `javabridge <https://pypi.python.org/pypi/javabridge>`_
 * `czifile <http://www.lfd.uci.edu/~gohlke/code/czifile.py.html>`_
+* `tifffile <http://www.lfd.uci.edu/~gohlke/code/tifffile.py.html>`_
 
 Notes
 -----
@@ -28,9 +29,9 @@ Currently the 5.1.3 version of bioformats_package.jar is used. Update it to your
 
 Acknowledgements
 ----------------
-*   Christoph Gohlke from providing the czifily.py.
-*   The Cellprofiler team for providing python-bioformats
-*   The OME people for creating BioFormats                                                                                 
+*   Christoph Gohlke from providing the czifile.py and tifffile.py.
+*   The Cellprofiler team for providing python-bioformats.
+*   The OME people for creating BioFormats.
 
 References
 ----------
