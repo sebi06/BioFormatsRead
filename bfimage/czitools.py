@@ -46,7 +46,7 @@ def writexml_czi(filename):
     xmlfile = filename.replace('.bfimage', '_MetaData.xml')
     tree = czi.metadata.getroottree()
     tree.write(xmlfile, encoding='utf-8', method='xml')
-    print 'XML metadata : ', xmlfile
+    print 'Write special CZI XML metainformation for: ', xmlfile
 
     czi.close()
 
