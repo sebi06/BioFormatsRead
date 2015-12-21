@@ -8,7 +8,7 @@ image data files thanks to BioFormats.
 
 :Author: Sebastian Rhode
 
-:Version: 2015.06.18
+:Version: 2015.12.21
 
 Requirements
 ------------
@@ -25,7 +25,7 @@ Notes
 The package is still under development and was mainly tested with CZI files.
 
 The python-bioformats package includes loci_tool.jar but it is also possible to use the latest bioformats_package.jar.
-Currently the 5.1.3 version of bioformats_package.jar is used. Update it to your needs.
+Currently the 5.1.7 version of bioformats_package.jar is used. Update it to your needs.
 
 Acknowledgements
 ----------------
