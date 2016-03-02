@@ -53,3 +53,13 @@ Screenshots
 .. figure:: images/BFRead_Test.png
    :align: center
    :alt:
+
+.. figure:: images/OME-XML_output.png
+   :align: center
+   :alt:
+
+.. figure:: images/planeinfo_output.png
+   :align: center
+   :alt:
+
+
