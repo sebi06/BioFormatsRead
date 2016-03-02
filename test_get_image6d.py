@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+@author: Sebi
+
+File: test_get_image6d.py
+Date: 03.02.2016
+Version. 1.0
+"""
+
 import numpy as np
 import os
 import bfimage as bf

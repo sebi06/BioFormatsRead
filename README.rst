@@ -8,7 +8,7 @@ image data files thanks to BioFormats.
 
 :Author: Sebastian Rhode
 
-:Version: 2015.12.21
+:Version: 2016.03.02
 
 Requirements
 ------------
@@ -25,7 +25,7 @@ Notes
 The package is still under development and was mainly tested with CZI files.
 
 The python-bioformats package includes loci_tool.jar but it is also possible to use the latest bioformats_package.jar.
-Currently the 5.1.7 version of bioformats_package.jar is used. Update it to your needs.
+Currently the 5.1.8 version of bioformats_package.jar is used. Update it to your needs.
 
 Acknowledgements
 ----------------
@@ -41,6 +41,11 @@ References
      http://www.openmicroscopy.org/site/support/file-formats/ome-tiff
 (3)  Read microscopy images to numpy array with python-bioformats.
      http://ilovesymposia.com/2014/08/10/read-microscopy-images-to-numpy-arrays-with-python-bioformats/
+
+Additional Tools
+----------------
+*   Write OME-XML Metadata to XML file.
+*   Creat and write plane info table.
 
 Screenshots
 -----------

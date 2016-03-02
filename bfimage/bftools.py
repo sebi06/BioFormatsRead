@@ -343,7 +343,7 @@ def get_planetable(imagefile, writecsv=False, separator=','):
             # optional detailed output
             #print id[-1], plane[-1], planeIndex, theT[-1], theZ[-1], theC[-1], xpos[-1], ypos[-1], zpos[-1], dt[-1]
             # create some kind of progress bar
-            print '\b.',
+            print '.',
             sys.stdout.flush()
 
     # just print an empty line
