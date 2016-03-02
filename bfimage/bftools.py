@@ -13,6 +13,9 @@ import bioformats
 import numpy as np
 import czitools as czt
 import os
+import pandas as pd
+from lxml import etree as etl
+import sys
 
 VM_STARTED = False
 VM_KILLED = False
@@ -41,6 +44,7 @@ def set_bfpath(bfpackage_path=BFPATH):
 
     return BFPATH
 
+
 def start_jvm(max_heap_size='4G'):
 
     """
@@ -58,6 +62,7 @@ def start_jvm(max_heap_size='4G'):
     # TODO - include check for the OS, so that the file paths are always working
 
     jars = jv.JARS + [BFPATH]
+    #jars = jv.JARS
     jv.start_vm(class_path=jars, max_heap_size=max_heap_size)
     VM_STARTED = True
 
@@ -90,8 +95,22 @@ def get_metadata_store(imagefile):
     omexml = bioformats.get_omexml_metadata(imagefile)
     new_omexml = omexml.encode('utf-8')
     metadatastore = bioformats.OMEXML(new_omexml)
+    xmlout = metadatastore.to_xml()
 
-    return metadatastore
+    return metadatastore, xmlout
+
+
+def createOMEXML(imagefile):
+
+    if not VM_STARTED:
+        start_jvm()
+    if VM_KILLED:
+        jvm_error()
+
+    omexml = bioformats.get_omexml_metadata(imagefile)
+    new_omexml = omexml.encode('utf-8')
+
+    return new_omexml
 
 
 def get_java_metadata_store(imagefile):
@@ -282,6 +301,75 @@ def get_dimension_only(imagefile):
     sizes = [totalseries, SizeT, SizeZ, SizeC, SizeY, SizeX]
 
     return sizes
+
+
+def get_planetable(imagefile, writecsv=False, separator=','):
+
+    MetaInfo = create_metainfo_dict()
+
+    # get image meta-information
+    #sz = get_dimension_only(imagefile)
+
+    # get JavaMetaDataStore and SeriesCount
+    jmd, MetaInfo['TotalSeries'], IMAGEID = get_java_metadata_store(imagefile)
+
+    # get dimension information and MetaInfo
+    MetaInfo = get_metainfo_dimension(jmd, MetaInfo)
+
+    id = []
+    plane = []
+    xpos = []
+    ypos = []
+    zpos = []
+    dt = []
+    theC = []
+    theZ = []
+    theT = []
+
+    print 'Start reading the plane data ',
+
+    for imageIndex in range(0, IMAGEID):
+        for planeIndex in range(0, MetaInfo['SizeZ'] * MetaInfo['SizeC'] * MetaInfo['SizeT']):
+
+            id.append(imageIndex)
+            plane.append(planeIndex)
+            theC.append(jmd.getPlaneTheC(imageIndex, planeIndex).getValue().intValue())
+            theZ.append(jmd.getPlaneTheZ(imageIndex, planeIndex).getValue().intValue())
+            theT.append(jmd.getPlaneTheT(imageIndex, planeIndex).getValue().intValue())
+            xpos.append(jmd.getPlanePositionX(imageIndex, planeIndex).value().doubleValue())
+            ypos.append(jmd.getPlanePositionY(imageIndex, planeIndex).value().doubleValue())
+            zpos.append(jmd.getPlanePositionZ(imageIndex, planeIndex).value().doubleValue())
+            dt.append(jmd.getPlaneDeltaT(imageIndex, planeIndex).value().doubleValue())
+            # optional detailed output
+            #print id[-1], plane[-1], planeIndex, theT[-1], theZ[-1], theC[-1], xpos[-1], ypos[-1], zpos[-1], dt[-1]
+            # create some kind of progress bar
+            print '\b.',
+            sys.stdout.flush()
+
+    # just print an empty line
+    print 'Done.\n'
+
+    # round the data
+    xpos = np.round(xpos, 1)
+    ypos = np.round(ypos, 1)
+    zpos = np.round(xpos, 1)
+    dt = np.round(dt, 3)
+    # normalize plane timings to 0 for the 1st acquired plane
+    dt = dt - dt.min()
+
+    # create Pandas dataframe to hold the plane data
+    df = pd.DataFrame([np.asarray(id), np.asarray(plane), np.asarray(theT), np.asarray(theZ), np.asarray(theC), xpos, ypos, zpos, dt])
+    df = df.transpose()
+    # give the columns the correct names
+    df.columns = ['IMAGEID', 'Plane', 'TheC', 'TheZ', 'TheC', 'XPos', 'YPos', 'ZPos', 'DeltaT']
+
+    if writecsv:
+        csvfile = imagefile[:-4] + '.csv'
+        # use tab as separator and do not write the index to the CSV data table
+        df.to_csv(csvfile, sep=separator, index=False)
+        print 'Writing CSV file: ', csvfile
+
+    return df
 
 
 def get_image6d(imagefile, sizes):
@@ -521,3 +609,55 @@ def calc_series_range_well(wellnumber, imgperwell):
     seriesseq = range(wellnumber * imgperwell,  wellnumber * imgperwell + imgperwell, 1)
 
     return seriesseq
+
+
+def create_omexml(testdata, method=1, writeczi_metadata=True):
+
+    # creates readable xml files from image data files. Default method should be = 1.
+    if method == 1:
+        # method 1
+        for i in range(0, len(testdata)):
+
+            # Change File name and write XML file to same folder
+            xmlfile1 = testdata[i] + '_MetaData1.xml'
+
+            try:
+                # get the actual OME-XML
+                omexml = createOMEXML(testdata[i])
+                # create root and tree from XML string and write "pretty" to disk
+                root = etl.fromstring(omexml)
+                tree = etl.ElementTree(root)
+                tree.write(xmlfile1, pretty_print=True, encoding='utf-8', method='xml')
+                print 'Created OME-XML file for testdata: ', testdata[i]
+            except:
+                print 'Creating OME-XML failed for testdata: ', testdata[i]
+
+    if method == 2:
+
+        # method 2
+        for i in range(0, len(testdata)):
+
+            # Change File name and write XML file to same folder
+            xmlfile2 = testdata[i] + '_MetaData2.xml'
+
+            try:
+                # get the actual OME-XML
+                md, omexml = get_metadata_store(testdata[i])
+                # create root and tree from XML string and write "pretty" to disk
+                root = etl.fromstring(omexml)
+                tree = etl.ElementTree(root)
+                tree.write(xmlfile2, pretty_print=True, encoding='utf-8', method='xml')
+                print 'Created OME-XML file for testdata: ', testdata[i]
+            except:
+                print 'Creating OME-XML failed for testdata: ', testdata[i]
+
+    if writeczi_metadata:
+
+        # this writes the special CZI xml metadata to disk, when a CZI file was found.
+        for i in range(0, len(testdata)):
+
+            if testdata[i][-4:] == '.czi':
+                try:
+                    czt.writexml_czi(testdata[i])
+                except:
+                    print 'Could not write special CZI metadata for: ', testdata[i]
