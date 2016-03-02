@@ -44,8 +44,10 @@ References
 
 Additional Tools
 ----------------
+*   Read image series, z-stacks, time series or single planes.
+*   Retrieve all important meta-information.
 *   Write OME-XML Metadata to XML file.
-*   Creat and write plane info table.
+*   Create and write plane info table.
 
 Screenshots
 -----------
