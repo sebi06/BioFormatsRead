@@ -13,9 +13,12 @@ import bfimage as bf
 filename = r'testdata/2x2_SNAP_CH=2_Z=5_T=2.czi'
 
 # create plane info and write into dataframe
-df = bf.get_planetable(filename, writecsv=True, separator=',')
+df = bf.get_planetable(filename, writecsv=True, separator='\t')
 
 # show the dataframe
-print df
+print df[:10]
+
+# show z-surface from wellplate - requires a image dataset with one image per well
+#dsp.dispXYZfromTable(df, df.shape[0])
 
 
