@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: showZwellplate.py
-Date: 03.02.2016
-Version. 1.0
+Date: 21.03.2016
+Version. 0.1
 """
 
 import bfimage as bf
