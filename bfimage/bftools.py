@@ -328,7 +328,7 @@ def get_planetable(imagefile, writecsv=False, separator=','):
 
     print 'Start reading the plane data ',
 
-    for imageIndex in range(0, IMAGEID):
+    for imageIndex in range(0, IMAGEID+1):
         for planeIndex in range(0, MetaInfo['SizeZ'] * MetaInfo['SizeC'] * MetaInfo['SizeT']):
 
             id.append(imageIndex)
@@ -342,9 +342,12 @@ def get_planetable(imagefile, writecsv=False, separator=','):
             dt.append(jmd.getPlaneDeltaT(imageIndex, planeIndex).value().doubleValue())
             # optional detailed output
             #print id[-1], plane[-1], planeIndex, theT[-1], theZ[-1], theC[-1], xpos[-1], ypos[-1], zpos[-1], dt[-1]
-            # create some kind of progress bar
-            print '.',
-            sys.stdout.flush()
+
+        # create some kind of progress bar
+        print '\b.',
+        sys.stdout.flush()
+        if np.mod(imageIndex, 50) == 0:
+            print '\n'
 
     # just print an empty line
     print 'Done.\n'
@@ -352,7 +355,7 @@ def get_planetable(imagefile, writecsv=False, separator=','):
     # round the data
     xpos = np.round(xpos, 1)
     ypos = np.round(ypos, 1)
-    zpos = np.round(xpos, 1)
+    zpos = np.round(zpos, 1)
     dt = np.round(dt, 3)
     # normalize plane timings to 0 for the 1st acquired plane
     dt = dt - dt.min()

@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt, cm
 import os
 import numpy as np
 
-filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
+filename = r'S:\Spyder_Projects_Testdata\CZI_Read\Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
 
 imgbase = os.path.basename(filename)
 imgdir = os.path.dirname(filename)
