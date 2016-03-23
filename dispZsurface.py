@@ -8,19 +8,19 @@ import numpy as np
 
 def ExtractLabels(nr, nc):
 
-     # labeling schemes
-    LabelX = ['1','2','3','4','5','6','7','8','9','10','11','12',
+     # labeling schemes for plates up-to 384 wellplate
+    labelX = ['1','2','3','4','5','6','7','8','9','10','11','12',
               '13','14','15','16','17','18','19','20','21','22','23','24',
               '25','26','27','28','29','30','31','32','33','34','35','36',
               '37','38','39','40','41','42','43','44','45','46','47','48',]
 
-    LabelY = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
+    labelY = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
               'Q','R','S','T','U','V','W','X','Y','Z','AA','AB','AC','AD','AE','AF']
 
-    lx = LabelX[0:nc]
-    ly = LabelY[0:nr]
+    lx = labelX[0:nc]
+    ly = labelY[0:nr]
 
-    # determine an appropriate font size
+    # determine an appropriate font size based on the plate type
     if nr <= 32 and nr > 16:
         fs = 7
     elif nr <= 16 and nr > 8:
