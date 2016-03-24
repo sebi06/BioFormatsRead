@@ -16,8 +16,7 @@ filename = r's:\Spyder_Projects_Testdata\CZI\WP_96_Positions.czi'
 # create plane info and write into dataframe
 df = bf.get_planetable(filename, writecsv=True, separator='\t')
 
+
 # show the dataframe
 print df[:5]
 print df.shape[0]
-
-
