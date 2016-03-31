@@ -57,7 +57,7 @@ def dispXYZfromTable(table, well):
     ypos = table['YPos']
     zpos = table['ZPos']
     # normalize z-data
-    zpos_norm = zpos - zpos.max()
+    zpos_norm = zpos - zpos.min()
     z = zpos_norm.reshape(nr, nc)
     xpos2d = xpos.reshape(nr, nc)
     ypos2d = ypos.reshape(nr, nc)
