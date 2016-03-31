@@ -14,9 +14,6 @@ import bfimage as bf
 #filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
 filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
 
-imgbase = os.path.basename(filename)
-imgdir = os.path.dirname(filename)
-
 # specify bioformats_package.jar to use if required
 #bf.set_bfpath(insert path to bioformats_package.jar here)
 
@@ -26,8 +23,8 @@ img6d = bf.bftools.get_image6d(filename, MetaInfo['Sizes'])
 
 ## show relevant image Meta-Information
 print '\n'
-print 'Image Directory      : ', imgdir
-print 'Image Filename       : ', imgbase
+print 'Image Directory      : ', MetaInfo['Directory']
+print 'Image Filename       : ', MetaInfo['Filename']
 print 'Images Dim Sizes     : ', MetaInfo['Sizes']
 print 'Dimension Order*     : ', MetaInfo['DimOrder BF']
 print 'Dimension Order CZI  : ', MetaInfo['OrderCZI']
