@@ -11,7 +11,7 @@ import bfimage as bf
 import dispZsurface as dsp
 import pandas as pd
 
-filename = r's:\Spyder_Projects_Testdata\CZI\WP_96_Positions.csv'
+filename = r'testdata/WP_96_Positions.csv'
 
 # create plane info from CZI image file and write CSV file (optional)
 planetable = bf.get_planetable(filename, writecsv=True, separator='\t')
