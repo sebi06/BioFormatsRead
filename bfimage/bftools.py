@@ -307,9 +307,6 @@ def get_planetable(imagefile, writecsv=False, separator=','):
 
     MetaInfo = create_metainfo_dict()
 
-    # get image meta-information
-    #sz = get_dimension_only(imagefile)
-
     # get JavaMetaDataStore and SeriesCount
     jmd, MetaInfo['TotalSeries'], IMAGEID = get_java_metadata_store(imagefile)
 
