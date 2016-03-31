@@ -27,6 +27,8 @@ The package is still under development and was mainly tested with CZI files.
 The python-bioformats package includes loci_tool.jar but it is also possible to use the latest bioformats_package.jar.
 Currently the 5.1.8 version of bioformats_package.jar is used. Update it to your needs.
 
+Some more infos can be found at: <http://slides.com/sebastianrhode/python-and-bioformats/fullscreen>
+
 Acknowledgements
 ----------------
 *   Christoph Gohlke from providing the czifile.py and tifffile.py.
