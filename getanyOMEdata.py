@@ -86,7 +86,7 @@ def getinfo(omexml, nodenames, ns='http://www.openmicroscopy.org/Schemas/OME/201
     return dictlist
 
 
-filename = r'c:\Users\M1SRH\Documents\Testdata_Zeiss\Python_bfimage_Testdata\20160331_C=2_Z=5_T=3_488_561_LSM800.czi'
+filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
 omexml = bf.createOMEXML(filename)
 #parseXML(omexml, 'Image', 'Pixel')
 
