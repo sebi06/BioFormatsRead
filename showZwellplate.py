@@ -11,13 +11,13 @@ import bfimage as bf
 import dispZsurface as dsp
 import pandas as pd
 
-filename = r's:\Spyder_Projects_Testdata\CZI\WP_96_Positions.csv'
+filename = r'testdata/Wellchamber_384_Comb.csv'
 
 # create plane info from CZI image file and write CSV file (optional)
-planetable = bf.get_planetable(filename, writecsv=True, separator='\t')
+#planetable = bf.get_planetable(filename, writecsv=True, separator=',')
 
 # or use the CSV file directly once it was created
-planetable = pd.read_csv(filename, sep='\t')
+planetable = pd.read_csv(filename, sep=',')
 
 # show the dataframe
 print planetable[:5]

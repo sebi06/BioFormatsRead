@@ -32,7 +32,7 @@ def get_metainfo_channel_description(filename):
         czi.close()
 
     except:
-        chdescript = 'n.a.'
+        chdescript = 'na'
 
     return chdescript
 
@@ -43,7 +43,7 @@ def writexml_czi(filename):
     czi = CziFile(filename)
 
     # Change File name and write XML file to same folder
-    xmlfile = filename.replace('.bfimage', '_MetaData.xml')
+    xmlfile = filename.replace('.czi', '_MetaData.xml')
     tree = czi.metadata.getroottree()
     tree.write(xmlfile, encoding='utf-8', method='xml')
     print 'Write special CZI XML metainformation for: ', xmlfile
@@ -68,7 +68,7 @@ def get_objective_name_cziread(filename):
         ids = misc.find_index_byname(namelst, 'ObjectiveName')
         objname = misc.get_entries(valuelst, ids)
     except:
-        objname = 'n.a.'
+        objname = 'na'
 
     czi.close()
 
@@ -108,9 +108,9 @@ def get_metainfo_cziread(filename):
     # define default values in case something is missing inside the metadata
     objNA = np.NaN
     objMag = np.NaN
-    objName = 'n.a.'
-    objImm = 'n.a.'
-    CamName = 'n.a.'
+    objName = 'na'
+    objImm = 'na'
+    CamName = 'na'
     totalMag = np.NaN
 
     try:
@@ -137,7 +137,7 @@ def get_metainfo_cziread(filename):
             if elem.tag == 'TotalMagnification':
                 totalMag = np.float(elem.text)
                 if totalMag == 0:
-                    totalMag == 'n.a.'
+                    totalMag == 'na'
 
         czi.close()
 

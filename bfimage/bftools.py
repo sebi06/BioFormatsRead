@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: bftools.py
-Date: 21.03.2016
-Version. 1.8
+Date: 02.04.2016
+Version. 1.9
 """
 
 
@@ -195,25 +195,25 @@ def get_metainfo_objective(jmd, filename):
         objimm = jmd.getObjectiveImmersion(instrumentID, objID).getValue()
         #objimm = jmd.getObjectiveImmersion(instrumentID, objID)
     except:
-        objimm = 'n.a'
+        objimm = 'na'
 
     # try to get objective Lens NA
     try:
         objna = np.round(jmd.getObjectiveLensNA(instrumentID, objID).floatValue(), 3)
     except:
-        objna = 'n.a.'
+        objna = 'na'
 
     # try to get objective magnification
     try:
         objmag = np.round(jmd.getObjectiveNominalMagnification(instrumentID, objID).floatValue(), 0)
     except:
-        objmag = 'n.a.'
+        objmag = 'na'
 
     # try to get objective model
     try:
         objmodel = jmd.getObjectiveModel(instrumentID, objID)
         if len(objmodel) == 0:
-            objmodel = 'n.a'
+            objmodel = 'na'
             print 'No objective model name found in metadata.'
     except:
         print 'Try to read objective name via czifile.py'
@@ -221,9 +221,9 @@ def get_metainfo_objective(jmd, filename):
         if filename[-4:] == '.czi':
             objmodel = czt.get_objective_name_cziread(filename)
             if objmodel == None:
-                objmodel = 'n.a.'
+                objmodel = 'na'
         else:
-            objmodel = 'n.a.'
+            objmodel = 'na'
 
     return objimm, objna, objmag, objmodel
 
@@ -267,8 +267,8 @@ def get_metainfo_wavelengths(jmd):
         except:
             wl_excitation[i] = 0
             wl_emission[i] = 0
-            dyes.append('n.a')
-            channels.append('n.a.')
+            dyes.append('na')
+            channels.append('na')
 
     return wl_excitation, wl_emission, dyes, channels
 
@@ -306,9 +306,6 @@ def get_dimension_only(imagefile):
 def get_planetable(imagefile, writecsv=False, separator=','):
 
     MetaInfo = create_metainfo_dict()
-
-    # get image meta-information
-    #sz = get_dimension_only(imagefile)
 
     # get JavaMetaDataStore and SeriesCount
     jmd, MetaInfo['TotalSeries'], IMAGEID = get_java_metadata_store(imagefile)
@@ -532,14 +529,13 @@ def create_metainfo_dict():
                 'SizeZ': 0,
                 'SizeC': 0,
                 'SizeT': 0,
-                'DimOrder BF': 'n.a',
-                'Immersion': 'n.a.',
+                'DimOrder BF': 'na',
+                'Immersion': 'na',
                 'NA': 0,
                 'ObjMag': 0,
-                'ObjModel': 'n.a.',
+                'ObjModel': 'na',
                 'ShapeCZI': 0,
                 'OrderCZI': 0,
-                'DetName': 'n.a',
                 'XScale': 0,
                 'YScale': 0,
                 'ZScale': 0,
@@ -547,7 +543,7 @@ def create_metainfo_dict():
                 'WLEm': 0,
                 'Dyes': [],
                 'Channels': [],
-                'ChDesc': 'n.a.',
+                'ChDesc': 'na',
                 'Sizes': 0}
 
     return MetaInfo
@@ -569,14 +565,10 @@ def get_relevant_metainfo_wrapper(filename):
     if filename[-4:] == '.czi':
         # get objective information using cziread
         print 'Using czifile.py to get CZI Shape info.'
-
         MetaInfo['ShapeCZI'], MetaInfo['OrderCZI'] = czt.get_shapeinfo_cziread(filename)
-        # currently not used any more --> trust BioFormtas instead
-        #MetaInfo['NA'], MetaInfo['ObjMag'], MetaInfo['ObjModel'],MetaInfo['Immersion'],\
-        #    MetaInfo['DetName'], MetaInfo['TotalMag'] = czt.get_metainfo_cziread(filename)
 
     # use bioformats to get the objective informations
-    print 'Using BioFormats to get MetaInfo.'
+    print 'Using BioFormats to get MetaInformation.'
     MetaInfo['Immersion'], MetaInfo['NA'], MetaInfo['ObjMag'], MetaInfo['ObjModel'] = get_metainfo_objective(jmd, filename)
 
     # get scaling information
