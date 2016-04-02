@@ -1,6 +1,6 @@
 import bfimage as bf
 
-filename = r'c:\Users\M1SRH\Documents\Spyder_Projects_Testdata\CZI_Read\2x2_SNAP_CH=2_Z=5.czi'
+filename = r'testdata/2x2_SNAP_CH=2_Z=5_T=2.czi'
 
 #sizes = bf.bftools.get_dimension_only(filename)
 
