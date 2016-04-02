@@ -10,8 +10,7 @@ Version. 0.1
 import bfimage as bf
 
 # define filename
-#filename = r'testdata\2x2_SNAP_CH=2_Z=5_T=2.czi'
-filename = r's:\Spyder_Projects_Testdata\CZI\WP_96_Positions.czi'
+filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
 
 # create plane info and write into dataframe
 df = bf.get_planetable(filename, writecsv=True, separator='\t')
