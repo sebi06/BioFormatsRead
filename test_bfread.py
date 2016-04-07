@@ -10,6 +10,7 @@ Version. 1.0
 import numpy as np
 import os
 import bfimage as bf
+import pytest
 
 
 def test_metainfo():
@@ -58,4 +59,5 @@ def test_metainfo():
         assert np.shape(img6d)[i] == dims[i]
 
 
-#test_metainfo()
+if __name__ == '__main__':
+    pytest.main()
