@@ -275,6 +275,11 @@ def get_metainfo_wavelengths(jmd):
 
 def get_dimension_only(imagefile):
 
+    if not VM_STARTED:
+        start_jvm()
+    if VM_KILLED:
+        jvm_error()
+
     # get OME-XML and change the encoding to UTF-8
     omexml = bioformats.get_omexml_metadata(imagefile)
     new_omexml = omexml.encode('utf-8')
@@ -292,7 +297,12 @@ def get_dimension_only(imagefile):
     SizeX = pixels.SizeX
     SizeY = pixels.SizeY
 
-    print 'Series: ', totalseries, 'T: ', SizeT,  'Z: ', SizeZ,  'C: ', SizeC,  'X: ', SizeX,  'Y: ', SizeY
+    print 'Series: ', totalseries
+    print 'Size T: ', SizeT
+    print 'Size Z: ', SizeZ
+    print 'Size C: ', SizeC
+    print 'Size X: ', SizeX
+    print 'Size Y: ', SizeY
 
     # usually the x-axis of an image is from left --> right and y from top --> bottom
     # in order to be compatible with numpy arrays XY are switched

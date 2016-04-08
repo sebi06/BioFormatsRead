@@ -4,7 +4,7 @@
 
 File: test_bfread.py
 Date: 08.04.2016
-Version. 0.5
+Version. 0.6
 """
 
 import numpy as np
@@ -12,8 +12,8 @@ import os
 import bfimage as bf
 import pytest
 
-
 def test_metainfo():
+
 
     filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
 
