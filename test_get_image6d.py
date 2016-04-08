@@ -34,10 +34,11 @@ print 'Image Dimensions     : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'], Met
 print 'Scaling XYZ [micron] : ', MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale']
 print 'Objective M-NA-Imm   : ', MetaInfo['ObjMag'], MetaInfo['NA'], MetaInfo['Immersion']
 print 'Objective Name       : ', MetaInfo['ObjModel']
-print 'Detector Name        : ', MetaInfo['DetName']
 print 'Ex. Wavelengths [nm] : ', MetaInfo['WLEx']
 print 'Em. Wavelengths [nm] : ', MetaInfo['WLEm']
 print 'Dyes                 : ', MetaInfo['Dyes']
+print 'Detector Model       : ', MetaInfo['Detector Model']
+print 'Detector Name        : ', MetaInfo['Detector Name']
 print 'Channels             : ', MetaInfo['Channels']
 print 'Channel Description  : ', MetaInfo['ChDesc']
 print 'Array Shape 6D       : ', np.shape(img6d)

@@ -2,30 +2,33 @@ from lxml import etree as etl
 import bfimage as bf
 
 
-def parseXML(omexml, ch1, ch2):
+def parseXML(omexml, topchild, subchild, highdetail=False):
     """
-    Parse XML with ElementTree
+    Parse XML with ElementTree and print the output to the console.
+    topchild = specific node to search for
+    subchild = specfic subchild of the topchild to search for
     """
     root = etl.fromstring(omexml)
     tree = etl.ElementTree(root)
 
     for child in root:
         print '*   ', child.tag, '--> ', child.attrib
-        if ch1 in child.tag:
+        if topchild in child.tag:
         #if child.tag == "{http://www.openmicroscopy.org/Schemas/OME/2015-01}Instrument":
             for step_child in child:
-                print '**  ', step_child.tag, step_child.attrib
+                print '**  ', step_child.tag, '-->', step_child.attrib
 
-                if ch2 in step_child.tag:
+                if subchild in step_child.tag and highdetail:
                     print "*** ", step_child.tag
 
                     testdict = {}
-                    for step_child2 in step_child:
-                        print '****', step_child2.tag, step_child2.attrib
-                        testdict[step_child2.tag] = step_child2.attrib
+                    if highdetail:
+                        for step_child2 in step_child:
+                            print '****', step_child2.tag, step_child2.attrib
+                            testdict[step_child2.tag] = step_child2.attrib
 
 
-def getinfo(omexml, nodenames, ns='http://www.openmicroscopy.org/Schemas/OME/2015-01'):
+def getinfofromOMEXML(omexml, nodenames, ns='http://www.openmicroscopy.org/Schemas/OME/2015-01'):
     """
     This function can be used to read the most useful OME-MetaInformation from the respective XML.
     Check for the correct namespace. More info can be found at: http://www.openmicroscopy.org/Schemas/
@@ -40,15 +43,15 @@ def getinfo(omexml, nodenames, ns='http://www.openmicroscopy.org/Schemas/OME/201
     parseXML(omexml, 'Image', 'Pixel')
 
     # case 1
-    result = getinfo(omexml, ['Instrument', 'Objective'], ns='http://www.openmicroscopy.org/Schemas/OME/2015-01')
+    result = getinfofromOMEXML(omexml, ['Instrument', 'Objective'], ns='http://www.openmicroscopy.org/Schemas/OME/2015-01')
     print result
 
     # case 2
-    result = getinfo(omexml, ['Instrument', 'Detector'])
+    result = getinfofromOMEXML(omexml, ['Instrument', 'Detector'])
     print result
 
     # case 3
-    result = getinfo(omexml, ['Image', 'Pixels', 'Channel'])
+    result = getinfofromOMEXML(omexml, ['Image', 'Pixels', 'Channel'])
     print result[0]
     print result[1]
 
@@ -88,17 +91,20 @@ def getinfo(omexml, nodenames, ns='http://www.openmicroscopy.org/Schemas/OME/201
 
 filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
 omexml = bf.createOMEXML(filename)
-#parseXML(omexml, 'Image', 'Pixel')
+parseXML(omexml, 'Image', 'Pixel')
+
+print '-' * 80 + '\n'
+parseXML(omexml, 'Instrument', 'Filterset', highdetail=True)
 
 print '-' * 80 + '\n'
 
-result = getinfo(omexml, ['Image', 'Pixels', 'Channel'], ns='http://www.openmicroscopy.org/Schemas/OME/2015-01')
+result = getinfofromOMEXML(omexml, ['Image', 'Pixels', 'Channel'], ns='http://www.openmicroscopy.org/Schemas/OME/2015-01')
 print result
-result = getinfo(omexml, ['Instrument', 'Objective'], ns='http://www.openmicroscopy.org/Schemas/OME/2015-01')
+result = getinfofromOMEXML(omexml, ['Instrument', 'Objective'], ns='http://www.openmicroscopy.org/Schemas/OME/2015-01')
 print result
-result = getinfo(omexml, ['Instrument', 'Detector'])
+result = getinfofromOMEXML(omexml, ['Instrument', 'Detector'])
 print result
-result = getinfo(omexml, ['Image', 'Pixels', 'Channel'])
+result = getinfofromOMEXML(omexml, ['Image', 'Pixels', 'Channel'])
 print result[0]
 print result[1]
 
