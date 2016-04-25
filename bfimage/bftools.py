@@ -429,7 +429,7 @@ def get_image2d(imagefile, sizes, seriesindex, channel, zplane, timepoint):
 
 def get_zstack(imagefile, sizes, seriesID, timepoint):
     """
-    This will read a single Z-Stack from an image data set.
+    This will read a single Z-Stack from an image data set for a specified image series.
     """
     if not VM_STARTED:
         start_jvm()
@@ -438,17 +438,32 @@ def get_zstack(imagefile, sizes, seriesID, timepoint):
 
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
 
-    # initialize array for specific series and time point that only contains a mutichannel z-Stack
-    #imgZStack = np.empty([sizes[2], sizes[3], sizes[4], sizes[5]], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
-    imgZStack = np.zeros([sizes[2], sizes[3], sizes[4], sizes[5]], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+    if timepoint == 'full':
 
-    for zplane in range(0, sizes[2]):
-        for channel in range(0, sizes[3]):
-            imgZStack[zplane, channel, :, :] = rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+        # initialize array for specific series that only contains a mutichannel z-Stack
+        imgZStack = np.zeros([sizes[1], sizes[2], sizes[3], sizes[4], sizes[5]], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+
+        for timepoint in range(0, sizes[1]):
+            for zplane in range(0, sizes[2]):
+                for channel in range(0, sizes[3]):
+                    imgZStack[timepoint, zplane, channel, :, :] = rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+
+        dimorder_out = 'TZCXY'
+
+    else:
+
+        # initialize array for specific series and time point that only contains a mutichannel z-Stack
+        imgZStack = np.zeros([sizes[2], sizes[3], sizes[4], sizes[5]], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+
+        for zplane in range(0, sizes[2]):
+            for channel in range(0, sizes[3]):
+                imgZStack[zplane, channel, :, :] = rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+
+        dimorder_out = 'ZCXY'
 
     rdr.close()
 
-    return imgZStack
+    return imgZStack, dimorder_out
 
 
 def get_timeseries(imagefile, sizes, seriesID):
@@ -471,6 +486,8 @@ def get_timeseries(imagefile, sizes, seriesID):
                 for channel in range(0, sizes[3]):
                     imgTimeSeries[timepoint, zplane, channel, :, :] = \
                         rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+                        
+        dimorder_out = 'TZCXY'
 
     else:
 
@@ -480,10 +497,12 @@ def get_timeseries(imagefile, sizes, seriesID):
                 for channel in range(0, sizes[3]):
                     imgTimeSeries[timepoint, channel, :, :] = \
                         rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+                        
+        dimorder_out = 'TCXY'
 
     rdr.close()
 
-    return imgTimeSeries
+    return imgTimeSeries, dimorder_out
 
 
 def get_imageseries(imagefile, sizes, seriesID=0):
