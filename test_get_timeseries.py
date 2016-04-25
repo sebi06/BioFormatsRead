@@ -20,7 +20,7 @@ channel = 1
 zplane = 2
 
 # get the actual time series from the data set
-tseries = bf.bftools.get_timeseries(filename, MetaInfo['Sizes'], seriesID, zplane='full')
+tserie, dimorder_out = bf.bftools.get_timeseries(filename, MetaInfo['Sizes'], seriesID, zplane=zplane)
 
 # show relevant image Meta-Information
 print '\n'
@@ -43,6 +43,7 @@ print 'Dyes                 : ', MetaInfo['Dyes']
 print 'Channel Description  : ', MetaInfo['ChDesc']
 print '============================================================='
 print 'Shape Time Series    : ', np.shape(tseries)
+print 'Dimension Order Out  : ', dimorder_out
 
 img2show = tseries[timepoint, channel, :, :]
 fig1 = plt.figure(figsize=(10, 8), dpi=100)
