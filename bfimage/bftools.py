@@ -462,14 +462,24 @@ def get_timeseries(imagefile, sizes, seriesID):
 
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
 
-    # initialize array for specific series and zplane that only contains a mutichannel time series
-    imgTimeSeries = np.zeros([sizes[1], sizes[2], sizes[3], sizes[4], sizes[5]], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+    if zplane == 'full':
 
-    for timepoint in range(0, sizes[1]):
-        for zplane in range(0, sizes[2]):
-            for channel in range(0, sizes[3]):
-                imgTimeSeries[timepoint, zplane, channel, :, :] = \
-                    rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+        # initialize array for specific series that only contains a mutichannel time series for a specific series
+        imgTimeSeries = np.zeros([sizes[1], sizes[2], sizes[3], sizes[4], sizes[5]], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+        for timepoint in range(0, sizes[1]):
+            for zplane in range(0, sizes[2]):
+                for channel in range(0, sizes[3]):
+                    imgTimeSeries[timepoint, zplane, channel, :, :] = \
+                        rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+
+    else:
+
+        # initialize array for specific series that only contains a mutichannel time series for a specific series and zplane
+        imgTimeSeries = np.zeros([sizes[1], sizes[3], sizes[4], sizes[5]], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+        for timepoint in range(0, sizes[1]):
+                for channel in range(0, sizes[3]):
+                    imgTimeSeries[timepoint, channel, :, :] = \
+                        rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
 
     rdr.close()
 
