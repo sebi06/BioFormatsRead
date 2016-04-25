@@ -451,7 +451,7 @@ def get_zstack(imagefile, sizes, seriesID, timepoint):
     return imgZStack
 
 
-def get_timeseries(imagefile, sizes, seriesID, zplane):
+def get_timeseries(imagefile, sizes, seriesID):
     """
     This will read a single Time Lapse from an image data set.
     """
@@ -463,12 +463,13 @@ def get_timeseries(imagefile, sizes, seriesID, zplane):
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
 
     # initialize array for specific series and zplane that only contains a mutichannel time series
-    #imgTimeSeries = np.empty([sizes[1], sizes[3], sizes[4], sizes[5]], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
-    imgTimeSeries = np.zeros([sizes[1], sizes[3], sizes[4], sizes[5]], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+    imgTimeSeries = np.zeros([sizes[1], sizes[2], sizes[3], sizes[4], sizes[5]], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
 
-    for timepoint in range(0, sizes[2]):
-        for channel in range(0, sizes[3]):
-            imgTimeSeries[timepoint, channel, :, :] = rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+    for timepoint in range(0, sizes[1]):
+        for zplane in range(0, sizes[2]):
+            for channel in range(0, sizes[3]):
+                imgTimeSeries[timepoint, zplane, channel, :, :] = \
+                    rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
 
     rdr.close()
 
