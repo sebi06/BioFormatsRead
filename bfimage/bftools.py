@@ -662,7 +662,7 @@ def create_omexml(testdata, method=1, writeczi_metadata=True):
         for i in range(0, len(testdata)):
 
             # Change File name and write XML file to same folder
-            xmlfile1 = testdata[i] + '_MetaData1.xml'
+            xmlfile1 = testdata[i][:-4] + '_MetaData1.xml'
 
             try:
                 # get the actual OME-XML
@@ -681,7 +681,7 @@ def create_omexml(testdata, method=1, writeczi_metadata=True):
         for i in range(0, len(testdata)):
 
             # Change File name and write XML file to same folder
-            xmlfile2 = testdata[i] + '_MetaData2.xml'
+            xmlfile2 = testdata[i][:-4] + '_MetaData2.xml'
 
             try:
                 # get the actual OME-XML
