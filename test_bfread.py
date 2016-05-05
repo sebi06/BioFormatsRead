@@ -11,98 +11,164 @@ import numpy as np
 import os
 import bfimage as bf
 import pytest
+import datetime
+import zencom as zc
+
+
+def setbfpath():
+
+    # specify bioformats_package.jar to use if required
+    bfpath = r'c:\Users\M1SRH\Documents\Software\BioFormats_Package\5.1.9\bioformats_package.jar'
+    bf.set_bfpath(bfpath)
+
+def get_filename():
+    filename = r'c:\Users\M1SRH\Documents\Python_Projects\BioFormatsRead\20160425_BF_CZI.czi'
+    return filename
+
+def get_dims():
+    #return [16, 3, 5, 2, 640, 640]
+    return [16, 1, 1, 2, 640, 640]
+
+def get_chwlex():
+    return [493, 553]
+
+def get_chwlem():
+    return [517, 568]
+
+def get_dyes():
+    return ['None', 'None']
+
+def get_chnames():
+    return ['AF488', 'AF555']
+
+
+def create_testCZI():
+
+    # Define the experiment to be executed
+    zenexperiment = r'e:\Data\BioFormats_CZI_Test\BioFormats_CZI_Test.czexp'
+
+    # get current data and create filename from it
+    today = datetime.datetime.today()
+    currentCZI = today.strftime('%Y%m%d') + '_BF_CZI.czi'
+
+    # Define place to store the CZI file
+    savefolder = 'e:\\Data\BioFormats_CZI_Test\\' + today.strftime('%Y%m%d') + '\\'
+
+    # check if the folder already exists
+    try:
+        os.makedirs(savefolder)
+    except OSError:
+        if not os.path.isdir(savefolder):
+            raise
+
+    czifilename_complete = zc.runZenExperiment(zenexperiment, savefolder, currentCZI, showCZI=False)
+
+    # create the xml information - expects list of filenames as input
+    bf.create_omexml([czifilename_complete], method=1, writeczi_metadata=True)
+
+    # create plane info table and write into dataframe
+    df = bf.get_planetable(czifilename_complete, writecsv=True, separator='\t')
+
+    # show the dataframe
+    print df[:5]
+    print df.shape[0]
+
+    return czifilename_complete
+
+
 
 def test_metainfo():
 
+    # run the test experiment to create the CZI test data set
+    czifilename_complete = create_testCZI()
 
-    filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
+    # set the correct path to the bioformats_package.jar
+    setbfpath()
 
     # get image meta-information
-    MetaInfo = bf.get_relevant_metainfo_wrapper(filename)
-    img6d = bf.get_image6d(filename, MetaInfo['Sizes'])
+    MetaInfo = bf.get_relevant_metainfo_wrapper(czifilename_complete)
+    img6d = bf.get_image6d(czifilename_complete, MetaInfo['Sizes'])
+
+    fulldims = get_dims()
+    print MetaInfo['Sizes']
 
     # check Sizes
-    assert MetaInfo['Sizes'] == [1, 1, 100, 1, 346, 580]
+    assert MetaInfo['Sizes'] == fulldims
     # check Dimension Order
     assert MetaInfo['DimOrder BF'] == 'XYCZT'
     # check Dimesnion Order CZI Style
-    assert MetaInfo['OrderCZI'] == 'BCZYX0'
+    assert MetaInfo['OrderCZI'] == 'BSTCZYX0'
     # check Image Dimensions
-    assert MetaInfo['TotalSeries'] == 1
-    assert MetaInfo['SizeT'] == 1
-    assert MetaInfo['SizeZ'] == 100
-    assert MetaInfo['SizeC'] == 1
-    assert MetaInfo['SizeY'] == 346
-    assert MetaInfo['SizeX'] == 580
+    assert MetaInfo['TotalSeries'] == fulldims[0]
+    assert MetaInfo['SizeT'] == fulldims[1]
+    assert MetaInfo['SizeZ'] == fulldims[2]
+    assert MetaInfo['SizeC'] == fulldims[3]
+    assert MetaInfo['SizeY'] == fulldims[4]
+    assert MetaInfo['SizeX'] == fulldims[5]
     # check Scaling
-    assert MetaInfo['XScale'] == 0.042
-    assert MetaInfo['YScale'] == 0.042
-    assert MetaInfo['ZScale'] == 0.1
+    assert MetaInfo['XScale'] == 0.2
+    assert MetaInfo['YScale'] == 0.2
+    assert MetaInfo['ZScale'] == 0.5
     # check Objective Data
-    assert MetaInfo['ObjMag'] == 63.0
-    assert MetaInfo['NA'] == 1.4
-    assert MetaInfo['Immersion'] == 'Oil'
+    assert MetaInfo['ObjMag'] == 5.0
+    assert MetaInfo['NA'] == 0.35
+    assert MetaInfo['Immersion'] == 'Air'
     # check objective Name
-    assert MetaInfo['ObjModel'] == 'na'
-    # check Excitation and Emission Wavelengths
-    assert MetaInfo['WLEx'] == 493
-    assert MetaInfo['WLEm'] == 517
-    # check Dye Names
-    assert MetaInfo['Dyes'] == ['Dye1']
-    # check Channels
-    assert MetaInfo['Channels'] == ['Alexa Fluor 488']
+    assert MetaInfo['ObjModel'] == 'Plan-Apochromat 5x/0.35'
+
+    # check properties of all channels
+    for ch in range(0, MetaInfo['SizeC']):
+        # check Excitation and Emission Wavelengths
+        assert MetaInfo['WLEx'][ch] == get_chwlex()[ch]
+        assert MetaInfo['WLEm'][ch] == get_chwlem()[ch]
+        # check Dye Names
+        assert MetaInfo['Dyes'][ch] == get_dyes()[ch]
+        assert MetaInfo['Channels'][ch] == get_chnames()[ch]
     # check Channel Description
     assert MetaInfo['ChDesc'] == []
     # check Numpy Array Shape
-    dims = [1, 1, 100, 1, 346, 580]
-    for i in range(0, len(dims)):
-        assert np.shape(img6d)[i] == dims[i]
+    for i in range(0, len(fulldims)):
+        assert np.shape(img6d)[i] == fulldims[i]
 
 
-def test_timeseries():
+    # test timeseries
 
-    filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
-    # get image meta-information
-    MetaInfo = bf.bftools.get_relevant_metainfo_wrapper(filename)
     seriesID = 0
-    timepoint = 2
-    channel = 1
     zplane = 2
-    dims = [5, 2, 640, 640]
+    dims = [3, 2, 640, 640]
     # get the actual time series from the data set
-    tseries = bf.bftools.get_timeseries(filename, MetaInfo['Sizes'], seriesID, zplane)
+    tseries, dimorder_out = bf.bftools.get_timeseries(czifilename_complete, MetaInfo['Sizes'], seriesID, zplane=zplane)
 
     for i in range(0, len(dims)):
         assert np.shape(tseries)[i] == dims[i]
 
+    # check resulting dimension order
+    assert dimorder_out == 'TCXY'
 
-def test_zstack():
 
-    filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
-    # get image meta-information
-    MetaInfo = bf.bftools.get_relevant_metainfo_wrapper(filename)
+    # test zstack
+
     seriesID = 0
     timepoint = 0
-    channel = 0
-    dims = [100, 1, 346, 580]
+    dims = [5, 2, 640, 640]
     # get the actual z-stack from the data set
-    zstack = bf.bftools.get_zstack(filename, MetaInfo['Sizes'], seriesID, timepoint)
+    zstack, dimorder_out = bf.bftools.get_zstack(czifilename_complete, MetaInfo['Sizes'], seriesID, timepoint=timepoint)
+    print zstack.shape
 
     # get plane with the brightest pixel
     zplane = (zstack == zstack.max()).nonzero()[0][0]
     # check found zplane
-    assert zplane == 46
+    assert zplane+1 == 1
 
     for i in range(0, len(dims)):
         assert np.shape(zstack)[i] == dims[i]
 
-def test_getdimonly():
 
-    filename = r'testdata/2x2_SNAP_CH=2_Z=5_T=2.czi'
+    # test getdimonly:
 
-    sizes_czi = bf.czitools.read_dimensions_czi(filename)
+    sizes_czi = bf.czitools.read_dimensions_czi(czifilename_complete)
 
-    dims = [1, 1, 2, 2, 5, 1216, 1216, 1]
+    dims = [1, 4, 3, 2, 5, 1216, 136216, 1]
     dimorder = 'BSTCZYX0'
 
     for i in range(0, len(dims)):

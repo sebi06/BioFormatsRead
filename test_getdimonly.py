@@ -1,10 +1,14 @@
 import bfimage as bf
 
-filename = r'testdata/2x2_SNAP_CH=2_Z=5_T=2.czi'
+# define testdata base directory and filename of the image dataset to be read
+filenames = [r'testdata/2x2_SNAP_CH=2_Z=5_T=2.czi']
 
-sizes = bf.bftools.get_dimension_only(filename)
+# specify bioformats_package.jar to use if required
+#bf.set_bfpath(insert path to bioformats_package.jar here)
 
-#sizes_czi = bf.czitools.read_dimensions_czi(filename)
+for currentfile in filenames:
 
-print sizes
-#print sizes_czi
+    sizes = bf.bftools.get_dimension_only(currentfile)
+    sizes_czi = bf.czitools.read_dimensions_czi(currentfile)
+    print sizes
+    print sizes_czi

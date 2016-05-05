@@ -466,7 +466,7 @@ def get_zstack(imagefile, sizes, seriesID, timepoint):
     return imgZStack, dimorder_out
 
 
-def get_timeseries(imagefile, sizes, seriesID):
+def get_timeseries(imagefile, sizes, seriesID, zplane='full'):
     """
     This will read a single Time Lapse from an image data set.
     """

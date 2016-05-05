@@ -19,7 +19,7 @@ timepoint = 0
 channel = 0
 
 # get the actual z-stack from the data set
-zstack = bf.bftools.get_zstack(filename, MetaInfo['Sizes'], seriesID, timepoint=timepoint)
+zstack, dimorder_out = bf.bftools.get_zstack(filename, MetaInfo['Sizes'], seriesID, timepoint=timepoint)
 
 # get plane with the brightest pixel
 zplane = (zstack == zstack.max()).nonzero()[0][0]

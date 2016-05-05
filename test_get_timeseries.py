@@ -20,7 +20,7 @@ channel = 1
 zplane = 2
 
 # get the actual time series from the data set
-tserie, dimorder_out = bf.bftools.get_timeseries(filename, MetaInfo['Sizes'], seriesID, zplane=zplane)
+tseries, dimorder_out = bf.bftools.get_timeseries(filename, MetaInfo['Sizes'], seriesID, zplane=zplane)
 
 # show relevant image Meta-Information
 print '\n'
