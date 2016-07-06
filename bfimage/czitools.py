@@ -10,6 +10,10 @@ Version. 0.8
 import misctools as misc
 from czifile import *
 import numpy as np
+import bfimage as bf
+from lxml import etree as etl
+import re
+from collections import Counter
 
 
 def get_metainfo_channel_description(filename):
@@ -165,6 +169,67 @@ def get_metainfo_cziread_camera(filename):
     return CamName
 
 
+def getWelllNamesfromCZI(filename):
+
+    # Current key for wells - 2016_07_21
+    wellkey = 'Information|Image|S|Scene|Shape|Name'
+
+    # Create OME-XMF using BioFormats from CZI file and encode
+    omexml = bf.createOMEXML(filename)
+    omexml_enc = omexml.encode('utf-8')
+    # Get the tree
+    tree = etl.fromstring(omexml_enc)
+    # Define NameSpace
+    name_space = "{http://www.openmicroscopy.org/Schemas/SA/2015-01}"
+
+    origin_meta_datas = tree.findall(".//{}OriginalMetadata".format(name_space))
+    # Iterate in founded origins
+    for origin in origin_meta_datas:
+        key = origin.find("{}Key".format(name_space)).text
+        if key == wellkey:
+            value = origin.find("{}Value".format(name_space)).text
+            #print("Value: {}".format(value))
+
+    return value
+
+
+def getWellInfofromCZI(wellstring):
+
+    # labeling schemes for plates up-to 1536 wellplate
+    colIDs = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
+              '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24',
+              '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36',
+              '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', ]
+
+    rowIDs = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+              'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
+
+    wellOK = wellstring[1:]
+    wellOK = wellOK[:-1]
+    wellOK = re.sub(r'\s+', '', wellOK)
+
+    welllist = [item for item in wellOK.split(',') if item.strip()]
+
+    #print welllist
+
+    cols = []
+    rows = []
+
+    for i in range(0, len(welllist)):
+        wellid_split = re.findall('\d+|\D+', welllist[i])
+        well_ch = wellid_split[0]
+        well_id = wellid_split[1]
+        cols.append(np.int(well_id) - 1)
+        well_id_index = rowIDs.index(well_ch)
+        rows.append(well_id_index)
+
+    welldict = Counter(welllist)
+
+    numwells = len(welllist)
+
+    return welllist, cols, rows, welldict, numwells
+
+
 def convert_dimension_string(cziorder):
     """
 
@@ -195,5 +260,4 @@ def convert_dimension_string(cziorder):
     dims = dimorder[0]+dimorder[1]+dimorder[2]+dimorder[3]+dimorder[4]
 
     return dims
-
 

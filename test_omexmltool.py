@@ -10,10 +10,15 @@ Version. 1.0
 import bfimage as bf
 
 # specify bioformats_package.jar to use if required
-#bf.set_bfpath(insert path to bioformats_packe.jar here)
+bfpath = r'c:\Users\M1SRH\Documents\Software\BioFormats_Package\5.1.10\bioformats_package.jar'
+bf.set_bfpath(bfpath)
 
 # INSERT THE FILES INSIDE THE LIST BELOW
 
-testfiles = [r'testdata/2x2_SNAP_CH=2_Z=5_T=2.czi']
+#testfiles = [r'c:\Users\M1SRH\Documents\Testdata_Zeiss\Pyramid_Test\PyTest_int_fromZEN.czi',
+#             r'c:\Users\M1SRH\Documents\Testdata_Zeiss\Pyramid_Test\PyTest_int_viaOAD-COM.czi']
 
-bf.create_omexml(testfiles, method=1, writeczi_metadata=True)
+testfiles = [r'c:\Users\M1SRH\Documents\Python_Projects_Testdata\CZI_XML_Test\B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi']
+
+#bf.create_omexml(testfiles, method=1, writeczi_metadata=True)
+bf.create_omexml(testfiles, method=2, writeczi_metadata=False)

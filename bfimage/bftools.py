@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: bftools.py
-Date: 06.07.2016
-Version. 2.0
+Date: 02.04.2016
+Version. 1.9
 """
 
 
@@ -16,6 +16,8 @@ import os
 import pandas as pd
 from lxml import etree as etl
 import sys
+import re
+from collections import Counter
 
 VM_STARTED = False
 VM_KILLED = False
@@ -194,6 +196,7 @@ def get_metainfo_objective(jmd, filename):
     # try to get immersion type -  # get the first objective record in the first Instrument record
     try:
         objimm = jmd.getObjectiveImmersion(instrumentID, objID).getValue()
+        #objimm = jmd.getObjectiveImmersion(instrumentID, objID)
     except:
         objimm = 'na'
 
@@ -393,6 +396,7 @@ def get_image6d(imagefile, sizes):
         jvm_error()
 
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
+
     img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
 
     # main loop to read the images from the data file
@@ -484,7 +488,7 @@ def get_timeseries(imagefile, sizes, seriesID, zplane='full'):
                 for channel in range(0, sizes[3]):
                     imgTimeSeries[timepoint, zplane, channel, :, :] = \
                         rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
-                        
+
         dimorder_out = 'TZCXY'
 
     else:
@@ -495,7 +499,7 @@ def get_timeseries(imagefile, sizes, seriesID, zplane='full'):
                 for channel in range(0, sizes[3]):
                     imgTimeSeries[timepoint, channel, :, :] = \
                         rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
-                        
+
         dimorder_out = 'TCXY'
 
     rdr.close()
@@ -513,6 +517,7 @@ def get_imageseries(imagefile, sizes, seriesID=0):
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
 
     # initialize an array with the correct dimensions of one series only
+    #imgseries = np.empty(sizes[1:], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
     imgseries = np.zeros(sizes[1:], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
 
     for timepoint in range(0, sizes[1]):
@@ -537,6 +542,7 @@ def get_series_from_well(imagefile, sizes, seriesseq):
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
     sizes[0] = len(seriesseq)
 
+    #img6dwell = np.empty(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
     img6dwell = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
 
     for seriesID in range(0, len(seriesseq)):
@@ -787,3 +793,69 @@ def parseXML(omexml, topchild, subchild, highdetail=False):
                         for step_child2 in step_child:
                             print '****', step_child2.tag, step_child2.attrib
                             testdict[step_child2.tag] = step_child2.attrib
+
+
+def getWelllNamesfromCZI(filename):
+
+    if not VM_STARTED:
+        start_jvm()
+    if VM_KILLED:
+        jvm_error()
+
+    # Current key for wells - 2016_07_21
+    wellkey = 'Information|Image|S|Scene|Shape|Name'
+
+    # Create OME-XMF using BioFormats from CZI file and encode
+    omexml = bioformats.get_omexml_metadata(filename)
+    omexml_enc = omexml.encode('utf-8')
+    # Get the tree
+    tree = etl.fromstring(omexml_enc)
+    # Define NameSpace
+    name_space = "{http://www.openmicroscopy.org/Schemas/SA/2015-01}"
+
+    origin_meta_datas = tree.findall(".//{}OriginalMetadata".format(name_space))
+    # Iterate in founded origins
+    for origin in origin_meta_datas:
+        key = origin.find("{}Key".format(name_space)).text
+        if key == wellkey:
+            value = origin.find("{}Value".format(name_space)).text
+            #print("Value: {}".format(value))
+
+    return value
+
+
+def getWellInfofromCZI(wellstring):
+
+    # labeling schemes for plates up-to 1536 wellplate
+    colIDs = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
+              '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24',
+              '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36',
+              '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', ]
+
+    rowIDs = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
+              'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
+
+    wellOK = wellstring[1:]
+    wellOK = wellOK[:-1]
+    wellOK = re.sub(r'\s+', '', wellOK)
+
+    welllist = [item for item in wellOK.split(',') if item.strip()]
+
+    #print welllist
+
+    cols = []
+    rows = []
+
+    for i in range(0, len(welllist)):
+        wellid_split = re.findall('\d+|\D+', welllist[i])
+        well_ch = wellid_split[0]
+        well_id = wellid_split[1]
+        cols.append(np.int(well_id) - 1)
+        well_id_index = rowIDs.index(well_ch)
+        rows.append(well_id_index)
+
+    welldict = Counter(welllist)
+
+    numwells = len(welllist)
+
+    return welllist, cols, rows, welldict, numwells

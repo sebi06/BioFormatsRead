@@ -1,0 +1,170 @@
+<OME xmlns="http://www.openmicroscopy.org/Schemas/OME/2015-01" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openmicroscopy.org/Schemas/OME/2015-01 http://www.openmicroscopy.org/Schemas/OME/2015-01/ome.xsd">
+  <Experimenter ID="Experimenter:0" UserName="M1SRH"/>
+  <Instrument ID="Instrument:0">
+    <Microscope Type="Inverted"/>
+    <Detector ID="Detector:Internal" Model="TestCam"/>
+    <Objective ID="Objective:1" Immersion="Air" LensNA="0.35" Model="Plan-Apochromat 5x/0.35" NominalMagnification="5.0" WorkingDistance="5000.0" WorkingDistanceUnit="µm"/>
+    <FilterSet ID="FilterSet:1">
+      <DichroicRef ID="Dichroic:1"/>
+      <EmissionFilterRef ID="Filter:1"/>
+      <EmissionFilterRef ID="Filter:2"/>
+      <EmissionFilterRef ID="Filter:3"/>
+    </FilterSet>
+    <Filter ID="Filter:1">
+      <TransmittanceRange CutIn="458.0" CutInUnit="nm" CutOut="474.0" CutOutUnit="nm"/>
+    </Filter>
+    <Filter ID="Filter:2">
+      <TransmittanceRange CutIn="546.0" CutInUnit="nm" CutOut="564.0" CutOutUnit="nm"/>
+    </Filter>
+    <Filter ID="Filter:3">
+      <TransmittanceRange CutIn="618.0" CutInUnit="nm" CutOut="756.0" CutOutUnit="nm"/>
+    </Filter>
+    <Dichroic ID="Dichroic:1"/>
+  </Instrument>
+  <Image ID="Image:0" Name="B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi #1">
+    <AcquisitionDate>2016-07-20T11:44:16.161</AcquisitionDate>
+    <ExperimenterRef ID="Experimenter:0"/>
+    <InstrumentRef ID="Instrument:0"/>
+    <ObjectiveSettings ID="Objective:1" Medium="Air" RefractiveIndex="1.000293"/>
+    <Pixels BigEndian="false" DimensionOrder="XYCZT" ID="Pixels:0" Interleaved="false" PhysicalSizeX="0.39999999999999997" PhysicalSizeXUnit="µm" PhysicalSizeY="0.39999999999999997" PhysicalSizeYUnit="µm" SignificantBits="8" SizeC="1" SizeT="2" SizeX="640" SizeY="640" SizeZ="1" Type="uint8">
+      <Channel AcquisitionMode="WideField" EmissionWavelength="465.0" EmissionWavelengthUnit="nm" ExcitationWavelength="353.0" ExcitationWavelengthUnit="nm" ID="Channel:0:0" IlluminationType="Epifluorescence" Name="DAPI" SamplesPerPixel="1">
+        <DetectorSettings Binning="1x1" Gain="0.0" ID="Detector:Internal"/>
+        <FilterSetRef ID="FilterSet:1"/>
+        <LightPath/>
+      </Channel>
+      <MetadataOnly/>
+      <Plane DeltaT="0.46000003814697266" DeltaTUnit="s" ExposureTime="20.0" ExposureTimeUnit="s" PositionX="30533.145" PositionXUnit="reference frame" PositionY="16533.145" PositionYUnit="reference frame" PositionZ="111.842" PositionZUnit="reference frame" TheC="0" TheT="0" TheZ="0"/>
+      <Plane DeltaT="5.456000089645386" DeltaTUnit="s" ExposureTime="20.0" ExposureTimeUnit="s" PositionX="30533.145" PositionXUnit="reference frame" PositionY="16533.145" PositionYUnit="reference frame" PositionZ="111.842" PositionZUnit="reference frame" TheC="0" TheT="1" TheZ="0"/>
+    </Pixels>
+  </Image>
+  <Image ID="Image:1" Name="B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi #2">
+    <AcquisitionDate>2016-07-20T11:44:16.161</AcquisitionDate>
+    <ExperimenterRef ID="Experimenter:0"/>
+    <InstrumentRef ID="Instrument:0"/>
+    <ObjectiveSettings ID="Objective:1" Medium="Air" RefractiveIndex="1.000293"/>
+    <Pixels BigEndian="false" DimensionOrder="XYCZT" ID="Pixels:1" Interleaved="false" PhysicalSizeX="0.39999999999999997" PhysicalSizeXUnit="µm" PhysicalSizeY="0.39999999999999997" PhysicalSizeYUnit="µm" SignificantBits="8" SizeC="1" SizeT="2" SizeX="640" SizeY="640" SizeZ="1" Type="uint8">
+      <Channel AcquisitionMode="WideField" EmissionWavelength="465.0" EmissionWavelengthUnit="nm" ExcitationWavelength="353.0" ExcitationWavelengthUnit="nm" ID="Channel:1:0" IlluminationType="Epifluorescence" Name="DAPI" SamplesPerPixel="1">
+        <DetectorSettings Binning="1x1" Gain="0.0" ID="Detector:Internal"/>
+        <FilterSetRef ID="FilterSet:1"/>
+        <LightPath/>
+      </Channel>
+      <MetadataOnly/>
+      <Plane DeltaT="0.6510000228881836" DeltaTUnit="s" ExposureTime="20.0" ExposureTimeUnit="s" PositionX="32466.855" PositionXUnit="reference frame" PositionY="16533.145" PositionYUnit="reference frame" PositionZ="111.842" PositionZUnit="reference frame" TheC="0" TheT="0" TheZ="0"/>
+      <Plane DeltaT="5.6519999504089355" DeltaTUnit="s" ExposureTime="20.0" ExposureTimeUnit="s" PositionX="32466.855" PositionXUnit="reference frame" PositionY="16533.145" PositionYUnit="reference frame" PositionZ="111.842" PositionZUnit="reference frame" TheC="0" TheT="1" TheZ="0"/>
+    </Pixels>
+  </Image>
+  <Image ID="Image:2" Name="B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi #3">
+    <AcquisitionDate>2016-07-20T11:44:16.161</AcquisitionDate>
+    <ExperimenterRef ID="Experimenter:0"/>
+    <InstrumentRef ID="Instrument:0"/>
+    <ObjectiveSettings ID="Objective:1" Medium="Air" RefractiveIndex="1.000293"/>
+    <Pixels BigEndian="false" DimensionOrder="XYCZT" ID="Pixels:2" Interleaved="false" PhysicalSizeX="0.39999999999999997" PhysicalSizeXUnit="µm" PhysicalSizeY="0.39999999999999997" PhysicalSizeYUnit="µm" SignificantBits="8" SizeC="1" SizeT="2" SizeX="640" SizeY="640" SizeZ="1" Type="uint8">
+      <Channel AcquisitionMode="WideField" EmissionWavelength="465.0" EmissionWavelengthUnit="nm" ExcitationWavelength="353.0" ExcitationWavelengthUnit="nm" ID="Channel:2:0" IlluminationType="Epifluorescence" Name="DAPI" SamplesPerPixel="1">
+        <DetectorSettings Binning="1x1" Gain="0.0" ID="Detector:Internal"/>
+        <FilterSetRef ID="FilterSet:1"/>
+        <LightPath/>
+      </Channel>
+      <MetadataOnly/>
+      <Plane DeltaT="0.8610000610351562" DeltaTUnit="s" ExposureTime="20.0" ExposureTimeUnit="s" PositionX="30533.145" PositionXUnit="reference frame" PositionY="18466.855" PositionYUnit="reference frame" PositionZ="111.842" PositionZUnit="reference frame" TheC="0" TheT="0" TheZ="0"/>
+      <Plane DeltaT="5.859999895095825" DeltaTUnit="s" ExposureTime="20.0" ExposureTimeUnit="s" PositionX="30533.145" PositionXUnit="reference frame" PositionY="18466.855" PositionYUnit="reference frame" PositionZ="111.842" PositionZUnit="reference frame" TheC="0" TheT="1" TheZ="0"/>
+    </Pixels>
+  </Image>
+  <Image ID="Image:3" Name="B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi #4">
+    <AcquisitionDate>2016-07-20T11:44:16.161</AcquisitionDate>
+    <ExperimenterRef ID="Experimenter:0"/>
+    <InstrumentRef ID="Instrument:0"/>
+    <ObjectiveSettings ID="Objective:1" Medium="Air" RefractiveIndex="1.000293"/>
+    <Pixels BigEndian="false" DimensionOrder="XYCZT" ID="Pixels:3" Interleaved="false" PhysicalSizeX="0.39999999999999997" PhysicalSizeXUnit="µm" PhysicalSizeY="0.39999999999999997" PhysicalSizeYUnit="µm" SignificantBits="8" SizeC="1" SizeT="2" SizeX="640" SizeY="640" SizeZ="1" Type="uint8">
+      <Channel AcquisitionMode="WideField" EmissionWavelength="465.0" EmissionWavelengthUnit="nm" ExcitationWavelength="353.0" ExcitationWavelengthUnit="nm" ID="Channel:3:0" IlluminationType="Epifluorescence" Name="DAPI" SamplesPerPixel="1">
+        <DetectorSettings Binning="1x1" Gain="0.0" ID="Detector:Internal"/>
+        <FilterSetRef ID="FilterSet:1"/>
+        <LightPath/>
+      </Channel>
+      <MetadataOnly/>
+      <Plane DeltaT="1.0509998798370361" DeltaTUnit="s" ExposureTime="20.0" ExposureTimeUnit="s" PositionX="32466.855" PositionXUnit="reference frame" PositionY="18466.855" PositionYUnit="reference frame" PositionZ="111.842" PositionZUnit="reference frame" TheC="0" TheT="0" TheZ="0"/>
+      <Plane DeltaT="6.055000066757202" DeltaTUnit="s" ExposureTime="20.0" ExposureTimeUnit="s" PositionX="32466.855" PositionXUnit="reference frame" PositionY="18466.855" PositionYUnit="reference frame" PositionZ="111.842" PositionZUnit="reference frame" TheC="0" TheT="1" TheZ="0"/>
+    </Pixels>
+  </Image>
+  <Image ID="Image:4" Name="B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi #5">
+    <AcquisitionDate>2016-07-20T11:44:16.161</AcquisitionDate>
+    <ExperimenterRef ID="Experimenter:0"/>
+    <InstrumentRef ID="Instrument:0"/>
+    <ObjectiveSettings ID="Objective:1" Medium="Air" RefractiveIndex="1.000293"/>
+    <Pixels BigEndian="false" DimensionOrder="XYCZT" ID="Pixels:4" Interleaved="false" PhysicalSizeX="0.39999999999999997" PhysicalSizeXUnit="µm" PhysicalSizeY="0.39999999999999997" PhysicalSizeYUnit="µm" SignificantBits="8" SizeC="1" SizeT="2" SizeX="640" SizeY="640" SizeZ="1" Type="uint8">
+      <Channel AcquisitionMode="WideField" EmissionWavelength="465.0" EmissionWavelengthUnit="nm" ExcitationWavelength="353.0" ExcitationWavelengthUnit="nm" ID="Channel:4:0" IlluminationType="Epifluorescence" Name="DAPI" SamplesPerPixel="1">
+        <DetectorSettings Binning="1x1" Gain="0.0" ID="Detector:Internal"/>
+        <FilterSetRef ID="FilterSet:1"/>
+        <LightPath/>
+      </Channel>
+      <MetadataOnly/>
+      <Plane DeltaT="1.2590000629425049" DeltaTUnit="s" ExposureTime="20.0" ExposureTimeUnit="s" PositionX="39533.145" PositionXUnit="reference frame" PositionY="16533.145" PositionYUnit="reference frame" PositionZ="111.842" PositionZUnit="reference frame" TheC="0" TheT="0" TheZ="0"/>
+      <Plane DeltaT="6.296999931335449" DeltaTUnit="s" ExposureTime="20.0" ExposureTimeUnit="s" PositionX="39533.145" PositionXUnit="reference frame" PositionY="16533.145" PositionYUnit="reference frame" PositionZ="111.842" PositionZUnit="reference frame" TheC="0" TheT="1" TheZ="0"/>
+    </Pixels>
+  </Image>
+  <Image ID="Image:5" Name="B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi #6">
+    <AcquisitionDate>2016-07-20T11:44:16.161</AcquisitionDate>
+    <ExperimenterRef ID="Experimenter:0"/>
+    <InstrumentRef ID="Instrument:0"/>
+    <ObjectiveSettings ID="Objective:1" Medium="Air" RefractiveIndex="1.000293"/>
+    <Pixels BigEndian="false" DimensionOrder="XYCZT" ID="Pixels:5" Interleaved="false" PhysicalSizeX="0.39999999999999997" PhysicalSizeXUnit="µm" PhysicalSizeY="0.39999999999999997" PhysicalSizeYUnit="µm" SignificantBits="8" SizeC="1" SizeT="2" SizeX="640" SizeY="640" SizeZ="1" Type="uint8">
+      <Channel AcquisitionMode="WideField" EmissionWavelength="465.0" EmissionWavelengthUnit="nm" ExcitationWavelength="353.0" ExcitationWavelengthUnit="nm" ID="Channel:5:0" IlluminationType="Epifluorescence" Name="DAPI" SamplesPerPixel="1">
+        <DetectorSettings Binning="1x1" Gain="0.0" ID="Detector:Internal"/>
+        <FilterSetRef ID="FilterSet:1"/>
+        <LightPath/>
+      </Channel>
+      <MetadataOnly/>
+      <Plane DeltaT="1.4500000476837158" DeltaTUnit="s" ExposureTime="20.0" ExposureTimeUnit="s" PositionX="41466.855" PositionXUnit="reference frame" PositionY="16533.145" PositionYUnit="reference frame" PositionZ="111.842" PositionZUnit="reference frame" TheC="0" TheT="0" TheZ="0"/>
+      <Plane DeltaT="6.490000009536743" DeltaTUnit="s" ExposureTime="20.0" ExposureTimeUnit="s" PositionX="41466.855" PositionXUnit="reference frame" PositionY="16533.145" PositionYUnit="reference frame" PositionZ="111.842" PositionZUnit="reference frame" TheC="0" TheT="1" TheZ="0"/>
+    </Pixels>
+  </Image>
+  <Image ID="Image:6" Name="B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi #7">
+    <AcquisitionDate>2016-07-20T11:44:16.161</AcquisitionDate>
+    <ExperimenterRef ID="Experimenter:0"/>
+    <InstrumentRef ID="Instrument:0"/>
+    <ObjectiveSettings ID="Objective:1" Medium="Air" RefractiveIndex="1.000293"/>
+    <Pixels BigEndian="false" DimensionOrder="XYCZT" ID="Pixels:6" Interleaved="false" PhysicalSizeX="0.39999999999999997" PhysicalSizeXUnit="µm" PhysicalSizeY="0.39999999999999997" PhysicalSizeYUnit="µm" SignificantBits="8" SizeC="1" SizeT="2" SizeX="640" SizeY="640" SizeZ="1" Type="uint8">
+      <Channel AcquisitionMode="WideField" EmissionWavelength="465.0" EmissionWavelengthUnit="nm" ExcitationWavelength="353.0" ExcitationWavelengthUnit="nm" ID="Channel:6:0" IlluminationType="Epifluorescence" Name="DAPI" SamplesPerPixel="1">
+        <DetectorSettings Binning="1x1" Gain="0.0" ID="Detector:Internal"/>
+        <FilterSetRef ID="FilterSet:1"/>
+        <LightPath/>
+      </Channel>
+      <MetadataOnly/>
+      <Plane DeltaT="1.6640000343322754" DeltaTUnit="s" ExposureTime="20.0" ExposureTimeUnit="s" PositionX="39533.145" PositionXUnit="reference frame" PositionY="18466.855" PositionYUnit="reference frame" PositionZ="111.842" PositionZUnit="reference frame" TheC="0" TheT="0" TheZ="0"/>
+      <Plane DeltaT="6.700000047683716" DeltaTUnit="s" ExposureTime="20.0" ExposureTimeUnit="s" PositionX="39533.145" PositionXUnit="reference frame" PositionY="18466.855" PositionYUnit="reference frame" PositionZ="111.842" PositionZUnit="reference frame" TheC="0" TheT="1" TheZ="0"/>
+    </Pixels>
+  </Image>
+  <Image ID="Image:7" Name="B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi #8">
+    <AcquisitionDate>2016-07-20T11:44:16.161</AcquisitionDate>
+    <ExperimenterRef ID="Experimenter:0"/>
+    <InstrumentRef ID="Instrument:0"/>
+    <ObjectiveSettings ID="Objective:1" Medium="Air" RefractiveIndex="1.000293"/>
+    <Pixels BigEndian="false" DimensionOrder="XYCZT" ID="Pixels:7" Interleaved="false" PhysicalSizeX="0.39999999999999997" PhysicalSizeXUnit="µm" PhysicalSizeY="0.39999999999999997" PhysicalSizeYUnit="µm" SignificantBits="8" SizeC="1" SizeT="2" SizeX="640" SizeY="640" SizeZ="1" Type="uint8">
+      <Channel AcquisitionMode="WideField" EmissionWavelength="465.0" EmissionWavelengthUnit="nm" ExcitationWavelength="353.0" ExcitationWavelengthUnit="nm" ID="Channel:7:0" IlluminationType="Epifluorescence" Name="DAPI" SamplesPerPixel="1">
+        <DetectorSettings Binning="1x1" Gain="0.0" ID="Detector:Internal"/>
+        <FilterSetRef ID="FilterSet:1"/>
+        <LightPath/>
+      </Channel>
+      <MetadataOnly/>
+      <Plane DeltaT="1.8569998741149902" DeltaTUnit="s" ExposureTime="20.0" ExposureTimeUnit="s" PositionX="41466.855" PositionXUnit="reference frame" PositionY="18466.855" PositionYUnit="reference frame" PositionZ="111.842" PositionZUnit="reference frame" TheC="0" TheT="0" TheZ="0"/>
+      <Plane DeltaT="6.898000001907349" DeltaTUnit="s" ExposureTime="20.0" ExposureTimeUnit="s" PositionX="41466.855" PositionXUnit="reference frame" PositionY="18466.855" PositionYUnit="reference frame" PositionZ="111.842" PositionZUnit="reference frame" TheC="0" TheT="1" TheZ="0"/>
+    </Pixels>
+  </Image>
+  <StructuredAnnotations xmlns="http://www.openmicroscopy.org/Schemas/SA/2015-01">
+    <XMLAnnotation ID="Annotation:0" Namespace="openmicroscopy.org/OriginalMetadata">
+      <Value>
+        <OriginalMetadata>
+          <Key>Experiment|AcquisitionBlock|TimeSeriesSetup|RegionsSetup|SampleHolder|AllowedScanArea|ContourType</Key>
+          <Value>[Rectangle]</Value>
+        </OriginalMetadata>
+      </Value>
+    </XMLAnnotation>
+    <XMLAnnotation ID="Annotation:2127" Namespace="openmicroscopy.org/OriginalMetadata">
+      <Value>
+        <OriginalMetadata>
+          <Key>Information|Image|S|Scene|Shape|Name</Key>
+          <Value>[B4, B4, B4, B4, B5, B5, B5, B5]</Value>
+        </OriginalMetadata>
+      </Value>
+    </XMLAnnotation>
+  </StructuredAnnotations>
+</OME>
