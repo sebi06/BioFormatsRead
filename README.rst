@@ -8,7 +8,7 @@ image data files thanks to BioFormats.
 
 :Author: Sebastian Rhode
 
-:Version: 2016.03.02
+:Version: 2016.07.06
 
 Requirements
 ------------
@@ -68,4 +68,6 @@ Screenshots
    :align: center
    :alt:
 
-
+Disclaimer
+----------------
+*   Remark: Please use at your own risk.
