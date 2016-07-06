@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: bftools.py
-Date: 02.04.2016
-Version. 1.9
+Date: 06.07.2016
+Version. 2.0
 """
 
 
@@ -154,7 +154,7 @@ def get_metainfo_dimension(jmd, MetaInfo):
     # get dimension order string from BioFormats library
     MetaInfo['DimOrder BF'] = jmd.getPixelsDimensionOrder(IMAGEID).getValue()
 
-	print 'Retrieving Image Dimensions ...'
+    print 'Retrieving Image Dimensions ...'
     print 'T: ', MetaInfo['SizeT'],  'Z: ', MetaInfo['SizeZ'],  'C: ', MetaInfo['SizeC'],  'X: ',\
         MetaInfo['SizeX'],  'Y: ', MetaInfo['SizeY']
 
@@ -194,7 +194,6 @@ def get_metainfo_objective(jmd, filename):
     # try to get immersion type -  # get the first objective record in the first Instrument record
     try:
         objimm = jmd.getObjectiveImmersion(instrumentID, objID).getValue()
-        #objimm = jmd.getObjectiveImmersion(instrumentID, objID)
     except:
         objimm = 'na'
 
@@ -394,8 +393,6 @@ def get_image6d(imagefile, sizes):
         jvm_error()
 
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
-
-
     img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
 
     # main loop to read the images from the data file
@@ -516,7 +513,6 @@ def get_imageseries(imagefile, sizes, seriesID=0):
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
 
     # initialize an array with the correct dimensions of one series only
-    #imgseries = np.empty(sizes[1:], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
     imgseries = np.zeros(sizes[1:], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
 
     for timepoint in range(0, sizes[1]):
@@ -541,7 +537,6 @@ def get_series_from_well(imagefile, sizes, seriesseq):
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
     sizes[0] = len(seriesseq)
 
-    #img6dwell = np.empty(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
     img6dwell = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
 
     for seriesID in range(0, len(seriesseq)):
