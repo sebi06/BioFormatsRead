@@ -97,7 +97,7 @@ def scatterplot(planetable, ImageID=0, T=0, Z=0, CH=0, size=35, savefigure=False
 
     # optional save figure as PNG
     if savefigure:
-        savename = filename[:-4] + '_XYZ-Pos' + str(CH) + '.png'
+        savename = filename[:-4] + '_XYZ-Pos' + '.png'
         fig1.savefig(savename)
 
     # optional 3D plot of surface
