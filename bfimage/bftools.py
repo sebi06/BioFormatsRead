@@ -154,6 +154,7 @@ def get_metainfo_dimension(jmd, MetaInfo):
     # get dimension order string from BioFormats library
     MetaInfo['DimOrder BF'] = jmd.getPixelsDimensionOrder(IMAGEID).getValue()
 
+	print 'Retrieving Image Dimensions ...'
     print 'T: ', MetaInfo['SizeT'],  'Z: ', MetaInfo['SizeZ'],  'C: ', MetaInfo['SizeC'],  'X: ',\
         MetaInfo['SizeX'],  'Y: ', MetaInfo['SizeY']
 
@@ -371,10 +372,10 @@ def get_planetable(imagefile, writecsv=False, separator=','):
     df = pd.DataFrame([np.asarray(id), np.asarray(plane), np.asarray(theT), np.asarray(theZ), np.asarray(theC), xpos, ypos, zpos, dt])
     df = df.transpose()
     # give the columns the correct names
-    df.columns = ['IMAGEID', 'Plane', 'TheC', 'TheZ', 'TheC', 'XPos', 'YPos', 'ZPos', 'DeltaT']
+    df.columns = ['ImageID', 'Plane', 'TheT', 'TheZ', 'TheC', 'XPos', 'YPos', 'ZPos', 'DeltaT']
 
     if writecsv:
-        csvfile = imagefile[:-4] + '.csv'
+        csvfile = imagefile[:-4] + '_planetable.csv'
         # use tab as separator and do not write the index to the CSV data table
         df.to_csv(csvfile, sep=separator, index=False)
         print 'Writing CSV file: ', csvfile
@@ -394,7 +395,7 @@ def get_image6d(imagefile, sizes):
 
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
 
-    #img6d = np.empty(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+
     img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
 
     # main loop to read the images from the data file
@@ -427,7 +428,7 @@ def get_image2d(imagefile, sizes, seriesindex, channel, zplane, timepoint):
     return img2d
 
 
-def get_zstack(imagefile, sizes, seriesID, timepoint):
+def get_zstack(imagefile, sizes, seriesID, timepoint='full'):
     """
     This will read a single Z-Stack from an image data set for a specified image series.
     """
@@ -681,7 +682,7 @@ def create_omexml(testdata, method=1, writeczi_metadata=True):
         for i in range(0, len(testdata)):
 
             # Change File name and write XML file to same folder
-            xmlfile2 = testdata[i][:-4] + '_MetaData2.xml'
+            xmlfile2 = testdata[i] + '_MetaData2.xml'
 
             try:
                 # get the actual OME-XML
