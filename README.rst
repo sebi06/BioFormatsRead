@@ -50,6 +50,8 @@ Additional Tools
 *   Retrieve all important meta-information.
 *   Write OME-XML Metadata to XML file.
 *   Create and write plane info table.
+*   Create PlaneTable with containing als XYZ Positions.
+*   Display XYZ data from PlaneTable.
 
 Screenshots
 -----------
@@ -62,7 +64,7 @@ Screenshots
    :align: center
    :alt:
 
-.. figure:: images/planeinfo_output.png
+.. figure:: images/testwell96_planetable_XYZ-Pos.png
    :align: center
    :alt:
 
