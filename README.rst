@@ -69,5 +69,5 @@ Screenshots
    :alt:
 
 Disclaimer
-----------------
+----------
 *   Remark: Please use at your own risk.
