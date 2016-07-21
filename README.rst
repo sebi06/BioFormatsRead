@@ -8,7 +8,7 @@ image data files thanks to BioFormats.
 
 :Author: Sebastian Rhode
 
-:Version: 2016.07.06
+:Version: 2016.07.21
 
 Requirements
 ------------
@@ -52,6 +52,7 @@ Additional Tools
 *   Create and write plane info table.
 *   Create PlaneTable with containing als XYZ Positions.
 *   Display XYZ data from PlaneTable.
+*   Extract Well Information form Scenes (CZI only).
 
 Screenshots
 -----------
