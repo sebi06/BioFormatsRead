@@ -802,6 +802,38 @@ def getWelllNamesfromCZI(filename):
 
     Attention: It works for CZI image data sets only!
 
+    Example XML structure (shortend)
+    -------------------------------------------------------------------------------------------------------------------------
+    <OME xmlns="http://www.openmicroscopy.org/Schemas/OME/2015-01" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openmicroscopy.org/Schemas/OME/2015-01 http://www.openmicroscopy.org/Schemas/OME/2015-01/ome.xsd">
+      <Experimenter ID="Experimenter:0" UserName="M1SRH"/>
+      <Image ID="Image:0" Name="B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi #1">
+        <AcquisitionDate>2016-07-20T11:44:16.161</AcquisitionDate>
+        <ExperimenterRef ID="Experimenter:0"/>
+        <InstrumentRef ID="Instrument:0"/>
+        <ObjectiveSettings ID="Objective:1" Medium="Air" RefractiveIndex="1.000293"/>
+        <Pixels BigEndian="false" DimensionOrder="XYCZT" ID="Pixels:0" Interleaved="false" PhysicalSizeX="0.39999999999999997" PhysicalSizeXUnit="µm" PhysicalSizeY="0.39999999999999997" PhysicalSizeYUnit="µm" SignificantBits="8" SizeC="1" SizeT="2" SizeX="640" SizeY="640" SizeZ="1" Type="uint8">
+          <Channel AcquisitionMode="WideField" EmissionWavelength="465.0" EmissionWavelengthUnit="nm" ExcitationWavelength="353.0" ExcitationWavelengthUnit="nm" ID="Channel:0:0" IlluminationType="Epifluorescence" Name="DAPI" SamplesPerPixel="1">
+            <DetectorSettings Binning="1x1" Gain="0.0" ID="Detector:Internal"/>
+            <FilterSetRef ID="FilterSet:1"/>
+            <LightPath/>
+          </Channel>
+          <MetadataOnly/>
+          <Plane DeltaT="0.46000003814697266" DeltaTUnit="s" ExposureTime="20.0" ExposureTimeUnit="s" PositionX="30533.145" PositionXUnit="reference frame" PositionY="16533.145" PositionYUnit="reference frame" PositionZ="111.842" PositionZUnit="reference frame" TheC="0" TheT="0" TheZ="0"/>
+          <Plane DeltaT="5.456000089645386" DeltaTUnit="s" ExposureTime="20.0" ExposureTimeUnit="s" PositionX="30533.145" PositionXUnit="reference frame" PositionY="16533.145" PositionYUnit="reference frame" PositionZ="111.842" PositionZUnit="reference frame" TheC="0" TheT="1" TheZ="0"/>
+        </Pixels>
+      </Image>
+      <StructuredAnnotations xmlns="http://www.openmicroscopy.org/Schemas/SA/2015-01">
+        <XMLAnnotation ID="Annotation:2127" Namespace="openmicroscopy.org/OriginalMetadata">
+          <Value>
+            <OriginalMetadata>
+              <Key>Information|Image|S|Scene|Shape|Name</Key>
+              <Value>[B4, B4, B4, B4, B5, B5, B5, B5]</Value>
+            </OriginalMetadata>
+          </Value>
+        </XMLAnnotation>
+      </StructuredAnnotations>
+    </OME>
+
     :param filename: input CZI image file location
     :return: string wellstring containing the information
     """
