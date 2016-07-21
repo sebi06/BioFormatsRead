@@ -12,7 +12,8 @@ import os
 import bfimage as bf
 
 #filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
-filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
+#filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
+filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
 
 # specify bioformats_package.jar to use if required
 #bf.set_bfpath(insert path to bioformats_package.jar here)
@@ -28,6 +29,7 @@ print 'Image Filename       : ', MetaInfo['Filename']
 print 'Images Dim Sizes     : ', MetaInfo['Sizes']
 print 'Dimension Order*     : ', MetaInfo['DimOrder BF']
 print 'Dimension Order CZI  : ', MetaInfo['OrderCZI']
+print 'Shape CZI            : ', MetaInfo['ShapeCZI']
 print 'Total Series Number  : ', MetaInfo['TotalSeries']
 print 'Image Dimensions     : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'], MetaInfo['SizeC'],\
                                     MetaInfo['SizeY'], MetaInfo['SizeX']

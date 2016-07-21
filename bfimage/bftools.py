@@ -796,37 +796,71 @@ def parseXML(omexml, topchild, subchild, highdetail=False):
 
 
 def getWelllNamesfromCZI(filename):
+    """
+    This function can be used to extract information about the well or image scence container
+    a CZI image was acquired. Those information are "hidden" inside the XML meta-information.
+
+    Attention: It works for CZI image data sets only!
+
+    :param filename: input CZI image file location
+    :return: string wellstring containing the information
+    """
 
     if not VM_STARTED:
         start_jvm()
     if VM_KILLED:
         jvm_error()
 
-    # Current key for wells - 2016_07_21
+    # Current key for wells inside the meta-information - 2016_07_21
     wellkey = 'Information|Image|S|Scene|Shape|Name'
 
     # Create OME-XMF using BioFormats from CZI file and encode
     omexml = bioformats.get_omexml_metadata(filename)
     omexml_enc = omexml.encode('utf-8')
-    # Get the tree
+    # Get the tree and define namespace
     tree = etl.fromstring(omexml_enc)
-    # Define NameSpace
     name_space = "{http://www.openmicroscopy.org/Schemas/SA/2015-01}"
 
+    # find OriginalMetadata
     origin_meta_datas = tree.findall(".//{}OriginalMetadata".format(name_space))
     # Iterate in founded origins
     for origin in origin_meta_datas:
         key = origin.find("{}Key".format(name_space)).text
         if key == wellkey:
-            value = origin.find("{}Value".format(name_space)).text
-            #print("Value: {}".format(value))
+            wellstring= origin.find("{}Value".format(name_space)).text
+            print("Value: {}".format(wellstring))
 
-    return value
+    return wellstring
 
 
-def getWellInfofromCZI(wellstring):
+def processWellStringfromCZI(wellstring):
+    """
+    This function extracts the information from a CZI wellstring and process the information.
+    Every scene inside a CZI file carries this information. Usually BioFormats translates scenes
+    into ImageSeries.
 
-    # labeling schemes for plates up-to 1536 wellplate
+    Input:
+    --------------------------------------------------------------
+    wellstring = '[B4, B4, B4, B4, B5, B5, B5, B5]
+
+    Output:
+    ---------------------------------------------------------------
+    welllist    = ['B4', 'B4', 'B4', 'B4', 'B5', 'B5', 'B5', 'B5']
+    colindex    = [3, 3, 3, 3, 4, 4, 4, 4]
+    rowindex    = [1, 1, 1, 1, 1, 1, 1, 1]
+    welldict    = Counter({'B4': 4, 'B5': 4})
+    numwells    = 8
+
+    :param wellstring:
+    :return: welllist - list containing all wellIDs as strings
+    :return: colindex - column indices for well found in welllist as integers
+    :return: rowindex - row indices for well found in welllist as integers
+    :return: welldict - dictionary containing all found wells and there occurence
+    :return: numwells, cols, rows, welldict, numwells
+    """
+
+    # labeling schemes for up-to 1536 wellplate
+    # currently colIDs is not used
     colIDs = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12',
               '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24',
               '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36',
@@ -835,27 +869,27 @@ def getWellInfofromCZI(wellstring):
     rowIDs = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
               'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF']
 
+    # remove the brackets and the white spaces
     wellOK = wellstring[1:]
     wellOK = wellOK[:-1]
     wellOK = re.sub(r'\s+', '', wellOK)
-
+    # split the rest based on the commas
     welllist = [item for item in wellOK.split(',') if item.strip()]
-
-    #print welllist
-
+    # initialize the lists
     cols = []
     rows = []
-
+    # split strings for single well intto the character and the number
     for i in range(0, len(welllist)):
         wellid_split = re.findall('\d+|\D+', welllist[i])
         well_ch = wellid_split[0]
         well_id = wellid_split[1]
+        # update the column index based on the number
         cols.append(np.int(well_id) - 1)
-        well_id_index = rowIDs.index(well_ch)
-        rows.append(well_id_index)
-
+        # update the row index based on the character
+        rows.append(rowIDs.index(well_ch))
+    # count the content of the list, e.g. how many time a certain well was detected
     welldict = Counter(welllist)
+    # count the number of different wells
+    numdifferentwells = len(welldict.keys())
 
-    numwells = len(welllist)
-
-    return welllist, cols, rows, welldict, numwells
+    return welllist, cols, rows, welldict, numdifferentwells
