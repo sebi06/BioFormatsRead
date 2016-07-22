@@ -412,7 +412,7 @@ def get_image6d(imagefile, sizes):
     return img6d
 
 
-def get_image2d(imagefile, sizes, seriesindex, channel, zplane, timepoint):
+def get_image2d(imagefile, sizes, seriesID, channel, zplane, timepoint):
     """
     This will just read a single plane from an image data set.
     """
@@ -422,7 +422,7 @@ def get_image2d(imagefile, sizes, seriesindex, channel, zplane, timepoint):
         jvm_error()
 
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
-    img2d = rdr.read(series=seriesindex, c=channel, z=zplane, t=timepoint, rescale=False)
+    img2d = rdr.read(series=serieID, c=channel, z=zplane, t=timepoint, rescale=False)
 
     rdr.close()
 
