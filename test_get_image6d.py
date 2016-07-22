@@ -22,7 +22,7 @@ filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
 MetaInfo = bf.bftools.get_relevant_metainfo_wrapper(filename)
 img6d = bf.bftools.get_image6d(filename, MetaInfo['Sizes'])
 
-## show relevant image Meta-Information
+# show relevant image Meta-Information
 print '\n'
 print 'Image Directory      : ', MetaInfo['Directory']
 print 'Image Filename       : ', MetaInfo['Filename']
