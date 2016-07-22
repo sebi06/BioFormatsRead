@@ -422,7 +422,7 @@ def get_image2d(imagefile, sizes, seriesID, channel, zplane, timepoint):
         jvm_error()
 
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
-    img2d = rdr.read(series=serieID, c=channel, z=zplane, t=timepoint, rescale=False)
+    img2d = rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
 
     rdr.close()
 
