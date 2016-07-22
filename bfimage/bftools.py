@@ -877,7 +877,7 @@ def processWellStringfromCZI(wellstring):
 
     Output:
     ---------------------------------------------------------------
-    welllist    = ['B4', 'B4', 'B4', 'B4', 'B5', 'B5', 'B5', 'B5']
+    welllist    = ['B4', 'B4', 'B4', 'B4', 'B5', 'B5', 'B5', 'B5']'
     colindex    = [3, 3, 3, 3, 4, 4, 4, 4]
     rowindex    = [1, 1, 1, 1, 1, 1, 1, 1]
     welldict    = Counter({'B4': 4, 'B5': 4})
@@ -925,3 +925,17 @@ def processWellStringfromCZI(wellstring):
     numdifferentwells = len(welldict.keys())
 
     return welllist, cols, rows, welldict, numdifferentwells
+
+
+def getImageSeriesIDforWell(welllist, wellID):
+    """
+    Returns all ImageSeries indicies for a specific wellID
+
+    :param welllist: list containing all wellIDs as stringe, e.g. '[B4, B4, B4, B4, B5, B5, B5, B5]'
+    :param wellID: string specifying the well, eg.g. 'B4'
+    :return: imageseriesindices - list containing all ImageSeries indices, which correspond the the well
+    """
+
+    imageseriesindices = [i for i, x in enumerate(welllist) if x == wellID]
+
+    return imageseriesindices
