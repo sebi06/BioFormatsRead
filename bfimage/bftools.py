@@ -593,7 +593,7 @@ def create_metainfo_dict():
     return MetaInfo
 
 
-def get_relevant_metainfo_wrapper(filename):
+def get_relevant_metainfo_wrapper(filename, ns='http://www.openmicroscopy.org/Schemas/OME/2016-06'):
 
     MetaInfo = create_metainfo_dict()
     omexml = createOMEXML(filename)
@@ -632,13 +632,13 @@ def get_relevant_metainfo_wrapper(filename):
 
     # try to get detector information
     try:
-        MetaInfo['Detector Model'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'])[0]['Model']
+        MetaInfo['Detector Model'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'], ns)[0]['Model']
     except IndexError as e:
         print 'Problem reading Detector Model. IndexError:', e.message
         MetaInfo['Detector Model'] = 'na'
 
     try:
-        MetaInfo['Detector Name'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'])[0]['ID']
+        MetaInfo['Detector Name'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'], ns)[0]['ID']
     except IndexError as e:
         print 'Problem reading Detector Name. Index Error:', e.message
         MetaInfo['Detector Name'] = 'na'
@@ -717,10 +717,12 @@ def create_omexml(testdata, method=1, writeczi_metadata=True):
                     print 'Could not write special CZI metadata for: ', testdata[i]
 
 
-def getinfofromOMEXML(omexml, nodenames, ns='http://www.openmicroscopy.org/Schemas/OME/2015-01'):
+def getinfofromOMEXML(omexml, nodenames, ns='http://www.openmicroscopy.org/Schemas/OME/2016-06'):
     """
     This function can be used to read the most useful OME-MetaInformation from the respective XML.
     Check for the correct namespace. More info can be found at: http://www.openmicroscopy.org/Schemas/
+
+    Some older version of BF may use: 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
 
     The output is a list that can contain multiple elements.
 
