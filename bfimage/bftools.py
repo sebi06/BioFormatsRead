@@ -630,9 +630,18 @@ def get_relevant_metainfo_wrapper(filename):
                          MetaInfo['SizeC'], MetaInfo['SizeY'], MetaInfo['SizeX']]
 
 
-    # get detector information
-    MetaInfo['Detector Model'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'])[0]['Model']
-    MetaInfo['Detector Name'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'])[0]['ID']
+    # try to get detector information
+    try:
+        MetaInfo['Detector Model'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'])[0]['Model']
+    except IndexError as e:
+        print('Problem reading Detector Model: ', e)
+        MetaInfo['Detector Model'] = 'na'
+
+    try:
+        MetaInfo['Detector Name'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'])[0]['ID']
+    except IndexError as e:
+        print('Problem reading Detector Name: ', e)
+        MetaInfo['Detector Name'] = 'na'
 
     return MetaInfo
 
