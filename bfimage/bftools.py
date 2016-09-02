@@ -959,6 +959,7 @@ def output2file(scriptname, output_name='output.txt', targetdir=os.getcwd()):
 
     f.close()
     # reset stdout to normal
+    sys.stdout.close()
     sys.__stdout__
 
     print 'Output written to : ', filepath_output
