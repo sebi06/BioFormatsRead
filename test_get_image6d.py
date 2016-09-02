@@ -10,6 +10,16 @@ Version. 1.0
 import numpy as np
 import os
 import bfimage as bf
+import sys
+
+redirect = True
+
+if redirect:
+    # redirect output
+    orig_stdout = sys.stdout
+    filepath_output = os.path.join(os.getcwd(), 'test_get_image6d_output.txt')
+    f = file(filepath_output, 'w')
+    sys.stdout = f
 
 #filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
 #filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
@@ -44,3 +54,9 @@ print 'Detector Name        : ', MetaInfo['Detector Name']
 print 'Channels             : ', MetaInfo['Channels']
 print 'Channel Description  : ', MetaInfo['ChDesc']
 print 'Array Shape 6D       : ', np.shape(img6d)
+
+if redirect:
+    sys.stdout = orig_stdout
+    f.close()
+    sys.__stdout__
+    print 'Output written to : ', filepath_output
