@@ -634,13 +634,13 @@ def get_relevant_metainfo_wrapper(filename):
     try:
         MetaInfo['Detector Model'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'])[0]['Model']
     except IndexError as e:
-        print('Problem reading Detector Model: ', e)
+        print 'Problem reading Detector Model: ', e
         MetaInfo['Detector Model'] = 'na'
 
     try:
         MetaInfo['Detector Name'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'])[0]['ID']
     except IndexError as e:
-        print('Problem reading Detector Name: ', e)
+        print 'Problem reading Detector Name: ', e
         MetaInfo['Detector Name'] = 'na'
 
     return MetaInfo
@@ -948,3 +948,19 @@ def getImageSeriesIDforWell(welllist, wellID):
     imageseriesindices = [i for i, x in enumerate(welllist) if x == wellID]
 
     return imageseriesindices
+    
+    
+def output2file(scriptname, output_name='output.txt', targetdir=os.getcwd()):
+
+    # log output to file
+    filepath_output = os.path.join(targetdir, output_name)
+    with open(filepath_output, 'wb') as f:
+        subprocess.check_call(['python', scriptname], stdout=f)
+
+    f.close()
+    # reset stdout to normal
+    sys.__stdout__
+
+    print 'Output written to : ', filepath_output
+
+    return filepath_output
