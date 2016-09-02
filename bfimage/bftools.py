@@ -634,13 +634,13 @@ def get_relevant_metainfo_wrapper(filename):
     try:
         MetaInfo['Detector Model'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'])[0]['Model']
     except IndexError as e:
-        print 'Problem reading Detector Model: ', e
+        print 'Problem reading Detector Model. IndexError:', e.message
         MetaInfo['Detector Model'] = 'na'
 
     try:
         MetaInfo['Detector Name'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'])[0]['ID']
     except IndexError as e:
-        print 'Problem reading Detector Name: ', e
+        print 'Problem reading Detector Name. Index Error:', e.message
         MetaInfo['Detector Name'] = 'na'
 
     return MetaInfo
