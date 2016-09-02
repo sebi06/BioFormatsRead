@@ -948,3 +948,48 @@ def getImageSeriesIDforWell(welllist, wellID):
     imageseriesindices = [i for i, x in enumerate(welllist) if x == wellID]
 
     return imageseriesindices
+
+
+def getPlanesAndPixelsFromCZI(filename):
+    """
+      This function can be used to extract information about the <Plane> and <Pixel> Elements in the
+      inside the XML meta-information tree. Returns two lists of dictionaries, each dictionary element corresponds to one <Plane> element
+      of the XML tree, with key/values of the XML tree mapped to respective key/values of the dictionary.
+
+      Attention: works for CZI image data sets only!
+
+      Added by Volker.Hilsenstein@embl.de
+    """
+    if not VM_STARTED:
+        start_jvm()
+    if VM_KILLED:
+        jvm_error()
+
+    # Create OME-XMF using BioFormats from CZI file and encode
+    omexml = bioformats.get_omexml_metadata(filename)
+    omexml_enc = omexml.encode('utf-8')
+
+    # Get the tree and define namespace
+    tree = etl.fromstring(omexml_enc)
+    # had wrong schema here SA instead of OME and was searching
+    # like crazy for the bug ...
+    # Maybe leave out schema completely and only search for *Plane*
+    # and *Pixels*
+    name_space = "{http://www.openmicroscopy.org/Schemas/OME/2015-01}"
+    Planes = []
+    Pixels = []
+    #for child in root:
+    #    m = re.match('.*Image.*', child.tag)
+    #    if m:
+    #        first_tag = m.group(0)
+    for element in tree.iter():
+    #for element in tree:
+        #print element.tag
+        if "{}Plane".format(name_space) in element.tag:
+            tmpdict = dict(zip(element.keys(), element.values()))
+            Planes.append(tmpdict)
+        if "{}Pixels".format(name_space) in element.tag:
+            tmpdict = dict(zip(element.keys(), element.values()))
+            Pixels.append(tmpdict)
+
+    return(Planes,Pixels)
