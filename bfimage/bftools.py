@@ -954,7 +954,7 @@ def output2file(scriptname, output_name='output.txt', targetdir=os.getcwd()):
 
     # log output to file
     filepath_output = os.path.join(targetdir, output_name)
-    with open(filepath_output, 'wb') as f:
+    with open(filepath_output, 'w') as f:
         subprocess.check_call(['python', scriptname], stdout=f)
 
     f.close()
