@@ -960,6 +960,8 @@ def getPlanesAndPixelsFromCZI(filename):
       of the XML tree, with key/values of the XML tree mapped to respective key/values of the dictionary.
       Attention: works for CZI image data sets only!
       Added by Volker.Hilsenstein@embl.de
+
+      Addey by sebi06 at 05092016
       
     """
     if not VM_STARTED:
