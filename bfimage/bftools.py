@@ -131,15 +131,30 @@ def get_java_metadata_store(imagefile):
     except:
         totalseries = 1  # in case there is only ONE series
 
+        try:
+        for sc in range(0, totalseries):
+            rdr.rdr.setSeries(sc)
+            resolutionCount = rdr.rdr.getResolutionCount()
+
+            print 'Resolution count for series #', sc, ' = ' + resolutionCount
+
+            for res in range(0, resolutionCount):
+                rdr.rdr.setResolution(res)
+                print 'Resolution #', res, ' dimensions = ', rdr.getSizeX(), ' x ', rdr.getSizeY()
+    except:
+        print 'Multi-Resolution API not enabled yet.'
     # rdr.rdr is the actual BioFormats reader. rdr handles its lifetime
     jmd = jv.JWrapper(rdr.rdr.getMetadataStore())
 
     imagecount = jmd.getImageCount()
-    IMAGEID = imagecount - 1
+
+    imageIDs = []
+    for id in range(0, imagecount):
+        imageIDs.append(id)
 
     rdr.close()
 
-    return jmd, totalseries, IMAGEID
+    return jmd, totalseries, imageIDs
 
 
 def get_metainfo_dimension(jmd, MetaInfo):
@@ -181,11 +196,38 @@ def get_metainfo_scaling(jmd):
     return xscale, yscale, zscale
 
 
-def get_metainfo_objective(jmd, filename):
+def get_metainfo_detector(jmd, instrumentindex=0, detectorindex=0):
 
     try:
-        # get the correct objective ID (the objective that was used to acquire the image)
-        instrumentID = np.int(jmd.getInstrumentID(IMAGEID)[-1])
+        # get the correct detector ID
+        detectorID = jmd.getDetectorID(instrumentindex, detectorindex)
+    except:
+        print 'No suitable detector ID found. Using default = 0.'
+        detectorID = 0
+
+    return detectorID
+
+
+def get_metainfo_instrument(jmd, instrumentindex=0):
+
+    try:
+        # get the correctinstrument ID
+        instrumentIDstr = jmd.getInstrumentID(instrumentindex)
+        instrumentID = np.int(jmd.getInstrumentID(instrumentindex)[-1])
+    except:
+        print 'No suitable instrumentID found. Using default = 0.'
+        instrumentIDstr = 'na'
+        instruementID = 0
+
+    return instrumentIDstr, instrumentID
+
+
+def get_metainfo_objective(jmd, filename, imageID=0):
+
+    try:
+       # get the correct objective ID (the objective that was used to acquire the image)
+        instrumentIDstr = jmd.getInstrumentID(imageID)
+        instrumentID = np.int(jmd.getInstrumentID(imageID)[-1])
         objID = np.int(jmd.getObjectiveSettingsID(instrumentID)[-1])
         # error handling --> sometime only one objective is there with ID > 0
         numobj = jmd.getObjectiveCount(instrumentID)
@@ -586,15 +628,18 @@ def create_metainfo_dict():
                 'WLEm': 0,
                 'Detector Model': [],
                 'Detector Name': [],
+                'DetectorID': 'na',
+                'InstrumentID': 0,
                 'Dyes': [],
                 'Channels': [],
                 'ChDesc': 'na',
-                'Sizes': 0}
+                'Sizes': 0,
+                'ImageIDs': []}
 
     return MetaInfo
 
 
-def get_relevant_metainfo_wrapper(filename, ns='http://www.openmicroscopy.org/Schemas/OME/2016-06'):
+def get_relevant_metainfo_wrapper(filename, ns='http://www.openmicroscopy.org/Schemas/OME/2015-01'):
 
     MetaInfo = create_metainfo_dict()
     omexml = createOMEXML(filename)
@@ -603,7 +648,7 @@ def get_relevant_metainfo_wrapper(filename, ns='http://www.openmicroscopy.org/Sc
     MetaInfo['Filename'] = os.path.basename(filename)
 
     # get JavaMetaDataStore and SeriesCount
-    jmd, MetaInfo['TotalSeries'], IMAGEID = get_java_metadata_store(filename)
+    jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'] = get_java_metadata_store(filename)
 
     # get dimension information and MetaInfo
     MetaInfo = get_metainfo_dimension(jmd, MetaInfo)
@@ -615,7 +660,7 @@ def get_relevant_metainfo_wrapper(filename, ns='http://www.openmicroscopy.org/Sc
 
     # use bioformats to get the objective informations
     print 'Using BioFormats to get MetaInformation.'
-    MetaInfo['Immersion'], MetaInfo['NA'], MetaInfo['ObjMag'], MetaInfo['ObjModel'] = get_metainfo_objective(jmd, filename)
+    MetaInfo['Immersion'], MetaInfo['NA'], MetaInfo['ObjMag'], MetaInfo['ObjModel'] = get_metainfo_objective(jmd, filename, imageID=0)
 
     # get scaling information
     MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale'] = get_metainfo_scaling(jmd)
@@ -631,7 +676,7 @@ def get_relevant_metainfo_wrapper(filename, ns='http://www.openmicroscopy.org/Sc
                          MetaInfo['SizeC'], MetaInfo['SizeY'], MetaInfo['SizeX']]
 
 
-    # try to get detector information
+    # try to get detector information - 1
     try:
         MetaInfo['Detector Model'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'], ns)[0]['Model']
     except IndexError as e:
@@ -643,6 +688,12 @@ def get_relevant_metainfo_wrapper(filename, ns='http://www.openmicroscopy.org/Sc
     except IndexError as e:
         print 'Problem reading Detector Name. Index Error:', e.message
         MetaInfo['Detector Name'] = 'na'
+
+    # try to get detector information - 2
+    try:
+        MetaInfo['DetectorID'] = get_metainfo_detector(jmd, instrumentindex=0, detectorindex=0)
+    except:
+        print 'Problem reading DetectorID from OME-XML.'
 
     return MetaInfo
 
