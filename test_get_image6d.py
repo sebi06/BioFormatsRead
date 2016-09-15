@@ -34,7 +34,7 @@ if redirect:
 #bf.set_bfpath(insert path to bioformats_package.jar here)
 
 # get image meta-information
-MetaInfo = bf.bftools.get_relevant_metainfo_wrapper(filename, ns=urlnamespace)
+MetaInfo = bf.bftools.get_relevant_metainfo_wrapper(filename, namespace=urlnamespace)
 img6d = bf.bftools.get_image6d(filename, MetaInfo['Sizes'])
 
 # show relevant image Meta-Information
