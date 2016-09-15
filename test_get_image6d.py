@@ -31,7 +31,7 @@ if redirect:
     sys.stdout = f
 
 # specify bioformats_package.jar to use if required
-bfpackage = r'BioFormats/5.1.10/bioformats_apckage.jar'
+bfpackage = r'BioFormats/5.1.10/bioformats_package.jar'
 bf.set_bfpath(bfpackage)
 
 # get image meta-information
