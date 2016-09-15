@@ -24,7 +24,7 @@ VM_STARTED = False
 VM_KILLED = False
 
 # define default path to bioformats_package.jar globally
-BFPATH = 'bioformats_package.jar'
+BFPATH = r'BioFormats/5.1.10/bioformats_package.jar'
 
 BF2NP_DTYPE = {
     0: np.int8,
