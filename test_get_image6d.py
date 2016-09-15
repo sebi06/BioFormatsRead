@@ -32,7 +32,7 @@ if redirect:
 
 # specify bioformats_package.jar to use if required
 bfpackage = r'BioFormats/5.1.10/bioformats_apckage.jar'
-bf.set_bfpath(insert path to bioformats_package.jar here)
+bf.set_bfpath(bfpackage)
 
 # get image meta-information
 MetaInfo = bf.bftools.get_relevant_metainfo_wrapper(filename, namespace=urlnamespace)
