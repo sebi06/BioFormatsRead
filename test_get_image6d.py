@@ -31,7 +31,7 @@ if redirect:
     sys.stdout = f
 
 # specify bioformats_package.jar to use if required
-#bf.set_bfpath(insert path to bioformats_package.jar here)
+bf.set_bfpath(insert path to bioformats_package.jar here)
 
 # get image meta-information
 MetaInfo = bf.bftools.get_relevant_metainfo_wrapper(filename, namespace=urlnamespace)
