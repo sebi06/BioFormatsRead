@@ -3,7 +3,7 @@
 @author: Sebi
 
 File: bftools.py
-Date: 02.09.2016
+Date: 15.09.2016
 Version. 1.9.1
 """
 
@@ -37,8 +37,6 @@ BF2NP_DTYPE = {
     7: np.double
 }
 
-# global default imageID
-IMAGEID = 0
 
 def set_bfpath(bfpackage_path=BFPATH):
     # this function can be used to set the path to the package individually
@@ -132,15 +130,13 @@ def get_java_metadata_store(imagefile):
         totalseries = 1  # in case there is only ONE series
 
         try:
-        for sc in range(0, totalseries):
-            rdr.rdr.setSeries(sc)
-            resolutionCount = rdr.rdr.getResolutionCount()
-
-            print 'Resolution count for series #', sc, ' = ' + resolutionCount
-
-            for res in range(0, resolutionCount):
-                rdr.rdr.setResolution(res)
-                print 'Resolution #', res, ' dimensions = ', rdr.getSizeX(), ' x ', rdr.getSizeY()
+            for sc in range(0, totalseries):
+                rdr.rdr.setSeries(sc)
+                resolutionCount = rdr.rdr.getResolutionCount()
+                print 'Resolution count for series #', sc, ' = ' + resolutionCount
+                for res in range(0, resolutionCount):
+                    rdr.rdr.setResolution(res)
+                    print 'Resolution #', res, ' dimensions = ', rdr.getSizeX(), ' x ', rdr.getSizeY()
     except:
         print 'Multi-Resolution API not enabled yet.'
     # rdr.rdr is the actual BioFormats reader. rdr handles its lifetime
@@ -157,20 +153,20 @@ def get_java_metadata_store(imagefile):
     return jmd, totalseries, imageIDs
 
 
-def get_metainfo_dimension(jmd, MetaInfo):
+def get_metainfo_dimension(jmd, MetaInfo, imageID=0):
     """
     Read the actual size for every dimension from the metadata
     and convert them into numbers.
     dimension order is returned as a string.
     """
 
-    MetaInfo['SizeC'] = np.int(jmd.getPixelsSizeC(IMAGEID).getValue().floatValue())
-    MetaInfo['SizeT'] = np.int(jmd.getPixelsSizeT(IMAGEID).getValue().floatValue())
-    MetaInfo['SizeZ'] = np.int(jmd.getPixelsSizeZ(IMAGEID).getValue().floatValue())
-    MetaInfo['SizeX'] = np.int(jmd.getPixelsSizeX(IMAGEID).getValue().floatValue())
-    MetaInfo['SizeY'] = np.int(jmd.getPixelsSizeY(IMAGEID).getValue().floatValue())
+    MetaInfo['SizeC'] = np.int(jmd.getPixelsSizeC(imageEID).getValue().floatValue())
+    MetaInfo['SizeT'] = np.int(jmd.getPixelsSizeT(imageID).getValue().floatValue())
+    MetaInfo['SizeZ'] = np.int(jmd.getPixelsSizeZ(imageID).getValue().floatValue())
+    MetaInfo['SizeX'] = np.int(jmd.getPixelsSizeX(imageID).getValue().floatValue())
+    MetaInfo['SizeY'] = np.int(jmd.getPixelsSizeY(imageID).getValue().floatValue())
     # get dimension order string from BioFormats library
-    MetaInfo['DimOrder BF'] = jmd.getPixelsDimensionOrder(IMAGEID).getValue()
+    MetaInfo['DimOrder BF'] = jmd.getPixelsDimensionOrder(imageID).getValue()
 
     print 'Retrieving Image Dimensions ...'
     print 'T: ', MetaInfo['SizeT'],  'Z: ', MetaInfo['SizeZ'],  'C: ', MetaInfo['SizeC'],  'X: ',\
@@ -179,16 +175,16 @@ def get_metainfo_dimension(jmd, MetaInfo):
     return MetaInfo
 
 
-def get_metainfo_scaling(jmd):
+def get_metainfo_scaling(jmd, imageID=0):
 
     # get scaling for XYZ in micron
-    xscale = np.round(jmd.getPixelsPhysicalSizeX(IMAGEID).value().floatValue(), 3)
-    yscale = np.round(jmd.getPixelsPhysicalSizeY(IMAGEID).value().floatValue(), 3)
+    xscale = np.round(jmd.getPixelsPhysicalSizeX(imageID).value().floatValue(), 3)
+    yscale = np.round(jmd.getPixelsPhysicalSizeY(imageID).value().floatValue(), 3)
 
     # check if there is only one z-plane
-    SizeZ = jmd.getPixelsSizeZ(IMAGEID).getValue().floatValue()
+    SizeZ = jmd.getPixelsSizeZ(imageID).getValue().floatValue()
     if SizeZ > 1:
-        zscale = np.round(jmd.getPixelsPhysicalSizeZ(IMAGEID).value().floatValue(), 3)
+        zscale = np.round(jmd.getPixelsPhysicalSizeZ(imageID).value().floatValue(), 3)
     else:
         # set z spacing equal to xy, if there is only one z-plane existing
         zscale = xscale
@@ -225,7 +221,7 @@ def get_metainfo_instrument(jmd, instrumentindex=0):
 def get_metainfo_objective(jmd, filename, imageID=0):
 
     try:
-       # get the correct objective ID (the objective that was used to acquire the image)
+        # get the correct objective ID (the objective that was used to acquire the image)
         instrumentIDstr = jmd.getInstrumentID(imageID)
         instrumentID = np.int(jmd.getInstrumentID(imageID)[-1])
         objID = np.int(jmd.getObjectiveSettingsID(instrumentID)[-1])
@@ -292,9 +288,9 @@ def get_metainfo_numscenes(filename):
     return numscenes
 
 
-def get_metainfo_wavelengths(jmd):
+def get_metainfo_wavelengths(jmd, imageID=0):
 
-    SizeC = np.int(jmd.getPixelsSizeC(IMAGEID).getValue().floatValue())
+    SizeC = np.int(jmd.getPixelsSizeC(imageID).getValue().floatValue())
 
     # initialize arrays for excitation and emission wavelength
     wl_excitation = np.zeros(SizeC)
@@ -306,10 +302,10 @@ def get_metainfo_wavelengths(jmd):
 
         try:
             # new from bioformats_package.jar >= 5.1.1
-            wl_excitation[i] = np.round(jmd.getChannelExcitationWavelength(IMAGEID, i).value().floatValue(), 0)
-            wl_emission[i] = np.round(jmd.getChannelEmissionWavelength(IMAGEID, i).value().floatValue() ,0)
-            dyes.append(str(jmd.getChannelFluor(IMAGEID, i)))
-            channels.append(str(jmd.getChannelName(IMAGEID, i)))
+            wl_excitation[i] = np.round(jmd.getChannelExcitationWavelength(imageID, i).value().floatValue(), 0)
+            wl_emission[i] = np.round(jmd.getChannelEmissionWavelength(imageID, i).value().floatValue(), 0)
+            dyes.append(str(jmd.getChannelFluor(imageID, i)))
+            channels.append(str(jmd.getChannelName(imageID, i)))
         except:
             wl_excitation[i] = 0
             wl_emission[i] = 0
@@ -319,7 +315,7 @@ def get_metainfo_wavelengths(jmd):
     return wl_excitation, wl_emission, dyes, channels
 
 
-def get_dimension_only(imagefile):
+def get_dimension_only(imagefile, imageID=0):
 
     if not VM_STARTED:
         start_jvm()
@@ -336,7 +332,7 @@ def get_dimension_only(imagefile):
 
     # get dimensions for CTZXY
     md = bioformats.OMEXML(new_omexml)
-    pixels = md.image(IMAGEID).Pixels
+    pixels = md.image(imageID).Pixels
     SizeC = pixels.SizeC
     SizeT = pixels.SizeT
     SizeZ = pixels.SizeZ
@@ -364,7 +360,7 @@ def get_planetable(imagefile, writecsv=False, separator=','):
     MetaInfo = create_metainfo_dict()
 
     # get JavaMetaDataStore and SeriesCount
-    jmd, MetaInfo['TotalSeries'], IMAGEID = get_java_metadata_store(imagefile)
+    jmd, MetaInfo['TotalSeries'], imageIDs = get_java_metadata_store(imagefile)
 
     # get dimension information and MetaInfo
     MetaInfo = get_metainfo_dimension(jmd, MetaInfo)
@@ -381,7 +377,7 @@ def get_planetable(imagefile, writecsv=False, separator=','):
 
     print 'Start reading the plane data ',
 
-    for imageIndex in range(0, IMAGEID+1):
+    for imageIndex in range(0, imageIDs[0]+1):
         for planeIndex in range(0, MetaInfo['SizeZ'] * MetaInfo['SizeC'] * MetaInfo['SizeT']):
 
             id.append(imageIndex)
@@ -648,28 +644,47 @@ def get_relevant_metainfo_wrapper(filename, ns='http://www.openmicroscopy.org/Sc
     MetaInfo['Filename'] = os.path.basename(filename)
 
     # get JavaMetaDataStore and SeriesCount
-    jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'] = get_java_metadata_store(filename)
+    try:
+        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'] = get_java_metadata_store(filename)
+        #jmd, MetaInfo['TotalSeries'] = get_java_metadata_store(filename)
+    except:
+        print 'Problem retrieving Java Metadata Store or Series size:', sys.exc_info()[0]
+        raise
 
-    # get dimension information and MetaInfo
-    MetaInfo = get_metainfo_dimension(jmd, MetaInfo)
+   # get dimension information and MetaInfo
+    try:
+        MetaInfo = get_metainfo_dimension(jmd, MetaInfo, imageID=0)
+    except:
+        print 'Problem retrieving image dimensions:', sys.exc_info()[0]
 
     if filename[-4:] == '.czi':
         # get objective information using cziread
         print 'Using czifile.py to get CZI Shape info.'
         MetaInfo['ShapeCZI'], MetaInfo['OrderCZI'] = czt.get_shapeinfo_cziread(filename)
 
-    # use bioformats to get the objective informations
-    print 'Using BioFormats to get MetaInformation.'
-    MetaInfo['Immersion'], MetaInfo['NA'], MetaInfo['ObjMag'], MetaInfo['ObjModel'] = get_metainfo_objective(jmd, filename, imageID=0)
+    # use bioformats to get the objective information
+    try:
+        MetaInfo['Immersion'], MetaInfo['NA'], MetaInfo['ObjMag'], MetaInfo['ObjModel'] = get_metainfo_objective(jmd, filename, imageID=0)
+    except:
+        print 'Problem retrieving object information:', sys.exc_info()[0]
 
     # get scaling information
-    MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale'] = get_metainfo_scaling(jmd)
+    try:
+        MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale'] = get_metainfo_scaling(jmd)
+    except:
+        print 'Problem retrieving scaling information:', sys.exc_info()[0]
 
     # get wavelengths and dyes information
-    MetaInfo['WLEx'], MetaInfo['WLEm'], MetaInfo['Dyes'], MetaInfo['Channels'] = get_metainfo_wavelengths(jmd)
+    try:
+        MetaInfo['WLEx'], MetaInfo['WLEm'], MetaInfo['Dyes'], MetaInfo['Channels'] = get_metainfo_wavelengths(jmd)
+    except:
+        print 'Problem retrieving wavelength information:', sys.exc_info()[0]
 
     # get channel description
-    MetaInfo['ChDesc'] = czt.get_metainfo_channel_description(filename)
+    try:
+        MetaInfo['ChDesc'] = czt.get_metainfo_channel_description(filename)
+    except:
+        print 'Problem retrieving channel description:', sys.exc_info()[0]
 
     # summarize dimensions
     MetaInfo['Sizes'] = [MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'],
@@ -769,12 +784,13 @@ def create_omexml(testdata, method=1, writeczi_metadata=True):
                     print 'Could not write special CZI metadata for: ', testdata[i]
 
 
-def getinfofromOMEXML(omexml, nodenames, ns='http://www.openmicroscopy.org/Schemas/OME/2016-06'):
+def getinfofromOMEXML(omexml, nodenames, ns='http://www.openmicroscopy.org/Schemas/OME/2015-01'):
     """
     This function can be used to read the most useful OME-MetaInformation from the respective XML.
     Check for the correct namespace. More info can be found at: http://www.openmicroscopy.org/Schemas/
 
-    Some older version of BF may use: 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
+    BF 5.1.10 ueses: 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
+    BF >  5.2 ueses: 'http://www.openmicroscopy.org/Schemas/OME/2016-06' --> not fully supported yet
 
     The output is a list that can contain multiple elements.
 
@@ -858,7 +874,7 @@ def parseXML(omexml, topchild, subchild, highdetail=False):
                             testdict[step_child2.tag] = step_child2.attrib
 
 
-def getWelllNamesfromCZI(filename):
+def getWelllNamesfromCZI(filename, namespace='{http://www.openmicroscopy.org/Schemas/SA/2015-01}'):
     """
     This function can be used to extract information about the well or image scence container
     a CZI image was acquired. Those information are "hidden" inside the XML meta-information.
@@ -914,15 +930,15 @@ def getWelllNamesfromCZI(filename):
     omexml_enc = omexml.encode('utf-8')
     # Get the tree and define namespace
     tree = etl.fromstring(omexml_enc)
-    name_space = "{http://www.openmicroscopy.org/Schemas/SA/2015-01}"
+    #namespace = "{http://www.openmicroscopy.org/Schemas/SA/2015-01}"
 
     # find OriginalMetadata
-    origin_meta_datas = tree.findall(".//{}OriginalMetadata".format(name_space))
+    origin_meta_datas = tree.findall(".//{}OriginalMetadata".format(namespace))
     # Iterate in founded origins
     for origin in origin_meta_datas:
-        key = origin.find("{}Key".format(name_space)).text
+        key = origin.find("{}Key".format(namespace)).text
         if key == wellkey:
-            wellstring= origin.find("{}Value".format(name_space)).text
+            wellstring= origin.find("{}Value".format(namespace)).text
             print("Value: {}".format(wellstring))
 
     return wellstring
@@ -1030,9 +1046,9 @@ def getPlanesAndPixelsFromCZI(filename):
     # like crazy for the bug ...
     # Maybe leave out schema completely and only search for *Plane*
     # and *Pixels*
-    name_space = "{http://www.openmicroscopy.org/Schemas/OME/2015-01}"
-    Planes = []
-    Pixels = []
+    namespace = "{http://www.openmicroscopy.org/Schemas/OME/2015-01}"
+    planes = []
+    pixels = []
     # for child in root:
     #    m = re.match('.*Image.*', child.tag)
     #    if m:
@@ -1040,14 +1056,14 @@ def getPlanesAndPixelsFromCZI(filename):
     for element in tree.iter():
         # for element in tree:
         # print element.tag
-        if "{}Plane".format(name_space) in element.tag:
+        if "{}Plane".format(namespace) in element.tag:
             tmpdict = dict(zip(element.keys(), element.values()))
-            Planes.append(tmpdict)
-        if "{}Pixels".format(name_space) in element.tag:
+            planes.append(tmpdict)
+        if "{}Pixels".format(namespace) in element.tag:
             tmpdict = dict(zip(element.keys(), element.values()))
             Pixels.append(tmpdict)
 
-    return Planes, Pixels
+    return planes, Pixels
 
     
 def output2file(scriptname, output_name='output.txt', targetdir=os.getcwd()):
