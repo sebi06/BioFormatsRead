@@ -635,7 +635,7 @@ def create_metainfo_dict():
     return MetaInfo
 
 
-def get_relevant_metainfo_wrapper(filename, ns='http://www.openmicroscopy.org/Schemas/OME/2015-01'):
+def get_relevant_metainfo_wrapper(filename, namespace='http://www.openmicroscopy.org/Schemas/OME/2015-01'):
 
     MetaInfo = create_metainfo_dict()
     omexml = createOMEXML(filename)
@@ -693,13 +693,13 @@ def get_relevant_metainfo_wrapper(filename, ns='http://www.openmicroscopy.org/Sc
 
     # try to get detector information - 1
     try:
-        MetaInfo['Detector Model'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'], ns)[0]['Model']
+        MetaInfo['Detector Model'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'], namespace)[0]['Model']
     except IndexError as e:
         print 'Problem reading Detector Model. IndexError:', e.message
         MetaInfo['Detector Model'] = 'na'
 
     try:
-        MetaInfo['Detector Name'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'], ns)[0]['ID']
+        MetaInfo['Detector Name'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'], namespace)[0]['ID']
     except IndexError as e:
         print 'Problem reading Detector Name. Index Error:', e.message
         MetaInfo['Detector Name'] = 'na'
