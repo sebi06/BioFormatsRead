@@ -129,14 +129,14 @@ def get_java_metadata_store(imagefile):
     except:
         totalseries = 1  # in case there is only ONE series
 
-        try:
-            for sc in range(0, totalseries):
-                rdr.rdr.setSeries(sc)
-                resolutionCount = rdr.rdr.getResolutionCount()
-                print 'Resolution count for series #', sc, ' = ' + resolutionCount
-                for res in range(0, resolutionCount):
-                    rdr.rdr.setResolution(res)
-                    print 'Resolution #', res, ' dimensions = ', rdr.getSizeX(), ' x ', rdr.getSizeY()
+    try:
+        for sc in range(0, totalseries):
+            rdr.rdr.setSeries(sc)
+            resolutionCount = rdr.rdr.getResolutionCount()
+            print 'Resolution count for series #', sc, ' = ' + resolutionCount
+            for res in range(0, resolutionCount):
+                rdr.rdr.setResolution(res)
+                print 'Resolution #', res, ' dimensions = ', rdr.getSizeX(), ' x ', rdr.getSizeY()
     except:
         print 'Multi-Resolution API not enabled yet.'
     # rdr.rdr is the actual BioFormats reader. rdr handles its lifetime
@@ -160,7 +160,7 @@ def get_metainfo_dimension(jmd, MetaInfo, imageID=0):
     dimension order is returned as a string.
     """
 
-    MetaInfo['SizeC'] = np.int(jmd.getPixelsSizeC(imageEID).getValue().floatValue())
+    MetaInfo['SizeC'] = np.int(jmd.getPixelsSizeC(imageID).getValue().floatValue())
     MetaInfo['SizeT'] = np.int(jmd.getPixelsSizeT(imageID).getValue().floatValue())
     MetaInfo['SizeZ'] = np.int(jmd.getPixelsSizeZ(imageID).getValue().floatValue())
     MetaInfo['SizeX'] = np.int(jmd.getPixelsSizeX(imageID).getValue().floatValue())
