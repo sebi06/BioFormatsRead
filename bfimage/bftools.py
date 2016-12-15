@@ -37,6 +37,8 @@ BF2NP_DTYPE = {
     7: np.double
 }
 
+# global default imageID
+#IMAGEID = 0
 
 def set_bfpath(bfpackage_path=BFPATH):
     # this function can be used to set the path to the package individually
@@ -360,7 +362,14 @@ def get_planetable(imagefile, writecsv=False, separator=','):
     MetaInfo = create_metainfo_dict()
 
     # get JavaMetaDataStore and SeriesCount
-    jmd, MetaInfo['TotalSeries'], imageIDs = get_java_metadata_store(imagefile)
+    #jmd, MetaInfo['TotalSeries'], imageIDs = get_java_metadata_store(imagefile)
+
+    # get JavaMetaDataStore and SeriesCount
+    try:
+        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'] = get_java_metadata_store(imagefile)
+    except:
+        print 'Problem retrieving Java Metadata Store or Series size:', sys.exc_info()[0]
+        raise
 
     # get dimension information and MetaInfo
     MetaInfo = get_metainfo_dimension(jmd, MetaInfo)
@@ -375,9 +384,9 @@ def get_planetable(imagefile, writecsv=False, separator=','):
     theZ = []
     theT = []
 
-    print 'Start reading the plane data ',
+    print 'Start reading the plane data ...',
 
-    for imageIndex in range(0, imageIDs[0]+1):
+    for imageIndex in range(0, max(MetaInfo['ImageIDs'])+1):
         for planeIndex in range(0, MetaInfo['SizeZ'] * MetaInfo['SizeC'] * MetaInfo['SizeT']):
 
             id.append(imageIndex)
@@ -646,12 +655,11 @@ def get_relevant_metainfo_wrapper(filename, namespace='http://www.openmicroscopy
     # get JavaMetaDataStore and SeriesCount
     try:
         jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'] = get_java_metadata_store(filename)
-        #jmd, MetaInfo['TotalSeries'] = get_java_metadata_store(filename)
     except:
         print 'Problem retrieving Java Metadata Store or Series size:', sys.exc_info()[0]
         raise
 
-   # get dimension information and MetaInfo
+    # get dimension information and MetaInfo
     try:
         MetaInfo = get_metainfo_dimension(jmd, MetaInfo, imageID=0)
     except:
@@ -661,6 +669,8 @@ def get_relevant_metainfo_wrapper(filename, namespace='http://www.openmicroscopy
         # get objective information using cziread
         print 'Using czifile.py to get CZI Shape info.'
         MetaInfo['ShapeCZI'], MetaInfo['OrderCZI'] = czt.get_shapeinfo_cziread(filename)
+
+    print 'Using BioFormats to get MetaInformation.'
 
     # use bioformats to get the objective information
     try:
@@ -690,7 +700,6 @@ def get_relevant_metainfo_wrapper(filename, namespace='http://www.openmicroscopy
     MetaInfo['Sizes'] = [MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'],
                          MetaInfo['SizeC'], MetaInfo['SizeY'], MetaInfo['SizeX']]
 
-
     # try to get detector information - 1
     try:
         MetaInfo['Detector Model'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'], namespace)[0]['Model']
@@ -709,6 +718,7 @@ def get_relevant_metainfo_wrapper(filename, namespace='http://www.openmicroscopy
         MetaInfo['DetectorID'] = get_metainfo_detector(jmd, instrumentindex=0, detectorindex=0)
     except:
         print 'Problem reading DetectorID from OME-XML.'
+
 
     return MetaInfo
 
@@ -930,9 +940,10 @@ def getWelllNamesfromCZI(filename, namespace='{http://www.openmicroscopy.org/Sch
     omexml_enc = omexml.encode('utf-8')
     # Get the tree and define namespace
     tree = etl.fromstring(omexml_enc)
-    #namespace = "{http://www.openmicroscopy.org/Schemas/SA/2015-01}"
+    #namespace = '{http://www.openmicroscopy.org/Schemas/SA/2015-01}'
 
     # find OriginalMetadata
+    wellstring = ''
     origin_meta_datas = tree.findall(".//{}OriginalMetadata".format(namespace))
     # Iterate in founded origins
     for origin in origin_meta_datas:
@@ -952,11 +963,11 @@ def processWellStringfromCZI(wellstring):
 
     Input:
     --------------------------------------------------------------
-    wellstring = '[B4, B4, B4, B4, B5, B5, B5, B5]
+    wellstring = '[B4, B4, B4, B4, B5, B5, B5, B5]'
 
     Output:
     ---------------------------------------------------------------
-    welllist    = ['B4', 'B4', 'B4', 'B4', 'B5', 'B5', 'B5', 'B5']'
+    welllist    = ['B4', 'B4', 'B4', 'B4', 'B5', 'B5', 'B5', 'B5']
     colindex    = [3, 3, 3, 3, 4, 4, 4, 4]
     rowindex    = [1, 1, 1, 1, 1, 1, 1, 1]
     welldict    = Counter({'B4': 4, 'B5': 4})
@@ -1003,6 +1014,8 @@ def processWellStringfromCZI(wellstring):
     # count the number of different wells
     numdifferentwells = len(welldict.keys())
 
+    # create
+
     return welllist, cols, rows, welldict, numdifferentwells
 
 
@@ -1027,9 +1040,6 @@ def getPlanesAndPixelsFromCZI(filename):
       of the XML tree, with key/values of the XML tree mapped to respective key/values of the dictionary.
       Attention: works for CZI image data sets only!
       Added by Volker.Hilsenstein@embl.de
-
-      Addey by sebi06 at 05092016
-      
     """
     if not VM_STARTED:
         start_jvm()
@@ -1049,13 +1059,13 @@ def getPlanesAndPixelsFromCZI(filename):
     namespace = "{http://www.openmicroscopy.org/Schemas/OME/2015-01}"
     planes = []
     pixels = []
-    # for child in root:
+    #for child in root:
     #    m = re.match('.*Image.*', child.tag)
     #    if m:
     #        first_tag = m.group(0)
     for element in tree.iter():
-        # for element in tree:
-        # print element.tag
+    #for element in tree:
+        #print element.tag
         if "{}Plane".format(namespace) in element.tag:
             tmpdict = dict(zip(element.keys(), element.values()))
             planes.append(tmpdict)
@@ -1065,7 +1075,7 @@ def getPlanesAndPixelsFromCZI(filename):
 
     return planes, pixels
 
-    
+
 def output2file(scriptname, output_name='output.txt', targetdir=os.getcwd()):
 
     # log output to file
@@ -1081,3 +1091,40 @@ def output2file(scriptname, output_name='output.txt', targetdir=os.getcwd()):
     print 'Output written to : ', filepath_output
 
     return filepath_output
+
+
+def showtypicalmetadata(filename,
+                        urlnamespace='http://www.openmicroscopy.org/Schemas/OME/2015-01',
+                        bfpackage = r'c:\Users\M1SRH\Documents\Software\BioFormats_Package\5.1.10\bioformats_package.jar',
+                        showinfo=False):
+
+    set_bfpath(bfpackage)
+
+    # get image meta-information
+    MetaInfo = get_relevant_metainfo_wrapper(filename, namespace=urlnamespace)
+
+    if showinfo:
+
+        # show relevant image Meta-Information
+        print '\n'
+        print '-------------------------------------------------------------'
+        print 'Image Directory      : ', MetaInfo['Directory']
+        print 'Image Filename       : ', MetaInfo['Filename']
+        print 'Dimension Order BF   : ', MetaInfo['DimOrder BF']
+        print 'Dimension Order CZI  : ', MetaInfo['OrderCZI']
+        print 'Shape CZI            : ', MetaInfo['ShapeCZI']
+        print 'Total Series Number  : ', MetaInfo['TotalSeries']
+        print 'Image Dimensions     : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'], MetaInfo['SizeC'], \
+            MetaInfo['SizeY'], MetaInfo['SizeX']
+        print 'Scaling XYZ [micron] : ', MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale']
+        print 'Objective M-NA-Imm   : ', MetaInfo['ObjMag'], MetaInfo['NA'], MetaInfo['Immersion']
+        print 'Objective Name       : ', MetaInfo['ObjModel']
+        print 'Ex. Wavelengths [nm] : ', MetaInfo['WLEx']
+        print 'Em. Wavelengths [nm] : ', MetaInfo['WLEm']
+        print 'Dyes                 : ', MetaInfo['Dyes']
+        print 'Detector Model       : ', MetaInfo['Detector Model']
+        print 'Detector Name        : ', MetaInfo['Detector Name']
+        print 'Channels             : ', MetaInfo['Channels']
+        print 'Channel Description  : ', MetaInfo['ChDesc']
+
+    return MetaInfo
