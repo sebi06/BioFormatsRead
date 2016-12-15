@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: bftools.py
-Date: 16.09.2016
-Version. 1.9.1
+Date: 14.12.2016
+Version. 1.9.2
 """
 
 
