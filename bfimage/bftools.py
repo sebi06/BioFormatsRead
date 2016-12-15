@@ -141,6 +141,20 @@ def get_java_metadata_store(imagefile):
                 print 'Resolution #', res, ' dimensions = ', rdr.getSizeX(), ' x ', rdr.getSizeY()
     except:
         print 'Multi-Resolution API not enabled yet.'
+    
+    series_dimensions = []
+    # cycle through all the series and check the dimensions
+    for sc in range(0, totalseries):
+        rdr.rdr.setSeries(sc)
+        dimx = rdr.rdr.getSizeX()
+        dimy = rdr.rdr.getSizeY()
+        series_dimensions.append((dimx, dimy))
+
+    if series_dimensions[0] == series_dimensions[1]:
+        multires = False
+    if not series_dimensions[0] == series_dimensions[1]:
+        multires = True
+    
     # rdr.rdr is the actual BioFormats reader. rdr handles its lifetime
     jmd = jv.JWrapper(rdr.rdr.getMetadataStore())
 
@@ -152,7 +166,7 @@ def get_java_metadata_store(imagefile):
 
     rdr.close()
 
-    return jmd, totalseries, imageIDs
+    return jmd, totalseries, imageIDs, series_dimensions, multires
 
 
 def get_metainfo_dimension(jmd, MetaInfo, imageID=0):
@@ -639,7 +653,9 @@ def create_metainfo_dict():
                 'Channels': [],
                 'ChDesc': 'na',
                 'Sizes': 0,
-                'ImageIDs': []}
+                'ImageIDs': [],
+                'SeriesDimensions': [],
+                'MutiResolution': False}
 
     return MetaInfo
 
@@ -654,7 +670,7 @@ def get_relevant_metainfo_wrapper(filename, namespace='http://www.openmicroscopy
 
     # get JavaMetaDataStore and SeriesCount
     try:
-        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'] = get_java_metadata_store(filename)
+        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], MetaInfo['SeriesDimensions'], MetaInfo['MultiResolution'] = get_java_metadata_store(filename)
     except:
         print 'Problem retrieving Java Metadata Store or Series size:', sys.exc_info()[0]
         raise
