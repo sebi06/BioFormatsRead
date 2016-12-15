@@ -460,7 +460,7 @@ def get_image6d(imagefile, sizes):
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
 
     img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
-    readstatus = 'OK'
+    readstate = 'OK'
     readproblems = []
 
     # main loop to read the images from the data file
