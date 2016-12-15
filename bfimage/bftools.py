@@ -460,14 +460,20 @@ def get_image6d(imagefile, sizes):
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
 
     img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+    readstatus = 'OK'
+    readproblems = []
 
     # main loop to read the images from the data file
     for seriesID in range(0, sizes[0]):
         for timepoint in range(0, sizes[1]):
             for zplane in range(0, sizes[2]):
                 for channel in range(0, sizes[3]):
-                    img6d[seriesID, timepoint, zplane, channel, :, :] =\
-                        rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+                    try:
+                        img6d[seriesID, timepoint, zplane, channel, :, :] =\
+                            rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+                    except:
+                        print 'Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1]
+                        readstate = 'NOK'
 
     rdr.close()
 
