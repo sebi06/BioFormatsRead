@@ -36,7 +36,11 @@ bf.set_bfpath(bfpackage)
 
 # get image meta-information
 MetaInfo = bf.bftools.get_relevant_metainfo_wrapper(filename, namespace=urlnamespace)
-img6d = bf.bftools.get_image6d(filename, MetaInfo['Sizes'])
+try:
+    img6d, readstate = bf.get_image6d(filename, MetaInfo['Sizes'])
+    arrayshape = np.shape(img6d)
+except:
+    arrayshape = []
 
 # show relevant image Meta-Information
 print '\n'
@@ -46,7 +50,9 @@ print 'BF Version used      : ', bfpackage
 print '-------------------------------------------------------------'
 print 'Image Directory      : ', MetaInfo['Directory']
 print 'Image Filename       : ', MetaInfo['Filename']
-print 'Images Dim Sizes     : ', MetaInfo['Sizes']
+print 'MutiResolution       : ', MetaInfo['MultiResolution']
+print 'Series Dimensions    : ', MetaInfo['SeriesDimensions']
+print 'Images Dim Sizes [0] : ', MetaInfo['Sizes']
 print 'Dimension Order BF   : ', MetaInfo['DimOrder BF']
 print 'Dimension Order CZI  : ', MetaInfo['OrderCZI']
 print 'Shape CZI            : ', MetaInfo['ShapeCZI']
@@ -65,7 +71,8 @@ print 'Detector ID          : ', MetaInfo['DetectorID']
 print 'Channels             : ', MetaInfo['Channels']
 print 'Channel Description  : ', MetaInfo['ChDesc']
 print 'ImageIDs             : ', MetaInfo['ImageIDs']
-print 'Array Shape 6D       : ', np.shape(img6d)
+print 'Array Shape 6D       : ', arrayshape
+print 'Read Status          : ', readstate
 
 if redirect:
     sys.stdout = orig_stdout
