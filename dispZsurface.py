@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def filterplanetable(planetable, ImageID =0, T=0, Z=0, CH=0):
+def filterplanetable(planetable, ImageID=0, T=0, Z=0, CH=0):
 
     # TODO - Implement smart filtering without creating an itermediate table
 
@@ -38,7 +38,7 @@ def filterplanetable(planetable, ImageID =0, T=0, Z=0, CH=0):
     return pt
 
 
-def scatterplot(planetable, ImageID=0, T=0, Z=0, CH=0, size=35, savefigure=False, filename='test.png', showsurface=True):
+def scatterplot(planetable, ImageID=0, T=0, Z=0, CH=0, size=35, savefigure=False, figsavename='test.png', showsurface=True):
     """
 
     This function can be used to visualize al XYZ positions from an image file for
@@ -97,7 +97,7 @@ def scatterplot(planetable, ImageID=0, T=0, Z=0, CH=0, size=35, savefigure=False
 
     # optional save figure as PNG
     if savefigure:
-        savename = filename[:-4] + '_XYZ-Pos' + '.png'
+        savename = figsavename[:-4] + '_XYZ-Pos' + '.png'
         fig1.savefig(savename)
 
     # optional 3D plot of surface

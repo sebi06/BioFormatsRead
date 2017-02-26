@@ -371,7 +371,7 @@ def get_dimension_only(imagefile, imageID=0):
     return sizes
 
 
-def get_planetable(imagefile, writecsv=False, separator=','):
+def get_planetable(imagefile, writecsv=False, separator='\t'):
 
     MetaInfo = create_metainfo_dict()
 
@@ -380,7 +380,7 @@ def get_planetable(imagefile, writecsv=False, separator=','):
 
     # get JavaMetaDataStore and SeriesCount
     try:
-        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'] = get_java_metadata_store(imagefile)
+        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], series_dimension, multires = get_java_metadata_store(imagefile)
     except:
         print 'Problem retrieving Java Metadata Store or Series size:', sys.exc_info()[0]
         raise
@@ -435,7 +435,7 @@ def get_planetable(imagefile, writecsv=False, separator=','):
     # create Pandas dataframe to hold the plane data
     df = pd.DataFrame([np.asarray(id), np.asarray(plane), np.asarray(theT), np.asarray(theZ), np.asarray(theC), xpos, ypos, zpos, dt])
     df = df.transpose()
-    # give the columns the correct names
+    # give the planetable columns the correct names
     df.columns = ['ImageID', 'Plane', 'TheT', 'TheZ', 'TheC', 'XPos', 'YPos', 'ZPos', 'DeltaT']
 
     if writecsv:
@@ -444,7 +444,7 @@ def get_planetable(imagefile, writecsv=False, separator=','):
         df.to_csv(csvfile, sep=separator, index=False)
         print 'Writing CSV file: ', csvfile
 
-    return df
+    return df, csvfile
 
 
 def get_image6d(imagefile, sizes):
