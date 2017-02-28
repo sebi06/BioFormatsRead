@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+"""
+@author: Sebi
+
+File: dispZsurface.py
+Date: 06.07.2016
+Version. 1.1
+"""
 
 from mpl_toolkits.mplot3d import axes3d
 from matplotlib import cm
@@ -63,7 +70,7 @@ def scatterplot(planetable, ImageID=0, T=0, Z=0, CH=0, size=35, savefigure=False
     ypos = ptf['YPos']
     zpos = ptf['ZPos']
 
-    # normalize z-data
+    # normalize z-data by substracting the minimum value
     zpos_norm = zpos - zpos.min()
 
     # delta xy for plotting the coordinate system in [micron]
@@ -81,19 +88,23 @@ def scatterplot(planetable, ImageID=0, T=0, Z=0, CH=0, size=35, savefigure=False
     ax1 = fig1.add_subplot(111)
     ax1.grid(True)
     plt.axis('equal')
+    
     # set the plot limits
     ax1.set_xlim(0, xpos.max() + delta)
     ax1.set_ylim(0, ypos.max() + delta)
+    
     # invert the Y-axis --> O,O = Top-Left
     ax1.invert_yaxis()
+    
     # define the labels
     ax1.set_title('XYZ-Positions (norm) : ' + 'ImageID=' + str(ImageID) + ' T=' + str(T) + ' Z='+ str(Z) + ' CH=' + str(CH))
     ax1.set_xlabel('Stage X-Axis [micron]')
     ax1.set_ylabel('Stage Y-Axis [micron]')
+    
     # plot data and label the colorbar
-    sc = plt.scatter(xpos, ypos, marker='s', c=zpos_norm, s=size, cmap=cm.coolwarm)
-    cb = plt.colorbar(sc)
-    cb.set_label('Z-Offset [micron]', labelpad=20)
+    sc1 = plt.scatter(xpos, ypos, marker='s', c=zpos_norm, s=size, cmap=cm.coolwarm)
+    cb1 = plt.colorbar(sc1)
+    cb1.set_label('Z-Offset [micron]', labelpad=20)
 
     # optional save figure as PNG
     if savefigure:
@@ -102,12 +113,24 @@ def scatterplot(planetable, ImageID=0, T=0, Z=0, CH=0, size=35, savefigure=False
 
     # optional 3D plot of surface
     if showsurface:
-
+        
         fig2 = plt.figure(figsize=(10, 6), dpi=100)
         ax2 = fig2.add_subplot(111, projection='3d')
-        ax2.plot(xpos, ypos, zpos_norm, '.', markersize=10)
+        
         # set the plot limits
         ax2.set_xlim(0, xpos.max() + delta)
         ax2.set_ylim(0, ypos.max() + delta)
+        
         # invert the Y-axis --> O,O = Top-Left
         ax2.invert_yaxis()
+        
+        # define the labels
+        ax2.set_xlabel('Stage X-Axis [micron]')
+        ax2.set_ylabel('Stage Y-Axis [micron]')
+        ax2.set_zlabel('Z-Offset [micron]')
+        
+        # plot data and label the colorbar
+        #sc2 = ax2.plot(xpos, ypos, zpos_norm, '.', markersize=10, cmap=plt.cm.coolwarm)
+        sc2 = ax2.scatter(xpos, ypos, zpos_norm, marker='.', s=200, c=zpos_norm, cmap=plt.cm.coolwarm, depthshade=False)
+        cb2 = plt.colorbar(sc2, shrink=.75)
+        cb2.set_label('Z-Offset [micron]', labelpad=20)
