@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: bftools.py
-Date: 14.12.2016
-Version. 1.9.2
+Date: 31.01.2017
+Version. 2.0.0
 """
 
 
@@ -36,9 +36,6 @@ BF2NP_DTYPE = {
     6: np.float32,
     7: np.double
 }
-
-# global default imageID
-#IMAGEID = 0
 
 def set_bfpath(bfpackage_path=BFPATH):
     # this function can be used to set the path to the package individually
@@ -171,7 +168,7 @@ def get_java_metadata_store(imagefile):
 
 def get_metainfo_dimension(jmd, MetaInfo, imageID=0):
     """
-    Read the actual size for every dimension from the metadata
+    Read the actual size for every dimension from the metadata from the 1st image series
     and convert them into numbers.
     dimension order is returned as a string.
     """
@@ -376,11 +373,8 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
     MetaInfo = create_metainfo_dict()
 
     # get JavaMetaDataStore and SeriesCount
-    #jmd, MetaInfo['TotalSeries'], imageIDs = get_java_metadata_store(imagefile)
-
-    # get JavaMetaDataStore and SeriesCount
     try:
-        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], series_dimension, multires = get_java_metadata_store(imagefile)
+        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], MetaInfo['SeriesDimensions'], MetaInfo['MultiResolution'] = get_java_metadata_store(imagefile)
     except:
         print 'Problem retrieving Java Metadata Store or Series size:', sys.exc_info()[0]
         raise
@@ -477,7 +471,7 @@ def get_image6d(imagefile, sizes):
 
     rdr.close()
 
-    return img6d
+    return img6d, readstate
 
 
 def get_image2d(imagefile, sizes, seriesID, channel, zplane, timepoint):
