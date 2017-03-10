@@ -32,7 +32,7 @@ print planetable.shape[0]
 
 # display the XYZ positions
 dsp.scatterplot(planetable, ImageID=0, T=0, CH=0, Z=0, size=250,
-                savefigure=False, figsavename=filenameczi, showsurface=True)
+                savefigure=False, figsavename=filenamecsv, showsurface=True)
 
 # show the plot
 plt.show()
