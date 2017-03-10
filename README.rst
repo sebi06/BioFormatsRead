@@ -8,7 +8,7 @@ image data files thanks to BioFormats.
 
 :Author: Sebastian Rhode
 
-:Version: 2016.12.14
+:Version: 2017.03.08
 
 Requirements
 ------------
