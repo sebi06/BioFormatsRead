@@ -1120,27 +1120,34 @@ def showtypicalmetadata(filename,
     MetaInfo = get_relevant_metainfo_wrapper(filename, namespace=urlnamespace)
 
     if showinfo:
-
+        
         # show relevant image Meta-Information
-        print '\n'
-        print '-------------------------------------------------------------'
-        print 'Image Directory      : ', MetaInfo['Directory']
-        print 'Image Filename       : ', MetaInfo['Filename']
-        print 'Dimension Order BF   : ', MetaInfo['DimOrder BF']
-        print 'Dimension Order CZI  : ', MetaInfo['OrderCZI']
-        print 'Shape CZI            : ', MetaInfo['ShapeCZI']
-        print 'Total Series Number  : ', MetaInfo['TotalSeries']
-        print 'Image Dimensions     : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'], MetaInfo['SizeC'], \
-            MetaInfo['SizeY'], MetaInfo['SizeX']
-        print 'Scaling XYZ [micron] : ', MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale']
-        print 'Objective M-NA-Imm   : ', MetaInfo['ObjMag'], MetaInfo['NA'], MetaInfo['Immersion']
-        print 'Objective Name       : ', MetaInfo['ObjModel']
-        print 'Ex. Wavelengths [nm] : ', MetaInfo['WLEx']
-        print 'Em. Wavelengths [nm] : ', MetaInfo['WLEm']
-        print 'Dyes                 : ', MetaInfo['Dyes']
-        print 'Detector Model       : ', MetaInfo['Detector Model']
-        print 'Detector Name        : ', MetaInfo['Detector Name']
-        print 'Channels             : ', MetaInfo['Channels']
-        print 'Channel Description  : ', MetaInfo['ChDesc']
+        print'\n'
+        print'OME NameSpace used   : ', urlnamespace)
+        print'BF Version used      : ', bfpackage)
+        print'-------------------------------------------------------------'
+        print'Image Directory      : ', MetaInfo['Directory']
+        print'Image Filename       : ', MetaInfo['Filename']
+        print'MutiResolution       : ', MetaInfo['MultiResolution']
+        print'Series Dimensions    : ', MetaInfo['SeriesDimensions']
+        print'Images Dim Sizes [0] : ', MetaInfo['Sizes']
+        print'Dimension Order BF   : ', MetaInfo['DimOrder BF']
+        print'Dimension Order CZI  : ', MetaInfo['OrderCZI']
+        print'Shape CZI            : ', MetaInfo['ShapeCZI']
+        print'Total Series Number  : ', MetaInfo['TotalSeries']
+        print'Image Dimensions     : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'], MetaInfo['SizeC'],\
+                                           MetaInfo['SizeY'], MetaInfo['SizeX']
+        print'Scaling XYZ [micron] : ', MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale']
+        print'Objective M-NA-Imm   : ', MetaInfo['ObjMag'], MetaInfo['NA'], MetaInfo['Immersion']
+        print'Objective Name       : ', MetaInfo['ObjModel']
+        print'Ex. Wavelengths [nm] : ', MetaInfo['WLEx']
+        print'Em. Wavelengths [nm] : ', MetaInfo['WLEm']
+        print'Dyes                 : ', MetaInfo['Dyes']
+        print'Detector Model       : ', MetaInfo['Detector Model']
+        print'Detector Name        : ', MetaInfo['Detector Name']
+        print'Detector ID          : ', MetaInfo['DetectorID']
+        print'Channels             : ', MetaInfo['Channels']
+        print'Channel Description  : ', MetaInfo['ChDesc']
+        print'ImageIDs             : ', MetaInfo['ImageIDs']
 
     return MetaInfo
