@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: test_get_image6d.py
-Date: 14.12.2016
-Version. 1.2
+Date: 31.01.2017
+Version. 1.4
 """
 
 import numpy as np
