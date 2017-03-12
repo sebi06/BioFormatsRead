@@ -1123,8 +1123,8 @@ def showtypicalmetadata(filename,
         
         # show relevant image Meta-Information
         print'\n'
-        print'OME NameSpace used   : ', urlnamespace)
-        print'BF Version used      : ', bfpackage)
+        print'OME NameSpace used   : ', urlnamespace
+        print'BF Version used      : ', bfpackage
         print'-------------------------------------------------------------'
         print'Image Directory      : ', MetaInfo['Directory']
         print'Image Filename       : ', MetaInfo['Filename']
