@@ -2,9 +2,9 @@
 """
 @author: Sebi
 
-File: test_get_image6d.py
-Date: 31.01.2017
-Version. 1.4
+File: test_get_image6d_subset.py
+Date: 10.08.2017
+Version. 0.1
 """
 
 import numpy as np
@@ -12,9 +12,9 @@ import os
 import bfimage as bf
 import sys
 
-#filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
+filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
 #filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
-filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
+#filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
 
 # use for BioFormtas <= 5.1.10
 urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
@@ -36,16 +36,39 @@ bf.set_bfpath(bfpackage)
 
 # get image meta-information
 MetaInfo = bf.bftools.get_relevant_metainfo_wrapper(filename, namespace=urlnamespace)
+
+print 'Image Dimensions : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'], MetaInfo['SizeC'],\
+                                    MetaInfo['SizeY'], MetaInfo['SizeX']
+
+###############   Subset Definition   #############
+
+# Series
+sstart = 0
+send = MetaInfo['TotalSeries']
+# TimePoints
+tstart = 0
+tend = MetaInfo['SizeT']
+# Z-Planes
+zstart = 0
+zend = MetaInfo['SizeZ']
+# Channels
+chstart = 0
+chend = MetaInfo['SizeC']
+
 try:
-    img6d, readstate = bf.get_image6d(filename, MetaInfo['Sizes'])
-    arrayshape = np.shape(img6d)
+    img6dsubset, readstate = bf.get_image6d_subset(filename, MetaInfo['Sizes'],
+                                                   seriesstart=sstart, seriesend=send,
+                                                   tstart=tstart, tend=tend,
+                                                   zstart=zstart, zend=zend,
+                                                   chstart=chstart, chend=chend)
+    arrayshape = np.shape(img6dsubset)
 except:
     arrayshape = []
     print 'Could not read image data into NumPy array.'
 
 # show relevant image Meta-Information
 print '\n'
-print 'Testscript used      :  test_get_image6d.py'
+print 'Testscript used      :  test_get_image6d_subset.py'
 print 'OME NameSpace used   : ', urlnamespace
 print 'BF Version used      : ', bfpackage
 print '-------------------------------------------------------------'

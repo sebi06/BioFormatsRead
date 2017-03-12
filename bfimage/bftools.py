@@ -19,6 +19,7 @@ import sys
 import re
 from collections import Counter
 import subprocess
+from unidecode import unidecode
 
 VM_STARTED = False
 VM_KILLED = False
@@ -147,10 +148,13 @@ def get_java_metadata_store(imagefile):
         dimy = rdr.rdr.getSizeY()
         series_dimensions.append((dimx, dimy))
 
-    if series_dimensions[0] == series_dimensions[1]:
+    if len(series_dimensions) == 1:
         multires = False
-    if not series_dimensions[0] == series_dimensions[1]:
-        multires = True
+    elif len(series_dimensions) > 1:
+        if series_dimensions[0] == series_dimensions[1]:
+            multires = False
+        if not series_dimensions[0] == series_dimensions[1]:
+            multires = True
     
     # rdr.rdr is the actual BioFormats reader. rdr handles its lifetime
     jmd = jv.JWrapper(rdr.rdr.getMetadataStore())
@@ -337,7 +341,9 @@ def get_dimension_only(imagefile, imageID=0):
 
     # get OME-XML and change the encoding to UTF-8
     omexml = bioformats.get_omexml_metadata(imagefile)
-    new_omexml = omexml.encode('utf-8')
+    # fix encoding issues
+    new_omexml = unidecode(omexml)
+    #new_omexml = omexml.encode('utf-8', )
 
     rdr = bioformats.get_image_reader(None, path=imagefile)
     # read total number of image series
@@ -364,6 +370,8 @@ def get_dimension_only(imagefile, imageID=0):
     # for numpy arrays the 2st axis are columns (top --> down) = Y-Axis for an image
 
     sizes = [totalseries, SizeT, SizeZ, SizeC, SizeY, SizeX]
+
+    rdr.close()
 
     return sizes
 
@@ -468,10 +476,61 @@ def get_image6d(imagefile, sizes):
                     except:
                         print 'Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1]
                         readstate = 'NOK'
+                        readproblems = sys.exc_info()[1]
 
     rdr.close()
 
     return img6d, readstate
+
+
+def get_image6d_subset(imagefile, sizes,
+                       seriesstart=0, seriesend=0,
+                       tstart=0, tend=0,
+                       zstart=0, zend=0,
+                       chstart=0, chend=0):
+    """
+
+    Attention: Still Experimental !!!
+
+    This function will read a subset of the image file store them into a 6D numpy array.
+    The 6D array has the following dimension order: [Series, T, Z, C, X, Y].
+    """
+    if not VM_STARTED:
+        start_jvm()
+    if VM_KILLED:
+        jvm_error()
+
+    rdr = bioformats.ImageReader(imagefile, perform_init=True)
+
+    subsetSizeS = seriesend - seriesstart
+    subsetSizeT = tend - tstart
+    subsetSizeZ = zend - zstart
+    subsetSizeC = chend - chstart
+
+    subsetsizes = [subsetSizeS,  subsetSizeT,  subsetSizeZ,  subsetSizeC,  sizes[4], sizes[5]]
+
+    img6dsubset = np.zeros(subsetsizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+    readstate = 'OK'
+    readproblems = []
+
+    # main loop to read the images from the data file
+    for seriesID in range(seriesstart, seriesend):
+        for timepoint in range(tstart, tend):
+            for zplane in range(zstart, zend):
+                for channel in range(chstart, chend):
+                    try:
+                        img6dsubset[seriesID, timepoint, zplane, channel, :, :] =\
+                            rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+                    except:
+                        print 'Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1]
+                        readstate = 'NOK'
+                        readproblems = sys.exc_info()[1]
+
+    rdr.close()
+
+    return img6dsubset, readstate
+
+
 
 
 def get_image2d(imagefile, sizes, seriesID, channel, zplane, timepoint):
@@ -1123,8 +1182,8 @@ def showtypicalmetadata(filename,
         
         # show relevant image Meta-Information
         print'\n'
-        print'OME NameSpace used   : ', urlnamespace)
-        print'BF Version used      : ', bfpackage)
+        print'OME NameSpace used   : ', urlnamespace
+        print'BF Version used      : ', bfpackage
         print'-------------------------------------------------------------'
         print'Image Directory      : ', MetaInfo['Directory']
         print'Image Filename       : ', MetaInfo['Filename']

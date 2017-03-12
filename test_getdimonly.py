@@ -4,7 +4,8 @@ import bfimage as bf
 filenames = [r'testdata/2x2_SNAP_CH=2_Z=5_T=2.czi']
 
 # specify bioformats_package.jar to use if required
-#bf.set_bfpath(insert path to bioformats_package.jar here)
+bfpackage = r'BioFormats/5.3.1/bioformats_package.jar'
+bf.set_bfpath(bfpackage)
 
 for currentfile in filenames:
 
