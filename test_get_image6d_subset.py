@@ -12,9 +12,9 @@ import os
 import bfimage as bf
 import sys
 
-filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
+#filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
 #filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
-#filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
+filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
 
 # use for BioFormtas <= 5.1.10
 urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
@@ -42,7 +42,7 @@ print 'Image Dimensions : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInf
 
 ###############   Subset Definition   #############
 
-# Series
+# Series  -> sstart = 0 and send = 4 will read series [0, 1, 2, 3] = the first four image series
 sstart = 0
 send = MetaInfo['TotalSeries']
 # TimePoints
