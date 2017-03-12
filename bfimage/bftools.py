@@ -531,9 +531,7 @@ def get_image6d_subset(imagefile, sizes,
     return img6dsubset, readstate
 
 
-
-
-def get_image2d(imagefile, sizes, seriesID, channel, zplane, timepoint):
+def get_image2d(imagefile, seriesID, channel, zplane, timepoint):
     """
     This will just read a single plane from an image data set.
     """
@@ -551,6 +549,9 @@ def get_image2d(imagefile, sizes, seriesID, channel, zplane, timepoint):
 
 
 def get_zstack(imagefile, sizes, seriesID, timepoint='full'):
+
+    # TODO Adapt to make use of new function get_image6g_subset.
+
     """
     This will read a single Z-Stack from an image data set for a specified image series.
     """
@@ -590,6 +591,9 @@ def get_zstack(imagefile, sizes, seriesID, timepoint='full'):
 
 
 def get_timeseries(imagefile, sizes, seriesID, zplane='full'):
+
+    # TODO Adapt to make use of new function get_image6g_subset.
+
     """
     This will read a single Time Lapse from an image data set.
     """
@@ -629,6 +633,8 @@ def get_timeseries(imagefile, sizes, seriesID, zplane='full'):
 
 
 def get_imageseries(imagefile, sizes, seriesID=0):
+
+    # TODO Adapt to make use of new function get_image6g_subset.
 
     if not VM_STARTED:
         start_jvm()
@@ -679,7 +685,6 @@ def get_series_from_well(imagefile, sizes, seriesseq):
 
 
 def create_metainfo_dict():
-
     """
     A Python dictionary will be created to hold the relevant Metadata.
     """
