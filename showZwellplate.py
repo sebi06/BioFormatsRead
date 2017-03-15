@@ -17,6 +17,15 @@ import matplotlib.pyplot as plt
 #filenameczi = r'testadata/yourCZIimage.czi'
 filenamecsv = r'testdata/testwell96_planetable.csv'
 
+# use for BioFormtas <= 5.1.10
+urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
+# use for BioFormtas > 5.2.0
+#urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
+
+# specify bioformats_package.jar to use if required
+#bfpath = r'c:\Users\M1SRH\Documents\Software\BioFormats_Package\5.1.10\bioformats_package.jar'
+#bf.set_bfpath(bfpath)
+
 # define separator
 separator = '\t'
 
