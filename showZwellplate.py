@@ -21,10 +21,10 @@ filenamecsv = r'testdata/testwell96_planetable.csv'
 separator = '\t'
 
 # create plane info from CZI image file and write CSV file (optional)
-#planetable, filenamecsv = bf.get_planetable(filenameczi, writecsv=True, sep=separator)
+planetable, filenamecsv = bf.get_planetable(filenameczi, writecsv=True, sep=separator)
 
 # or use the CSV file directly once it was created
-planetable = pd.read_csv(filenamecsv, sep=separator)
+#planetable = pd.read_csv(filenamecsv, sep=separator)
 
 # show the dataframe
 print planetable[:10]
