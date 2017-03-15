@@ -26,7 +26,7 @@ redirect = False
 if redirect:
     # redirect output
     orig_stdout = sys.stdout
-    filepath_output = os.path.join(os.getcwd(), 'test_get_image6d_output.txt')
+    filepath_output = os.path.join(os.getcwd(), filename[:-4]+'_output.txt')
     f = file(filepath_output, 'w')
     sys.stdout = f
 
