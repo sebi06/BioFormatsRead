@@ -4,10 +4,10 @@
 
 File: bftools.py
 Date: 31.01.2017
-Version. 2.0.0
+Version. 2.0.1
 """
 
-
+from __future__ import print_function
 import javabridge as jv
 import bioformats
 import numpy as np
@@ -20,6 +20,7 @@ import re
 from collections import Counter
 import subprocess
 from unidecode import unidecode
+
 
 VM_STARTED = False
 VM_KILLED = False
@@ -133,12 +134,12 @@ def get_java_metadata_store(imagefile):
         for sc in range(0, totalseries):
             rdr.rdr.setSeries(sc)
             resolutionCount = rdr.rdr.getResolutionCount()
-            print 'Resolution count for series #', sc, ' = ' + resolutionCount
+            print('Resolution count for series #', sc, ' = ' + resolutionCount)
             for res in range(0, resolutionCount):
                 rdr.rdr.setResolution(res)
-                print 'Resolution #', res, ' dimensions = ', rdr.getSizeX(), ' x ', rdr.getSizeY()
+                print('Resolution #', res, ' dimensions = ', rdr.getSizeX(), ' x ', rdr.getSizeY())
     except:
-        print 'Multi-Resolution API not enabled yet.'
+        print('Multi-Resolution API not enabled yet.')
     
     series_dimensions = []
     # cycle through all the series and check the dimensions
@@ -185,9 +186,9 @@ def get_metainfo_dimension(jmd, MetaInfo, imageID=0):
     # get dimension order string from BioFormats library
     MetaInfo['DimOrder BF'] = jmd.getPixelsDimensionOrder(imageID).getValue()
 
-    print 'Retrieving Image Dimensions ...'
-    print 'T: ', MetaInfo['SizeT'],  'Z: ', MetaInfo['SizeZ'],  'C: ', MetaInfo['SizeC'],  'X: ',\
-        MetaInfo['SizeX'],  'Y: ', MetaInfo['SizeY']
+    print('Retrieving Image Dimensions ...')
+    print('T: ', MetaInfo['SizeT'],  'Z: ', MetaInfo['SizeZ'],  'C: ', MetaInfo['SizeC'],  'X: ',\
+        MetaInfo['SizeX'],  'Y: ', MetaInfo['SizeY'])
 
     return MetaInfo
 
@@ -215,7 +216,7 @@ def get_metainfo_detector(jmd, instrumentindex=0, detectorindex=0):
         # get the correct detector ID
         detectorID = jmd.getDetectorID(instrumentindex, detectorindex)
     except:
-        print 'No suitable detector ID found. Using default = 0.'
+        print('No suitable detector ID found. Using default = 0.')
         detectorID = 0
 
     return detectorID
@@ -228,7 +229,7 @@ def get_metainfo_instrument(jmd, instrumentindex=0):
         instrumentIDstr = jmd.getInstrumentID(instrumentindex)
         instrumentID = np.int(jmd.getInstrumentID(instrumentindex)[-1])
     except:
-        print 'No suitable instrumentID found. Using default = 0.'
+        print('No suitable instrumentID found. Using default = 0.')
         instrumentIDstr = 'na'
         instruementID = 0
 
@@ -247,7 +248,7 @@ def get_metainfo_objective(jmd, filename, imageID=0):
         if numobj == 1:
             objID = 0
     except:
-        print 'No suitable instrument and objective ID found.'
+        print('No suitable instrument and objective ID found.')
 
     # try to get immersion type -  # get the first objective record in the first Instrument record
     try:
@@ -273,9 +274,9 @@ def get_metainfo_objective(jmd, filename, imageID=0):
         objmodel = jmd.getObjectiveModel(instrumentID, objID)
         if len(objmodel) == 0:
             objmodel = 'na'
-            print 'No objective model name found in metadata.'
+            print('No objective model name found in metadata.')
     except:
-        print 'Try to read objective name via czifile.py'
+        print('Try to read objective name via czifile.py')
         # this is a fallback option --> use cziread.py to get the information
         if filename[-4:] == '.czi':
             objmodel = czt.get_objective_name_cziread(filename)
@@ -358,12 +359,12 @@ def get_dimension_only(imagefile, imageID=0):
     SizeX = pixels.SizeX
     SizeY = pixels.SizeY
 
-    print 'Series: ', totalseries
-    print 'Size T: ', SizeT
-    print 'Size Z: ', SizeZ
-    print 'Size C: ', SizeC
-    print 'Size X: ', SizeX
-    print 'Size Y: ', SizeY
+    print('Series: ', totalseries)
+    print('Size T: ', SizeT)
+    print('Size Z: ', SizeZ)
+    print('Size C: ', SizeC)
+    print('Size X: ', SizeX)
+    print('Size Y: ', SizeY)
 
     # usually the x-axis of an image is from left --> right and y from top --> bottom
     # in order to be compatible with numpy arrays XY are switched
@@ -384,7 +385,7 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
     try:
         jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], MetaInfo['SeriesDimensions'], MetaInfo['MultiResolution'] = get_java_metadata_store(imagefile)
     except:
-        print 'Problem retrieving Java Metadata Store or Series size:', sys.exc_info()[0]
+        print('Problem retrieving Java Metadata Store or Series size:', sys.exc_info()[0])
         raise
 
     # get dimension information and MetaInfo
@@ -400,7 +401,7 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
     theZ = []
     theT = []
 
-    print 'Start reading the plane data ...',
+    print('Start reading the plane data ...')
 
     for imageIndex in range(0, max(MetaInfo['ImageIDs'])+1):
         for planeIndex in range(0, MetaInfo['SizeZ'] * MetaInfo['SizeC'] * MetaInfo['SizeT']):
@@ -418,13 +419,13 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
             #print id[-1], plane[-1], planeIndex, theT[-1], theZ[-1], theC[-1], xpos[-1], ypos[-1], zpos[-1], dt[-1]
 
         # create some kind of progress bar
-        print '\b.',
+        print('\b.',)
         sys.stdout.flush()
         if np.mod(imageIndex, 50) == 0:
-            print '\n'
+            print('\n')
 
     # just print an empty line
-    print 'Done.\n'
+    print('Done.\n')
 
     # round the data
     xpos = np.round(xpos, 1)
@@ -444,7 +445,7 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
         csvfile = imagefile[:-4] + '_planetable.csv'
         # use tab as separator and do not write the index to the CSV data table
         df.to_csv(csvfile, sep=separator, index=False)
-        print 'Writing CSV file: ', csvfile
+        print('Writing CSV file: ', csvfile)
 
     return df, csvfile
 
@@ -474,7 +475,7 @@ def get_image6d(imagefile, sizes):
                         img6d[seriesID, timepoint, zplane, channel, :, :] =\
                             rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
                     except:
-                        print 'Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1]
+                        print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
                         readstate = 'NOK'
                         readproblems = sys.exc_info()[1]
 
@@ -522,7 +523,7 @@ def get_image6d_subset(imagefile, sizes,
                         img6dsubset[seriesID, timepoint, zplane, channel, :, :] =\
                             rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
                     except:
-                        print 'Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1]
+                        print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
                         readstate = 'NOK'
                         readproblems = sys.exc_info()[1]
 
@@ -736,45 +737,45 @@ def get_relevant_metainfo_wrapper(filename, namespace='http://www.openmicroscopy
     try:
         jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], MetaInfo['SeriesDimensions'], MetaInfo['MultiResolution'] = get_java_metadata_store(filename)
     except:
-        print 'Problem retrieving Java Metadata Store or Series size:', sys.exc_info()[0]
+        print('Problem retrieving Java Metadata Store or Series size:', sys.exc_info()[0])
         raise
 
     # get dimension information and MetaInfo
     try:
         MetaInfo = get_metainfo_dimension(jmd, MetaInfo, imageID=0)
     except:
-        print 'Problem retrieving image dimensions:', sys.exc_info()[0]
+        print('Problem retrieving image dimensions:', sys.exc_info()[0])
 
     if filename[-4:] == '.czi':
         # get objective information using cziread
-        print 'Using czifile.py to get CZI Shape info.'
+        print('Using czifile.py to get CZI Shape info.')
         MetaInfo['ShapeCZI'], MetaInfo['OrderCZI'] = czt.get_shapeinfo_cziread(filename)
 
-    print 'Using BioFormats to get MetaInformation.'
+    print('Using BioFormats to get MetaInformation.')
 
     # use bioformats to get the objective information
     try:
         MetaInfo['Immersion'], MetaInfo['NA'], MetaInfo['ObjMag'], MetaInfo['ObjModel'] = get_metainfo_objective(jmd, filename, imageID=0)
     except:
-        print 'Problem retrieving object information:', sys.exc_info()[0]
+        print('Problem retrieving object information:', sys.exc_info()[0])
 
     # get scaling information
     try:
         MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale'] = get_metainfo_scaling(jmd)
     except:
-        print 'Problem retrieving scaling information:', sys.exc_info()[0]
+        print('Problem retrieving scaling information:', sys.exc_info()[0])
 
     # get wavelengths and dyes information
     try:
         MetaInfo['WLEx'], MetaInfo['WLEm'], MetaInfo['Dyes'], MetaInfo['Channels'] = get_metainfo_wavelengths(jmd)
     except:
-        print 'Problem retrieving wavelength information:', sys.exc_info()[0]
+        print('Problem retrieving wavelength information:', sys.exc_info()[0])
 
     # get channel description
     try:
         MetaInfo['ChDesc'] = czt.get_metainfo_channel_description(filename)
     except:
-        print 'Problem retrieving channel description:', sys.exc_info()[0]
+        print('Problem retrieving channel description:', sys.exc_info()[0])
 
     # summarize dimensions
     MetaInfo['Sizes'] = [MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'],
@@ -784,20 +785,20 @@ def get_relevant_metainfo_wrapper(filename, namespace='http://www.openmicroscopy
     try:
         MetaInfo['Detector Model'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'], namespace)[0]['Model']
     except IndexError as e:
-        print 'Problem reading Detector Model. IndexError:', e.message
+        print('Problem reading Detector Model. IndexError:', e.message)
         MetaInfo['Detector Model'] = 'na'
 
     try:
         MetaInfo['Detector Name'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'], namespace)[0]['ID']
     except IndexError as e:
-        print 'Problem reading Detector Name. Index Error:', e.message
+        print('Problem reading Detector Name. Index Error:', e.message)
         MetaInfo['Detector Name'] = 'na'
 
     # try to get detector information - 2
     try:
         MetaInfo['DetectorID'] = get_metainfo_detector(jmd, instrumentindex=0, detectorindex=0)
     except:
-        print 'Problem reading DetectorID from OME-XML.'
+        print('Problem reading DetectorID from OME-XML.')
 
 
     return MetaInfo
@@ -839,9 +840,9 @@ def create_omexml(testdata, method=1, writeczi_metadata=True):
                 root = etl.fromstring(omexml)
                 tree = etl.ElementTree(root)
                 tree.write(xmlfile1, pretty_print=True, encoding='utf-8', method='xml')
-                print 'Created OME-XML file for testdata: ', testdata[i]
+                print('Created OME-XML file for testdata: ', testdata[i])
             except:
-                print 'Creating OME-XML failed for testdata: ', testdata[i]
+                print('Creating OME-XML failed for testdata: ', testdata[i])
 
     if method == 2:
 
@@ -858,9 +859,9 @@ def create_omexml(testdata, method=1, writeczi_metadata=True):
                 root = etl.fromstring(omexml)
                 tree = etl.ElementTree(root)
                 tree.write(xmlfile2, pretty_print=True, encoding='utf-8', method='xml')
-                print 'Created OME-XML file for testdata: ', testdata[i]
+                print('Created OME-XML file for testdata: ', testdata[i])
             except:
-                print 'Creating OME-XML failed for testdata: ', testdata[i]
+                print('Creating OME-XML failed for testdata: ', testdata[i])
 
     if writeczi_metadata:
 
@@ -871,7 +872,7 @@ def create_omexml(testdata, method=1, writeczi_metadata=True):
                 try:
                     czt.writexml_czi(testdata[i])
                 except:
-                    print 'Could not write special CZI metadata for: ', testdata[i]
+                    print('Could not write special CZI metadata for: ', testdata[i])
 
 
 def getinfofromOMEXML(omexml, nodenames, ns='http://www.openmicroscopy.org/Schemas/OME/2015-01'):
@@ -948,19 +949,19 @@ def parseXML(omexml, topchild, subchild, highdetail=False):
     tree = etl.ElementTree(root)
 
     for child in root:
-        print '*   ', child.tag, '--> ', child.attrib
+        print('*   ', child.tag, '--> ', child.attrib)
         if topchild in child.tag:
         #if child.tag == "{http://www.openmicroscopy.org/Schemas/OME/2015-01}Instrument":
             for step_child in child:
-                print '**  ', step_child.tag, '-->', step_child.attrib
+                print('**  ', step_child.tag, '-->', step_child.attrib)
 
                 if subchild in step_child.tag and highdetail:
-                    print "*** ", step_child.tag
+                    print("*** ", step_child.tag)
 
                     testdict = {}
                     if highdetail:
                         for step_child2 in step_child:
-                            print '****', step_child2.tag, step_child2.attrib
+                            print('****', step_child2.tag, step_child2.attrib)
                             testdict[step_child2.tag] = step_child2.attrib
 
 
@@ -1168,7 +1169,7 @@ def output2file(scriptname, output_name='output.txt', targetdir=os.getcwd()):
     sys.stdout.close()
     sys.__stdout__
 
-    print 'Output written to : ', filepath_output
+    print('Output written to : ', filepath_output)
 
     return filepath_output
 
@@ -1186,32 +1187,32 @@ def showtypicalmetadata(filename,
     if showinfo:
         
         # show relevant image Meta-Information
-        print'\n'
-        print'OME NameSpace used   : ', urlnamespace
-        print'BF Version used      : ', bfpackage
-        print'-------------------------------------------------------------'
-        print'Image Directory      : ', MetaInfo['Directory']
-        print'Image Filename       : ', MetaInfo['Filename']
-        print'MutiResolution       : ', MetaInfo['MultiResolution']
-        print'Series Dimensions    : ', MetaInfo['SeriesDimensions']
-        print'Images Dim Sizes [0] : ', MetaInfo['Sizes']
-        print'Dimension Order BF   : ', MetaInfo['DimOrder BF']
-        print'Dimension Order CZI  : ', MetaInfo['OrderCZI']
-        print'Shape CZI            : ', MetaInfo['ShapeCZI']
-        print'Total Series Number  : ', MetaInfo['TotalSeries']
-        print'Image Dimensions     : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'], MetaInfo['SizeC'],\
-                                           MetaInfo['SizeY'], MetaInfo['SizeX']
-        print'Scaling XYZ [micron] : ', MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale']
-        print'Objective M-NA-Imm   : ', MetaInfo['ObjMag'], MetaInfo['NA'], MetaInfo['Immersion']
-        print'Objective Name       : ', MetaInfo['ObjModel']
-        print'Ex. Wavelengths [nm] : ', MetaInfo['WLEx']
-        print'Em. Wavelengths [nm] : ', MetaInfo['WLEm']
-        print'Dyes                 : ', MetaInfo['Dyes']
-        print'Detector Model       : ', MetaInfo['Detector Model']
-        print'Detector Name        : ', MetaInfo['Detector Name']
-        print'Detector ID          : ', MetaInfo['DetectorID']
-        print'Channels             : ', MetaInfo['Channels']
-        print'Channel Description  : ', MetaInfo['ChDesc']
-        print'ImageIDs             : ', MetaInfo['ImageIDs']
+        print('\n')
+        print('OME NameSpace used   : ', urlnamespace)
+        print('BF Version used      : ', bfpackage)
+        print('-------------------------------------------------------------')
+        print('Image Directory      : ', MetaInfo['Directory'])
+        print('Image Filename       : ', MetaInfo['Filename'])
+        print('MutiResolution       : ', MetaInfo['MultiResolution'])
+        print('Series Dimensions    : ', MetaInfo['SeriesDimensions'])
+        print('Images Dim Sizes [0] : ', MetaInfo['Sizes'])
+        print('Dimension Order BF   : ', MetaInfo['DimOrder BF'])
+        print('Dimension Order CZI  : ', MetaInfo['OrderCZI'])
+        print('Shape CZI            : ', MetaInfo['ShapeCZI'])
+        print('Total Series Number  : ', MetaInfo['TotalSeries'])
+        print('Image Dimensions     : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'], MetaInfo['SizeC'],\
+                                           MetaInfo['SizeY'], MetaInfo['SizeX'])
+        print('Scaling XYZ [micron] : ', MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale'])
+        print('Objective M-NA-Imm   : ', MetaInfo['ObjMag'], MetaInfo['NA'], MetaInfo['Immersion'])
+        print('Objective Name       : ', MetaInfo['ObjModel'])
+        print('Ex. Wavelengths [nm] : ', MetaInfo['WLEx'])
+        print('Em. Wavelengths [nm] : ', MetaInfo['WLEm'])
+        print('Dyes                 : ', MetaInfo['Dyes'])
+        print('Detector Model       : ', MetaInfo['Detector Model'])
+        print('Detector Name        : ', MetaInfo['Detector Name'])
+        print('Detector ID          : ', MetaInfo['DetectorID'])
+        print('Channels             : ', MetaInfo['Channels'])
+        print('Channel Description  : ', MetaInfo['ChDesc'])
+        print('ImageIDs             : ', MetaInfo['ImageIDs'])
 
     return MetaInfo
