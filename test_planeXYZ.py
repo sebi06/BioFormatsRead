@@ -19,7 +19,8 @@ urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
 #urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 
 # specify bioformats_package.jar to use if required
-#bf.set_bfpath(insert path to bioformats_package.jar here)
+bfpackage = r'bioformats_package/5.1.10/bioformats_package.jar'
+bf.set_bfpath(bfpackage)
 
 # create plane info and write into dataframe
 df, csvfile = bf.get_planetable(filename, writecsv=True, separator='\t')

@@ -14,8 +14,8 @@ import matplotlib.pyplot as plt
 
 #filenamecsv = r'testdata/Wellchamber_384_Comb.csv'
 #filenamecsv = r'testdata/fixed endpoint 3C 2_5 384well_planetable.csv'
-#filenameczi = r'testadata/yourCZIimage.czi'
-filenamecsv = r'testdata/testwell96_planetable.csv'
+filenameczi = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
+#filenamecsv = r'testdata/testwell96_planetable.csv'
 
 # use for BioFormtas <= 5.1.10
 urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
@@ -23,14 +23,14 @@ urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
 #urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 
 # specify bioformats_package.jar to use if required
-#bfpath = r'c:\Users\M1SRH\Documents\Software\BioFormats_Package\5.1.10\bioformats_package.jar'
-#bf.set_bfpath(bfpath)
+bfpackage = r'bioformats_package/5.1.10/bioformats_package.jar'
+bf.set_bfpath(bfpackage)
 
 # define separator
 separator = '\t'
 
 # create plane info from CZI image file and write CSV file (optional)
-planetable, filenamecsv = bf.get_planetable(filenameczi, writecsv=True, sep=separator)
+planetable, filenamecsv = bf.get_planetable(filenameczi, writecsv=True, separator=separator)
 
 # or use the CSV file directly once it was created
 #planetable = pd.read_csv(filenamecsv, sep=separator)
