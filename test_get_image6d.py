@@ -23,7 +23,7 @@ urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
 # use for BioFormtas > 5.2.0
 #urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 
-redirect = True
+redirect = False
 
 if redirect:
     # redirect output
@@ -33,7 +33,7 @@ if redirect:
     sys.stdout = fo
 
 # specify bioformats_package.jar to use if required
-bfpackage = r'BioFormats/5.1.10/bioformats_package.jar'
+bfpackage = r'bioformats_package/5.1.10/bioformats_package.jar'
 bf.set_bfpath(bfpackage)
 
 # get image meta-information

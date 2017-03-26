@@ -4,7 +4,7 @@
 
 File: bftools.py
 Date: 31.01.2017
-Version. 2.0.1
+Version. 2.1.0
 """
 
 from __future__ import print_function
@@ -94,25 +94,40 @@ def get_metadata_store(imagefile):
     if VM_KILLED:
         jvm_error()
 
-    omexml = bioformats.get_omexml_metadata(imagefile)
-    new_omexml = omexml.encode('utf-8')
-    metadatastore = bioformats.OMEXML(new_omexml)
-    xmlout = metadatastore.to_xml()
+    # get OME-XML and change the encoding to UTF-8
+    omexml = get_OMEXML(imagefile)
+    # get the metadata from the OME-XML
+    metadata = bioformats.OMEXML(omexml)
 
-    return metadatastore, xmlout
+    return metadata
 
 
-def createOMEXML(imagefile):
+def get_XMLfromMetaData(metadata):
 
     if not VM_STARTED:
         start_jvm()
     if VM_KILLED:
         jvm_error()
 
-    omexml = bioformats.get_omexml_metadata(imagefile)
-    new_omexml = omexml.encode('utf-8')
+    # get the xml string from the metadata
+    xmlstring = metadata.to_xml()
 
-    return new_omexml
+    return xmlstring
+
+
+def get_OMEXML(imagefile):
+
+    if not VM_STARTED:
+        start_jvm()
+    if VM_KILLED:
+        jvm_error()
+
+    # get OME-XML and change the encoding to UTF-8
+    omexml = bioformats.get_omexml_metadata(imagefile)
+    #new_omexml = omexml.encode('utf-8')
+    omexml = unidecode(omexml)
+
+    return omexml
 
 
 def get_java_metadata_store(imagefile):
@@ -133,9 +148,9 @@ def get_java_metadata_store(imagefile):
     try:
         for sc in range(0, totalseries):
             rdr.rdr.setSeries(sc)
-            resolutionCount = rdr.rdr.getResolutionCount()
-            print('Resolution count for series #', sc, ' = ' + resolutionCount)
-            for res in range(0, resolutionCount):
+            resolutioncount = rdr.rdr.getResolutionCount()
+            print('Resolution count for series #', sc, ' = ' + resolutioncount)
+            for res in range(0, resolutioncount):
                 rdr.rdr.setResolution(res)
                 print('Resolution #', res, ' dimensions = ', rdr.getSizeX(), ' x ', rdr.getSizeY())
     except:
@@ -159,7 +174,6 @@ def get_java_metadata_store(imagefile):
     
     # rdr.rdr is the actual BioFormats reader. rdr handles its lifetime
     jmd = jv.JWrapper(rdr.rdr.getMetadataStore())
-
     imagecount = jmd.getImageCount()
 
     imageIDs = []
@@ -340,19 +354,13 @@ def get_dimension_only(imagefile, imageID=0):
     if VM_KILLED:
         jvm_error()
 
-    # get OME-XML and change the encoding to UTF-8
-    omexml = bioformats.get_omexml_metadata(imagefile)
-    # fix encoding issues
-    new_omexml = unidecode(omexml)
-    #new_omexml = omexml.encode('utf-8', )
-
     rdr = bioformats.get_image_reader(None, path=imagefile)
     # read total number of image series
     totalseries = rdr.rdr.getSeriesCount()
 
     # get dimensions for CTZXY
-    md = bioformats.OMEXML(new_omexml)
-    pixels = md.image(imageID).Pixels
+    metadata = get_metadata_store(imagefile)
+    pixels = metadata.image(imageID).Pixels
     SizeC = pixels.SizeC
     SizeT = pixels.SizeT
     SizeZ = pixels.SizeZ
@@ -725,17 +733,18 @@ def create_metainfo_dict():
     return MetaInfo
 
 
-def get_relevant_metainfo_wrapper(filename, namespace='http://www.openmicroscopy.org/Schemas/OME/2015-01'):
+def get_relevant_metainfo_wrapper(imagefile, namespace='http://www.openmicroscopy.org/Schemas/OME/2015-01'):
 
     MetaInfo = create_metainfo_dict()
-    omexml = createOMEXML(filename)
+    omexml = get_OMEXML(imagefile)
 
-    MetaInfo['Directory'] = os.path.dirname(filename)
-    MetaInfo['Filename'] = os.path.basename(filename)
+    MetaInfo['Directory'] = os.path.dirname(imagefile)
+    MetaInfo['Filename'] = os.path.basename(imagefile)
 
     # get JavaMetaDataStore and SeriesCount
     try:
-        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], MetaInfo['SeriesDimensions'], MetaInfo['MultiResolution'] = get_java_metadata_store(filename)
+        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], MetaInfo['SeriesDimensions'],\
+        MetaInfo['MultiResolution'] = get_java_metadata_store(imagefile)
     except:
         print('Problem retrieving Java Metadata Store or Series size:', sys.exc_info()[0])
         raise
@@ -746,16 +755,16 @@ def get_relevant_metainfo_wrapper(filename, namespace='http://www.openmicroscopy
     except:
         print('Problem retrieving image dimensions:', sys.exc_info()[0])
 
-    if filename[-4:] == '.czi':
+    if imagefile[-4:] == '.czi':
         # get objective information using cziread
         print('Using czifile.py to get CZI Shape info.')
-        MetaInfo['ShapeCZI'], MetaInfo['OrderCZI'] = czt.get_shapeinfo_cziread(filename)
+        MetaInfo['ShapeCZI'], MetaInfo['OrderCZI'] = czt.get_shapeinfo_cziread(imagefile)
 
     print('Using BioFormats to get MetaInformation.')
 
     # use bioformats to get the objective information
     try:
-        MetaInfo['Immersion'], MetaInfo['NA'], MetaInfo['ObjMag'], MetaInfo['ObjModel'] = get_metainfo_objective(jmd, filename, imageID=0)
+        MetaInfo['Immersion'], MetaInfo['NA'], MetaInfo['ObjMag'], MetaInfo['ObjModel'] = get_metainfo_objective(jmd, imagefile, imageID=0)
     except:
         print('Problem retrieving object information:', sys.exc_info()[0])
 
@@ -773,7 +782,7 @@ def get_relevant_metainfo_wrapper(filename, namespace='http://www.openmicroscopy
 
     # get channel description
     try:
-        MetaInfo['ChDesc'] = czt.get_metainfo_channel_description(filename)
+        MetaInfo['ChDesc'] = czt.get_metainfo_channel_description(imagefile)
     except:
         print('Problem retrieving channel description:', sys.exc_info()[0])
 
@@ -823,56 +832,52 @@ def calc_series_range_well(wellnumber, imgperwell):
     return seriesseq
 
 
-def create_omexml(testdata, method=1, writeczi_metadata=True):
+def writeomexml(imagefile, method=1, writeczi_metadata=True):
 
     # creates readable xml files from image data files. Default method should be = 1.
     if method == 1:
         # method 1
-        for i in range(0, len(testdata)):
+        # Change File name and write XML file to same folder
+        xmlfile1 = imagefile[:-4] + '_MetaData1.xml'
 
-            # Change File name and write XML file to same folder
-            xmlfile1 = testdata[i][:-4] + '_MetaData1.xml'
-
-            try:
-                # get the actual OME-XML
-                omexml = createOMEXML(testdata[i])
-                # create root and tree from XML string and write "pretty" to disk
-                root = etl.fromstring(omexml)
-                tree = etl.ElementTree(root)
-                tree.write(xmlfile1, pretty_print=True, encoding='utf-8', method='xml')
-                print('Created OME-XML file for testdata: ', testdata[i])
-            except:
-                print('Creating OME-XML failed for testdata: ', testdata[i])
+        try:
+            # get the actual OME-XML
+            omexml = get_OMEXML(imagefile)
+            # create root and tree from XML string and write "pretty" to disk
+            root = etl.fromstring(omexml)
+            tree = etl.ElementTree(root)
+            tree.write(xmlfile1, pretty_print=True, encoding='utf-8', method='xml')
+            print('Created OME-XML file for testdata: ', imagefile)
+        except:
+            print('Creating OME-XML failed for testdata: ', imagefile)
 
     if method == 2:
 
         # method 2
-        for i in range(0, len(testdata)):
+        # Change File name and write XML file to same folder
+        xmlfile2 = imagefile + '_MetaData2.xml'
 
-            # Change File name and write XML file to same folder
-            xmlfile2 = testdata[i] + '_MetaData2.xml'
-
-            try:
-                # get the actual OME-XML
-                md, omexml = get_metadata_store(testdata[i])
-                # create root and tree from XML string and write "pretty" to disk
-                root = etl.fromstring(omexml)
-                tree = etl.ElementTree(root)
-                tree.write(xmlfile2, pretty_print=True, encoding='utf-8', method='xml')
-                print('Created OME-XML file for testdata: ', testdata[i])
-            except:
-                print('Creating OME-XML failed for testdata: ', testdata[i])
+        try:
+            # get the actual OME-XML
+            md = get_metadata_store(imagefile)
+            omexmlstring = get_XMLfromMetaData(md)
+            # create root and tree from XML string and write "pretty" to disk
+            root = etl.fromstring(omexmlstring)
+            tree = etl.ElementTree(root)
+            tree.write(xmlfile2, pretty_print=True, encoding='utf-8', method='xml')
+            print('Created OME-XML file for : ', imagefile)
+        except:
+            print('Creating OME-XML failed for : ', imagefile)
 
     if writeczi_metadata:
 
         # this writes the special CZI xml metadata to disk, when a CZI file was found.
-        for i in range(0, len(testdata)):
 
-            if testdata[i][-4:] == '.czi':
-                try:
-                    czt.writexml_czi(testdata[i])
-                except:
-                    print('Could not write special CZI metadata for: ', testdata[i])
+        if imagefile[-4:] == '.czi':
+            try:
+                czt.writexml_czi(imagefile)
+            except:
+                print('Could not write special CZI metadata for: ', imagefile)
 
 
 def getinfofromOMEXML(omexml, nodenames, ns='http://www.openmicroscopy.org/Schemas/OME/2015-01'):
@@ -885,10 +890,10 @@ def getinfofromOMEXML(omexml, nodenames, ns='http://www.openmicroscopy.org/Schem
 
     The output is a list that can contain multiple elements.
 
-    Usages:
+    Usage:
     ------
 
-    filename = r'c:\Users\M1SRH\Documents\Testdata_Zeiss\Python_bfimage_Testdata\20160331_C=2_Z=5_T=3_488_561_LSM800.czi'
+    filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi
     omexml = bf.createOMEXML(filename)
     parseXML(omexml, 'Image', 'Pixel')
 
@@ -965,7 +970,7 @@ def parseXML(omexml, topchild, subchild, highdetail=False):
                             testdict[step_child2.tag] = step_child2.attrib
 
 
-def getWelllNamesfromCZI(filename, namespace='{http://www.openmicroscopy.org/Schemas/SA/2015-01}'):
+def getWelllNamesfromCZI(imagefile, namespace='{http://www.openmicroscopy.org/Schemas/SA/2015-01}'):
     """
     This function can be used to extract information about the well or image scence container
     a CZI image was acquired. Those information are "hidden" inside the XML meta-information.
@@ -1016,11 +1021,10 @@ def getWelllNamesfromCZI(filename, namespace='{http://www.openmicroscopy.org/Sch
     # Current key for wells inside the meta-information - 2016_07_21
     wellkey = 'Information|Image|S|Scene|Shape|Name'
 
-    # Create OME-XMF using BioFormats from CZI file and encode
-    omexml = bioformats.get_omexml_metadata(filename)
-    omexml_enc = omexml.encode('utf-8')
+    # Create OME-XML using BioFormats from CZI file and encode
+    omexml = get_OMEXML(imagefile)
     # Get the tree and define namespace
-    tree = etl.fromstring(omexml_enc)
+    tree = etl.fromstring(omexml)
     #namespace = '{http://www.openmicroscopy.org/Schemas/SA/2015-01}'
 
     # find OriginalMetadata
@@ -1114,7 +1118,7 @@ def getImageSeriesIDforWell(welllist, wellID):
     return imageseriesindices
 
 
-def getPlanesAndPixelsFromCZI(filename):
+def getPlanesAndPixelsFromCZI(imagefile):
     """
       This function can be used to extract information about the <Plane> and <Pixel> Elements in the
       inside the XML meta-information tree. Returns two lists of dictionaries, each dictionary element corresponds to one <Plane> element
@@ -1127,12 +1131,11 @@ def getPlanesAndPixelsFromCZI(filename):
     if VM_KILLED:
         jvm_error()
 
-    # Create OME-XMF using BioFormats from CZI file and encode
-    omexml = bioformats.get_omexml_metadata(filename)
-    omexml_enc = omexml.encode('utf-8')
+    # Create OME-XML using BioFormats from CZI file
+    omexml = get_OMEXML(imagefile)
 
     # Get the tree and define namespace
-    tree = etl.fromstring(omexml_enc)
+    tree = etl.fromstring(omexml)
     # had wrong schema here SA instead of OME and was searching
     # like crazy for the bug ...
     # Maybe leave out schema completely and only search for *Plane*
@@ -1176,7 +1179,7 @@ def output2file(scriptname, output_name='output.txt', targetdir=os.getcwd()):
 
 def showtypicalmetadata(filename,
                         urlnamespace='http://www.openmicroscopy.org/Schemas/OME/2015-01',
-                        bfpackage = r'c:\Users\M1SRH\Documents\Software\BioFormats_Package\5.1.10\bioformats_package.jar',
+                        bfpackage=r'bioformats_package/5.1.10/bioformats_package.jar',
                         showinfo=False):
 
     set_bfpath(bfpackage)
