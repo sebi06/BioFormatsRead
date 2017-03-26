@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+"""
+@author: Sebi
+
+File: test_wellinfo.py
+Date: 26.03.2017
+Version. 0.3
+"""
+
+from __future__ import print_function
 import bfimage as bf
 
 filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
@@ -10,10 +20,10 @@ welllist, cols, rows, welldict, numdiffwells = bf.processWellStringfromCZI(wells
 well2check = 'B4'
 isids = bf.getImageSeriesIDforWell(welllist, well2check)
 
-print 'WellString          : ', wellstr
-print 'WellList            : ', welllist
-print 'Well Column Indices : ', cols
-print 'Well Row Indices    : ', rows
-print 'WellCounter         : ', welldict
-print 'Different Wells     : ', numdiffwells
-print 'ImageSeries Ind. Well ', well2check, ' : ', isids
+print('WellString          : ', wellstr)
+print('WellList            : ', welllist)
+print('Well Column Indices : ', cols)
+print('Well Row Indices    : ', rows)
+print('WellCounter         : ', welldict)
+print('Different Wells     : ', numdiffwells)
+print('ImageSeries Ind. Well ', well2check, ' : ', isids)

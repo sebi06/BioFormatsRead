@@ -3,10 +3,11 @@
 @author: Sebi
 
 File: test_planeXYZ.py
-Date: 08.03.2017
-Version. 0.2
+Date: 26.03.2017
+Version. 0.3
 """
 
+from __future__ import print_function
 import bfimage as bf
 
 # define filename
@@ -24,5 +25,5 @@ urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
 df, csvfile = bf.get_planetable(filename, writecsv=True, separator='\t')
 
 # show the dataframe
-print df[:5]
-print df.shape[0]
+print(df[:5])
+print(df.shape[0])

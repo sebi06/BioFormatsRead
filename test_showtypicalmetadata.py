@@ -7,6 +7,7 @@ Date: 31.01.2017
 Version. 1.0
 """
 
+from __future__ import print_function
 import numpy as np
 import os
 import bfimage as bf
@@ -32,14 +33,14 @@ if redirect:
     # redirect output
     orig_stdout = sys.stdout
     filepath_output = os.path.join(os.getcwd(), filename[:-4]+'_output.txt')
-    f = open(filepath_output, 'w')
-    sys.stdout = f
+    fo = open(filepath_output, 'wb+')
+    sys.stdout = fo
 
 # get image meta-information
 MetaInfo = bf.showtypicalmetadata(filename, urlnamespace=urlnamespace, bfpackage=bfpackage, showinfo=True)
 
 if redirect:
     sys.stdout = orig_stdout
-    f.close()
+    fo.close()
     sys.__stdout__
     print('Output written to : ', filepath_output)
