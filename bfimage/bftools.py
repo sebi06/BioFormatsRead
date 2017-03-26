@@ -97,12 +97,12 @@ def get_metadata_store(imagefile):
     # get OME-XML and change the encoding to UTF-8
     omexml = get_OMEXML(imagefile)
     # get the metadata from the OME-XML
-    metadata = bioformats.OMEXML(omexml)
+    omexmlmetadata = bioformats.OMEXML(omexml)
 
-    return metadata
+    return omexmlmetadata
 
 
-def get_XMLfromMetaData(metadata):
+def get_XMLStringfromMetaData(metadata):
 
     if not VM_STARTED:
         start_jvm()
@@ -137,6 +137,7 @@ def get_java_metadata_store(imagefile):
     if VM_KILLED:
         jvm_error()
 
+    # get the actual image reader
     rdr = bioformats.get_image_reader(None, path=imagefile)
 
     # for "whatever" reason the number of total series can only be accessed here ...
@@ -173,8 +174,8 @@ def get_java_metadata_store(imagefile):
             multires = True
     
     # rdr.rdr is the actual BioFormats reader. rdr handles its lifetime
-    jmd = jv.JWrapper(rdr.rdr.getMetadataStore())
-    imagecount = jmd.getImageCount()
+    javametadata = jv.JWrapper(rdr.rdr.getMetadataStore())
+    imagecount = javametadata.getImageCount()
 
     imageIDs = []
     for id in range(0, imagecount):
@@ -182,7 +183,7 @@ def get_java_metadata_store(imagefile):
 
     rdr.close()
 
-    return jmd, totalseries, imageIDs, series_dimensions, multires
+    return javametadata, totalseries, imageIDs, series_dimensions, multires
 
 
 def get_metainfo_dimension(jmd, MetaInfo, imageID=0):
@@ -860,7 +861,7 @@ def writeomexml(imagefile, method=1, writeczi_metadata=True):
         try:
             # get the actual OME-XML
             md = get_metadata_store(imagefile)
-            omexmlstring = get_XMLfromMetaData(md)
+            omexmlstring = get_XMLStringfromMetaData(md)
             # create root and tree from XML string and write "pretty" to disk
             root = etl.fromstring(omexmlstring)
             tree = etl.ElementTree(root)

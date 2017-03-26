@@ -25,10 +25,11 @@ testfile = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
 #bf.writeomexml(testfile, method=2, writeczi_metadata=False)
 
 # get the complete metadatastore and the XML string itself
-metadata, xmlstring = bf.get_metadata_store(testfile)
+metadata = bf.get_metadata_store(testfile)
+xmlstring = bf.get_XMLStringfromMetaData(metadata)
 
 # get OME-XML
-omexml = bf.createOMEXML(testfile)
+omexml = bf.get_OMEXML(testfile)
 
 jmd, totalseries, ids, dim, multires = bf.get_java_metadata_store(testfile)
 

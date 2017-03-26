@@ -74,6 +74,7 @@ print('Detector ID          : ', MetaInfo['DetectorID'])
 print('Channels             : ', MetaInfo['Channels'])
 print('Channel Description  : ', MetaInfo['ChDesc'])
 print('ImageIDs             : ', MetaInfo['ImageIDs'])
+print('-------------------------------------------------------------')
 print('Array Shape 6D       : ', arrayshape)
 print('Read Status          : ', readstate)
 

@@ -19,7 +19,7 @@ import sys
 filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
 
 # specify bioformats_package.jar to use if required
-bfpackage = r'BioFormats/5.1.10/bioformats_package.jar'
+bfpackage = r'bioformats_package/5.1.10/bioformats_package.jar'
 bf.set_bfpath(bfpackage)
 
 # use for BioFormtas <= 5.1.10
