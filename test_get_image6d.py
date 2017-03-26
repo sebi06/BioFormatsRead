@@ -23,15 +23,14 @@ urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
 # use for BioFormtas > 5.2.0
 #urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 
-redirect = False
+redirect = True
 
 if redirect:
     # redirect output
     orig_stdout = sys.stdout
     filepath_output = os.path.join(os.getcwd(), filename[:-4]+'_output.txt')
-    f = open(filepath_output,).write(sys.stdout)
-    #f = file(filepath_output, 'w')
-    sys.stdout = f
+    fo = open(filepath_output, 'wb+')
+    sys.stdout = fo
 
 # specify bioformats_package.jar to use if required
 bfpackage = r'BioFormats/5.1.10/bioformats_package.jar'
@@ -80,6 +79,6 @@ print('Read Status          : ', readstate)
 
 if redirect:
     sys.stdout = orig_stdout
-    f.close()
+    fo.close()
     sys.__stdout__
     print('Output written to : ', filepath_output)
