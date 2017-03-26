@@ -3,10 +3,11 @@
 @author: Sebi
 
 File: test_get_image6d_subset.py
-Date: 10.08.2017
-Version. 0.1
+Date: 26.03.2017
+Version. 0.2
 """
 
+from __future__ import print_function
 import numpy as np
 import os
 import bfimage as bf
@@ -26,9 +27,9 @@ redirect = False
 if redirect:
     # redirect output
     orig_stdout = sys.stdout
-    filepath_output = os.path.join(os.getcwd(), 'test_get_image6d_output.txt')
-    f = file(filepath_output, 'w')
-    sys.stdout = f
+    filepath_output = os.path.join(os.getcwd(), filename[:-4]+'_output.txt')
+    fo = open(filepath_output, 'wb+')
+    sys.stdout = fo
 
 # specify bioformats_package.jar to use if required
 bfpackage = r'BioFormats/5.1.10/bioformats_package.jar'
@@ -37,8 +38,8 @@ bf.set_bfpath(bfpackage)
 # get image meta-information
 MetaInfo = bf.bftools.get_relevant_metainfo_wrapper(filename, namespace=urlnamespace)
 
-print 'Image Dimensions : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'], MetaInfo['SizeC'],\
-                                    MetaInfo['SizeY'], MetaInfo['SizeX']
+print('Image Dimensions : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'], MetaInfo['SizeC'],\
+                                    MetaInfo['SizeY'], MetaInfo['SizeX'])
 
 ###############   Subset Definition   #############
 
@@ -64,42 +65,42 @@ try:
     arrayshape = np.shape(img6dsubset)
 except:
     arrayshape = []
-    print 'Could not read image data into NumPy array.'
+    print('Could not read image data into NumPy array.')
 
 # show relevant image Meta-Information
-print '\n'
-print 'Testscript used      :  test_get_image6d_subset.py'
-print 'OME NameSpace used   : ', urlnamespace
-print 'BF Version used      : ', bfpackage
-print '-------------------------------------------------------------'
-print 'Image Directory      : ', MetaInfo['Directory']
-print 'Image Filename       : ', MetaInfo['Filename']
-print 'MutiResolution       : ', MetaInfo['MultiResolution']
-print 'Series Dimensions    : ', MetaInfo['SeriesDimensions']
-print 'Images Dim Sizes [0] : ', MetaInfo['Sizes']
-print 'Dimension Order BF   : ', MetaInfo['DimOrder BF']
-print 'Dimension Order CZI  : ', MetaInfo['OrderCZI']
-print 'Shape CZI            : ', MetaInfo['ShapeCZI']
-print 'Total Series Number  : ', MetaInfo['TotalSeries']
-print 'Image Dimensions     : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'], MetaInfo['SizeC'],\
-                                    MetaInfo['SizeY'], MetaInfo['SizeX']
-print 'Scaling XYZ [micron] : ', MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale']
-print 'Objective M-NA-Imm   : ', MetaInfo['ObjMag'], MetaInfo['NA'], MetaInfo['Immersion']
-print 'Objective Name       : ', MetaInfo['ObjModel']
-print 'Ex. Wavelengths [nm] : ', MetaInfo['WLEx']
-print 'Em. Wavelengths [nm] : ', MetaInfo['WLEm']
-print 'Dyes                 : ', MetaInfo['Dyes']
-print 'Detector Model       : ', MetaInfo['Detector Model']
-print 'Detector Name        : ', MetaInfo['Detector Name']
-print 'Detector ID          : ', MetaInfo['DetectorID']
-print 'Channels             : ', MetaInfo['Channels']
-print 'Channel Description  : ', MetaInfo['ChDesc']
-print 'ImageIDs             : ', MetaInfo['ImageIDs']
-print 'Array Shape 6D       : ', arrayshape
-print 'Read Status          : ', readstate
+print('\n')
+print('Testscript used      :  test_get_image6d.py')
+print('OME NameSpace used   : ', urlnamespace)
+print('BF Version used      : ', bfpackage)
+print('-------------------------------------------------------------')
+print('Image Directory      : ', MetaInfo['Directory'])
+print('Image Filename       : ', MetaInfo['Filename'])
+print('MutiResolution       : ', MetaInfo['MultiResolution'])
+print('Series Dimensions    : ', MetaInfo['SeriesDimensions'])
+print('Images Dim Sizes [0] : ', MetaInfo['Sizes'])
+print('Dimension Order BF   : ', MetaInfo['DimOrder BF'])
+print('Dimension Order CZI  : ', MetaInfo['OrderCZI'])
+print('Shape CZI            : ', MetaInfo['ShapeCZI'])
+print('Total Series Number  : ', MetaInfo['TotalSeries'])
+print('Image Dimensions     : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'], MetaInfo['SizeC'],\
+                                    MetaInfo['SizeY'], MetaInfo['SizeX'])
+print('Scaling XYZ [micron] : ', MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale'])
+print('Objective M-NA-Imm   : ', MetaInfo['ObjMag'], MetaInfo['NA'], MetaInfo['Immersion'])
+print('Objective Name       : ', MetaInfo['ObjModel'])
+print('Ex. Wavelengths [nm] : ', MetaInfo['WLEx'])
+print('Em. Wavelengths [nm] : ', MetaInfo['WLEm'])
+print('Dyes                 : ', MetaInfo['Dyes'])
+print('Detector Model       : ', MetaInfo['Detector Model'])
+print('Detector Name        : ', MetaInfo['Detector Name'])
+print('Detector ID          : ', MetaInfo['DetectorID'])
+print('Channels             : ', MetaInfo['Channels'])
+print('Channel Description  : ', MetaInfo['ChDesc'])
+print('ImageIDs             : ', MetaInfo['ImageIDs'])
+print('Array Shape 6D       : ', arrayshape)
+print('Read Status          : ', readstate)
 
 if redirect:
     sys.stdout = orig_stdout
-    f.close()
+    fo.close()
     sys.__stdout__
-    print 'Output written to : ', filepath_output
+    print('Output written to : ', filepath_output)
