@@ -7,6 +7,7 @@ Date: 06.07.2016
 Version. 1.1
 """
 
+from __future__ import print_function
 from mpl_toolkits.mplot3d import axes3d
 from matplotlib import cm
 import matplotlib.pyplot as plt
@@ -19,25 +20,25 @@ def filterplanetable(planetable, ImageID=0, T=0, Z=0, CH=0):
 
     # filter planetable for specific imageID
     if ImageID > planetable['ImageID'].max():
-        print 'ImageID was invalid. Using ImageID = 0.'
+        print('ImageID was invalid. Using ImageID = 0.')
         CH = 0
     pt = planetable[planetable['ImageID'] == ImageID]
 
     # filter planetable for specific timepoint
     if T > planetable['TheT'].max():
-        print 'Time Index was invalid. Using T = 0.'
+        print('Time Index was invalid. Using T = 0.')
         CH = 0
     pt = planetable[planetable['TheT'] == T]
 
     # filter resulting planetable pt for a specific z-plane
     if Z > planetable['TheZ'].max():
-        print 'Z-Plane Index was invalid. Using Z = 0.'
+        print('Z-Plane Index was invalid. Using Z = 0.')
         zplane = 0
     pt = pt[pt['TheZ'] == Z]
 
     # filter planetable for specific channel
     if CH > planetable['TheC'].max():
-        print 'Channel Index was invalid. Using CH = 0.'
+        print('Channel Index was invalid. Using CH = 0.')
         CH = 0
     pt = planetable[planetable['TheC'] == CH]
 
