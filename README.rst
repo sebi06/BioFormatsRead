@@ -32,6 +32,8 @@ The new 5.4.0 version of the BioFormats library offers various new features for 
 
 Some more infos can be found at: `python-and-bioformats <http://slides.com/sebastianrhode/python-and-bioformats/fullscreen>`_
 
+Important Remark: Not all function where tested to work with Python 3 yet.
+
 Acknowledgements
 ----------------
 *   Christoph Gohlke from providing the czifile.py and tifffile.py.
