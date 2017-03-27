@@ -52,8 +52,6 @@ Additional Tools
 *   Read image series, z-stacks, time series or single planes.
 *   Retrieve all important meta-information.
 *   Write OME-XML Metadata to XML file.
-*   Create and write plane info table.
-*   Create PlaneTable with containing als XYZ Positions.
 *   Display XYZ data from PlaneTable.
 *   Extract Well Information form Scenes (CZI only).
 
