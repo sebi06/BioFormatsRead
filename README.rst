@@ -8,12 +8,13 @@ image data files thanks to BioFormats.
 
 :Author: Sebastian Rhode
 
-:Version: 2017.03.08
+:Version: 2017.03.26
 
-Requirements
-------------
-* `CPython 2.7 <http://www.python.org>`_
-* `Numpy 1.8.2 <http://www.numpy.org>`_
+Important Requirements
+----------------------
+* `Python 2 or 3 <http://www.python.org>`_
+* `Numpy <http://www.numpy.org>`_
+* `Matplotlib <http://www.matplotlib.org>`_
 * `python-bioformats <https://github.com/CellProfiler/python-bioformats>`_
 * `BioFormats package <http://downloads.openmicroscopy.org/bio-formats/>`_
 * `javabridge <https://pypi.python.org/pypi/javabridge>`_
@@ -27,7 +28,7 @@ The package is still under development and was mainly tested with CZI files.
 The python-bioformats package includes loci_tool.jar but it is also possible to use the latest bioformats_package.jar.
 Currently the 5.1.10 version of bioformats_package.jar is used.
 
-The new 5.3.0 version of the BioFormats library offers various new features for reading especially CZI images, which are currently not fully supoorted by python-bioformats.
+The new 5.4.0 version of the BioFormats library offers various new features for reading especially CZI images, which are currently not fully supoorted by python-bioformats. But most of the functionality should work without any problems.
 
 Some more infos can be found at: `python-and-bioformats <http://slides.com/sebastianrhode/python-and-bioformats/fullscreen>`_
 
