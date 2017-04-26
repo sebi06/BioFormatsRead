@@ -1,0 +1,32 @@
+Multi-Resolution API not enabled yet.
+Retrieving Image Dimensions ...
+T:  2 Z:  1 C:  1 X:  640 Y:  640
+Using czifile.py to get CZI Shape info.
+Using BioFormats to get MetaInformation.
+
+
+OME NameSpace used   :  http://www.openmicroscopy.org/Schemas/OME/2015-01
+BF Version used      :  bioformats_package/5.1.10/bioformats_package.jar
+-------------------------------------------------------------
+Image Directory      :  testdata
+Image Filename       :  B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi
+MutiResolution       :  False
+Series Dimensions    :  [(640, 640), (640, 640), (640, 640), (640, 640), (640, 640), (640, 640), (640, 640), (640, 640)]
+Images Dim Sizes [0] :  [8, 2, 1, 1, 640, 640]
+Dimension Order BF   :  XYCZT
+Dimension Order CZI  :  BSTCYX0
+Shape CZI            :  (1, 8, 2, 1, 5474, 27974, 1)
+Total Series Number  :  8
+Image Dimensions     :  8 2 1 1 640 640
+Scaling XYZ [micron] :  0.4 0.4 0.4
+Objective M-NA-Imm   :  5.0 0.35 Air
+Objective Name       :  Plan-Apochromat 5x/0.35
+Ex. Wavelengths [nm] :  [ 353.]
+Em. Wavelengths [nm] :  [ 465.]
+Dyes                 :  ['None']
+Detector Model       :  TestCam
+Detector Name        :  Detector:Internal
+Detector ID          :  Detector:Internal
+Channels             :  ['DAPI']
+Channel Description  :  []
+ImageIDs             :  [0, 1, 2, 3, 4, 5, 6, 7]

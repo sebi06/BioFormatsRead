@@ -12,7 +12,7 @@ from lxml import etree as etl
 import os
 import bfimage as bf
 
-filename = r'c:\Users\M1SRH\Documents\Testdata_Zeiss\Python_bfimage_Testdata\20160331_C=2_Z=5_T=3_A488_A555_CD7.czi'
+filename = r'c:\Python_bfimage_Testdata\20160331_C=2_Z=5_T=3_A488_A555_CD7.czi'
 
 omexml = bf.createOMEXML(filename)
 # create root and tree from XML string and write "pretty" to disk

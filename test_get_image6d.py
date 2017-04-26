@@ -14,9 +14,7 @@ import bftools as bf
 
 #filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
 #filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
-#filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
-filename = r'l:\Data\BioFormats_CZI_Test\20170419\20170419_BioFormats_CZI_Test_small_384chamber_5X_2X.czi'
-#filename = r'l:\Data\BioFormats_CZI_Test\20160425_BF_CZI.czi'
+filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
 
 # use for BioFormtas <= 5.1.10
 #urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'

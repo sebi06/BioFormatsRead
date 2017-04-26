@@ -18,7 +18,7 @@ import zencom as zc
 def setbfpath():
 
     # specify bioformats_package.jar to use if required
-    bfpath = r'c:\Users\M1SRH\Documents\Software\BioFormats_Package\5.1.9\bioformats_package.jar'
+    bfpath = r'c:\BioFormats_Package\5.1.9\bioformats_package.jar'
     bf.set_bfpath(bfpath)
 
 def get_filename():

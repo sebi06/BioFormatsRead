@@ -35,7 +35,7 @@ pytest text_bfread.py
 """
 
 def get_filename():
-    filename = r'l:\Data\BioFormats_CZI_Test\20170419\20170419_BioFormats_CZI_Test_small_384chamber_5X_2X.czi'
+    filename = r'l:\20170419_BioFormats_CZI_Test_small_384chamber_5X_2X.czi'
     return filename
 
 
