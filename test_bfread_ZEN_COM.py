@@ -9,7 +9,7 @@ Version. 0.6
 
 import numpy as np
 import os
-import bfimage as bf
+import bftools as bf
 import pytest
 import datetime
 import zencom as zc
@@ -84,7 +84,7 @@ def test_metainfo():
     img6d = bf.get_image6d(czifilename_complete, MetaInfo['Sizes'])
 
     fulldims = get_dims()
-    print MetaInfo['Sizes']
+    print(MetaInfo['Sizes'])
 
     # check Sizes
     assert MetaInfo['Sizes'] == fulldims
@@ -143,7 +143,7 @@ def test_metainfo():
     dims = [5, 2, 640, 640]
     # get the actual z-stack from the data set
     zstack, dimorder_out = bf.bftools.get_zstack(czifilename_complete, MetaInfo['Sizes'], seriesID, timepoint=timepoint)
-    print zstack.shape
+    print(zstack.shape)
 
     # get plane with the brightest pixel
     zplane = (zstack == zstack.max()).nonzero()[0][0]
