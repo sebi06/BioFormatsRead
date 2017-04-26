@@ -7,7 +7,8 @@ Date: 17.12.2015
 Version. 1.0
 """
 
-import bfimage as bf
+from __future__ import print_function
+import bftools as bf
 from lxml import etree as etl
 
 
@@ -28,9 +29,9 @@ def create_omexml(testdata, method=1, writeczi_metadata=True):
                 root = etl.fromstring(omexml)
                 tree = etl.ElementTree(root)
                 tree.write(xmlfile1, pretty_print=True, encoding='utf-8', method='xml')
-                print 'Created OME-XML file for testdata: ', testdata[i]
+                print('Created OME-XML file for testdata: ', testdata[i])
             except:
-                print 'Creating OME-XML failed for testdata: ', testdata[i]
+                print('Creating OME-XML failed for testdata: ', testdata[i])
 
     if method == 2:
         # method 2
@@ -46,9 +47,9 @@ def create_omexml(testdata, method=1, writeczi_metadata=True):
                 root = etl.fromstring(omexml)
                 tree = etl.ElementTree(root)
                 tree.write(xmlfile2, pretty_print=True, encoding='utf-8', method='xml')
-                print 'Created OME-XML file for testdata: ', testdata[i]
+                print('Created OME-XML file for testdata: ', testdata[i])
             except:
-                print 'Creating OME-XML failed for testdata: ', testdata[i]
+                print('Creating OME-XML failed for testdata: ', testdata[i])
 
     if writeczi_metadata:
 
@@ -59,7 +60,7 @@ def create_omexml(testdata, method=1, writeczi_metadata=True):
                 try:
                     bf.czt.writexml_czi(testdata[i])
                 except:
-                    print 'Could not write special CZI metadata for: ', testdata[i]
+                    print('Could not write special CZI metadata for: ', testdata[i])
 
 
 # INSERT THE FILES INSIDE THE LIST BELOW

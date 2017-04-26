@@ -7,7 +7,7 @@ Date: 01.09.2016
 Version. 0.1
 """
 
-import bfimage as bf
+import bftools as bf
 import os
 
 script2test = 'test_get_image6d.py'

@@ -3,10 +3,11 @@
 @author: Sebi
 
 File: zencom.py
-Date: 28.04.2016
-Version. 0.1
+Date: 18.04.2017
+Version. 0.2
 """
 
+from __future__ import print_function
 import win32com.client
 import numpy as np
 
@@ -16,9 +17,9 @@ def getZENScripting():
     # Import the ZEN OAD Scripting into Python
     try:
         Zen = win32com.client.GetActiveObject("Zeiss.Micro.Scripting.ZenWrapperLM")
-        print 'Successfully imported ZEN Scripting.'
+        print('Successfully imported ZEN Scripting.')
     except:
-        print 'Could not import ZEN Scripting.'
+        print('Could not import ZEN Scripting.')
         raise
 
     return Zen
@@ -33,9 +34,9 @@ def readXYZ(Zen):
         xyz[0] = Zen.Devices.Stage.ActualPositionX
         xyz[1] = Zen.Devices.Stage.ActualPositionX
         xyz[2] = Zen.Devices.Focus.ActualPosition
-        print 'XYZ Position [micron]: ', xyz[0], xyz[1], xyz[2]
+        print('XYZ Position [micron]: ', xyz[0], xyz[1], xyz[2])
     except:
-        print 'Could not read current XYZ position.'
+        print('Could not read current XYZ position.')
 
     return xyz
 

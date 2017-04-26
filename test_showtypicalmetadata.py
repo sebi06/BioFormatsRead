@@ -10,7 +10,7 @@ Version. 1.0
 from __future__ import print_function
 import numpy as np
 import os
-import bfimage as bf
+import bftools as bf
 import sys
 
 # define testdata base directory and filename of the image dataset to be read

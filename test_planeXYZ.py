@@ -8,7 +8,7 @@ Version. 0.3
 """
 
 from __future__ import print_function
-import bfimage as bf
+import bftools as bf
 
 # define filename
 filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
@@ -19,7 +19,7 @@ urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
 #urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 
 # specify bioformats_package.jar to use if required
-bfpackage = r'bioformats_package/5.1.10/bioformats_package.jar'
+bfpackage = r'bfpackage/5.4.1/bioformats_package.jar'
 bf.set_bfpath(bfpackage)
 
 # create plane info and write into dataframe
