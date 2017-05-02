@@ -7,14 +7,12 @@ Date: 02.05.2017
 Version. 0.1
 """
 
-from __future__ import print_function
-import numpy as np
-import os
 import bftools as bf
 
 #filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
 #filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
-filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
+#filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
+filename = r'/home/sebi06/Dokumente/Image_Datasets/2x2_SNAP_CH=2_Z=5.czi'
 
 # use for BioFormtas <= 5.1.10
 #urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'

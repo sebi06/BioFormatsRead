@@ -3,13 +3,12 @@
 @author: Sebi
 
 File: test_get_image6d.py
-Date: 17.04.2017
-Version. 1.6
+Date: 02.05.2017
+Version. 1.7
 """
 
 from __future__ import print_function
 import numpy as np
-import os
 import bftools as bf
 
 #filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'

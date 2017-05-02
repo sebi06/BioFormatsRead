@@ -2,13 +2,12 @@
 """
 @author: Sebi
 
-File: test_get_image6d.py
-Date: 31.01.2017
-Version. 1.0
+File: test_showtypicalmetadata.py
+Date: 02.05.2017
+Version. 1.1
 """
 
 from __future__ import print_function
-import numpy as np
 import os
 import bftools as bf
 import sys
