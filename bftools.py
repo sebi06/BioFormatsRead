@@ -541,6 +541,62 @@ def get_image6d_subset(imagefile, sizes,
     return img6dsubset, readstate
 
 
+def get_image6d_multires(imagefile, MetaInfo):
+    """
+    This function will read the image data series by series.
+    Every series will be stored inside a tuple as a 5D numpy array.
+    The 5D array has the following dimension order: [T, Z, C, X, Y].
+    """
+    if not VM_STARTED:
+        start_jvm()
+    if VM_KILLED:
+        jvm_error()
+
+    rdr = bioformats.ImageReader(imagefile, perform_init=True)
+
+    readstate = 'OK'
+    readproblems = []
+
+    # initialize the empty list that will hold all the 5D image arrays
+    series_list = []
+
+    numseries = MetaInfo['Sizes'][0]
+    sizeT = MetaInfo['Sizes'][1]
+    sizeZ = MetaInfo['Sizes'][2]
+    sizeC = MetaInfo['Sizes'][3]
+
+    for seriesID in range(0, numseries):
+        # read the XY dimension of the first series
+        current_sizeX = MetaInfo['SeriesDimensions'][seriesID][0]
+        current_sizeY = MetaInfo['SeriesDimensions'][seriesID][1]
+
+        newsize = [sizeT, sizeZ, sizeC, current_sizeX, current_sizeY]
+
+        # create the 5D numpy array
+        img5d = np.zeros(newsize, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+
+        # main loop to read the images from the data file
+        for timepoint in range(0, sizeT):
+            for zplane in range(0, sizeZ):
+                for channel in range(0, sizeC):
+                    try:
+                        img5d[seriesID, timepoint, zplane, channel, :, :] =\
+                            rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+                    except:
+                        print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
+                        readstate = 'NOK'
+                        readproblems = sys.exc_info()[1]
+
+        # store the 5D array inside a tuple
+        series_list.append(img5d)
+        # clear the array from memory
+        img5d = None
+
+    rdr.close()
+
+    return series_list, readstate
+
+
 def get_image2d(imagefile, seriesID, channel, zplane, timepoint):
     """
     This will just read a single plane from an image data set.
