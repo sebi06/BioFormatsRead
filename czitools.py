@@ -8,7 +8,7 @@ Version. 0.8
 """
 
 from __future__ import print_function
-from unidecode import unidecode
+#from unidecode import unidecode
 import misctools as misc
 from czifile import *
 import numpy as np

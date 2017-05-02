@@ -795,7 +795,7 @@ def get_relevant_metainfo_wrapper(imagefile,
 
     # summarize dimensions
     MetaInfo['Sizes'] = [MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'],
-                         MetaInfo['SizeC'], MetaInfo['SizeY'], MetaInfo['SizeX']]
+                         MetaInfo['SizeC'], MetaInfo['SizeX'], MetaInfo['SizeY']]
 
     # try to get detector information - 1
     try:
@@ -1203,7 +1203,7 @@ def showtypicalmetadata(MetaInfo, namespace='n.a.', bfpath='n.a.'):
     print('Shape CZI            : ', MetaInfo['ShapeCZI'])
     print('Total Series Number  : ', MetaInfo['TotalSeries'])
     print('Image Dimensions     : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'], MetaInfo['SizeC'],\
-                                       MetaInfo['SizeY'], MetaInfo['SizeX'])
+                                       MetaInfo['SizeX'], MetaInfo['SizeY'])
     print('Scaling XYZ [micron] : ', MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale'])
     print('Objective M-NA-Imm   : ', MetaInfo['ObjMag'], MetaInfo['NA'], MetaInfo['Immersion'])
     print('Objective Name       : ', MetaInfo['ObjModel'])
