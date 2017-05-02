@@ -2,9 +2,9 @@
 """
 @author: Sebi
 
-File: test_get_image6d.py
-Date: 17.04.2017
-Version. 1.6
+File: test_get_image6d_multires.py
+Date: 02.05.2017
+Version. 0.1
 """
 
 from __future__ import print_function
