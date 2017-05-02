@@ -1,6 +1,6 @@
-===============================
-bfimage
-===============================
+==================================
+BioFormatsRead - Scripts and Tools
+==================================
 
 This collection of scripts can be used to read image data using BioFormats into numpy arrays.
 It was initially created to simplify reading CZI image files, but should work with many more
