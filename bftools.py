@@ -614,115 +614,6 @@ def get_image2d(imagefile, seriesID, channel, zplane, timepoint):
     return img2d
 
 
-def get_zstack(imagefile, sizes, seriesID, timepoint='full'):
-
-    # TODO Adapt to make use of new function get_image6g_subset.
-
-    """
-    This will read a single Z-Stack from an image data set for a specified image series.
-    """
-    if not VM_STARTED:
-        start_jvm()
-    if VM_KILLED:
-        jvm_error()
-
-    rdr = bioformats.ImageReader(imagefile, perform_init=True)
-
-    if timepoint == 'full':
-
-        # initialize array for specific series that only contains a mutichannel z-Stack
-        imgZStack = np.zeros([sizes[1], sizes[2], sizes[3], sizes[4], sizes[5]], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
-
-        for timepoint in range(0, sizes[1]):
-            for zplane in range(0, sizes[2]):
-                for channel in range(0, sizes[3]):
-                    imgZStack[timepoint, zplane, channel, :, :] = rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
-
-        dimorder_out = 'TZCXY'
-
-    else:
-
-        # initialize array for specific series and time point that only contains a mutichannel z-Stack
-        imgZStack = np.zeros([sizes[2], sizes[3], sizes[4], sizes[5]], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
-
-        for zplane in range(0, sizes[2]):
-            for channel in range(0, sizes[3]):
-                imgZStack[zplane, channel, :, :] = rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
-
-        dimorder_out = 'ZCXY'
-
-    rdr.close()
-
-    return imgZStack, dimorder_out
-
-
-def get_timeseries(imagefile, sizes, seriesID, zplane='full'):
-
-    # TODO Adapt to make use of new function get_image6g_subset.
-
-    """
-    This will read a single Time Lapse from an image data set.
-    """
-    if not VM_STARTED:
-        start_jvm()
-    if VM_KILLED:
-        jvm_error()
-
-    rdr = bioformats.ImageReader(imagefile, perform_init=True)
-
-    if zplane == 'full':
-
-        # initialize array for specific series that only contains a mutichannel time series for a specific series
-        imgTimeSeries = np.zeros([sizes[1], sizes[2], sizes[3], sizes[4], sizes[5]], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
-        for timepoint in range(0, sizes[1]):
-            for zplane in range(0, sizes[2]):
-                for channel in range(0, sizes[3]):
-                    imgTimeSeries[timepoint, zplane, channel, :, :] = \
-                        rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
-
-        dimorder_out = 'TZCXY'
-
-    else:
-
-        # initialize array for specific series that only contains a mutichannel time series for a specific series and zplane
-        imgTimeSeries = np.zeros([sizes[1], sizes[3], sizes[4], sizes[5]], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
-        for timepoint in range(0, sizes[1]):
-                for channel in range(0, sizes[3]):
-                    imgTimeSeries[timepoint, channel, :, :] = \
-                        rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
-
-        dimorder_out = 'TCXY'
-
-    rdr.close()
-
-    return imgTimeSeries, dimorder_out
-
-
-def get_imageseries(imagefile, sizes, seriesID=0):
-
-    # TODO Adapt to make use of new function get_image6g_subset.
-
-    if not VM_STARTED:
-        start_jvm()
-    if VM_KILLED:
-        jvm_error()
-
-    rdr = bioformats.ImageReader(imagefile, perform_init=True)
-
-    # initialize an array with the correct dimensions of one series only
-    #imgseries = np.empty(sizes[1:], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
-    imgseries = np.zeros(sizes[1:], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
-
-    for timepoint in range(0, sizes[1]):
-        for zplane in range(0, sizes[2]):
-            for channel in range(0, sizes[3]):
-                imgseries[seriesID, timepoint, zplane, channel, :, :] = rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
-
-    rdr.close()
-
-    return imgseries
-
-
 def get_series_from_well(imagefile, sizes, seriesseq):
     """
     Reads all scenes from a single well and stores them in a array.
@@ -735,7 +626,6 @@ def get_series_from_well(imagefile, sizes, seriesseq):
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
     sizes[0] = len(seriesseq)
 
-    #img6dwell = np.empty(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
     img6dwell = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
 
     for seriesID in range(0, len(seriesseq)):
