@@ -3,17 +3,14 @@
 @author: Sebi
 
 File: czitools.py
-Date: 09.06.2015
-Version. 0.8
+Date: 03.05.2017
+Version. 0.9
 """
 
 from __future__ import print_function
-#from unidecode import unidecode
 import misctools as misc
 from czifile import *
 import numpy as np
-import bftools as bf
-from lxml import etree as etl
 import re
 from collections import Counter
 
@@ -34,7 +31,6 @@ def get_metainfo_channel_description(filename):
         # get the channel descriptions
         ids = misc.find_index_byname(namelst, 'Description')
         chdescript = misc.get_entries(valuelst, ids)
-        #if chdescript == []
 
         czi.close()
 
@@ -72,7 +68,7 @@ def get_objective_name_cziread(filename):
 
     # get the channel descriptions
     try:
-        ids = bf.misctools.find_index_byname(namelst, 'ObjectiveName')
+        ids = misc.find_index_byname(namelst, 'ObjectiveName')
         objname = misc.get_entries(valuelst, ids)
     except:
         objname = 'n.a.'
@@ -165,36 +161,11 @@ def get_metainfo_cziread_camera(filename):
     for elem in czi.metadata.getiterator():
 
         if elem.tag == 'CameraName':
-            CamName = elem.text
+            cameraname = elem.text
 
     czi.close()
 
-    return CamName
-
-
-def getWelllNamesfromCZI(filename):
-
-    # Current key for wells - 2016_07_21
-    wellkey = 'Information|Image|S|Scene|Shape|Name'
-
-    # Create OME-XMF using BioFormats from CZI file and encode
-    omexml = bf.createOMEXML(filename)
-    #omexml_enc = omexml.encode('utf-8')
-    omexml_enc = unidecode(omexml)
-    # Get the tree
-    tree = etl.fromstring(omexml_enc)
-    # Define NameSpace
-    name_space = "{http://www.openmicroscopy.org/Schemas/SA/2016-06}"
-
-    origin_meta_datas = tree.findall(".//{}OriginalMetadata".format(name_space))
-    # Iterate in founded origins
-    for origin in origin_meta_datas:
-        key = origin.find("{}Key".format(name_space)).text
-        if key == wellkey:
-            value = origin.find("{}Value".format(name_space)).text
-            #print("Value: {}".format(value))
-
-    return value
+    return cameraname
 
 
 def getWellInfofromCZI(wellstring):
@@ -211,10 +182,7 @@ def getWellInfofromCZI(wellstring):
     wellOK = wellstring[1:]
     wellOK = wellOK[:-1]
     wellOK = re.sub(r'\s+', '', wellOK)
-
     welllist = [item for item in wellOK.split(',') if item.strip()]
-
-    #print welllist
 
     cols = []
     rows = []
@@ -232,36 +200,3 @@ def getWellInfofromCZI(wellstring):
     numwells = len(welllist)
 
     return welllist, cols, rows, welldict, numwells
-
-
-def convert_dimension_string(cziorder):
-    """
-
-    EXPERIMENTAL !!!
-
-    Read the actual dimension order from the CZI file via czifile.py, NOT BioFormats.
-    The order will be converted to the standard ordering scheme of Bioformats, e.g. XYCZT or XYZCT etc.
-    """
-
-    # TODO - Experimental - Can this be removed?
-
-    # get number of dimensions of CZI file and create empty list
-    numdimczi = len(cziorder)
-    dimorder = [None] * 5
-    # first two dimension strings are always XY
-    dimorder[0] = 'X'
-    dimorder[1] = 'Y'
-    # read next 3 dimension strings from the back after XY and store them into the list
-    dimorder[2] = str(cziorder[numdimczi - 3 - 1])
-    dimorder[3] = str(cziorder[numdimczi - 4 - 1])
-    dimorder[4] = str(cziorder[numdimczi - 5 - 1])
-    if dimorder[3] != 'Z' or dimorder[3] != 'T':
-        dimorder[3] = 'Z'
-    if dimorder[4] != 'Z' or dimorder[4] != 'T':
-        dimorder[4] = 'T'
-
-    # concatenate the complete dimension string from list elements
-    dims = dimorder[0] + dimorder[1] + dimorder[2] + dimorder[3] + dimorder[4]
-
-    return dims
-
