@@ -580,7 +580,7 @@ def get_image6d_multires(imagefile, MetaInfo):
             for zplane in range(0, sizeZ):
                 for channel in range(0, sizeC):
                     try:
-                        img5d[seriesID, timepoint, zplane, channel, :, :] =\
+                        img5d[timepoint, zplane, channel, :, :] =\
                             rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
                     except:
                         print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
