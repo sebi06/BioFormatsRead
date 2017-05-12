@@ -19,7 +19,6 @@ import sys
 import re
 from collections import Counter
 import subprocess
-#from unidecode import unidecode
 
 
 VM_STARTED = False
@@ -38,6 +37,7 @@ BF2NP_DTYPE = {
     6: np.float32,
     7: np.double
 }
+
 
 def set_bfpath(bfpackage_path=BFPATH):
     # this function can be used to set the path to the package individually
@@ -64,7 +64,6 @@ def start_jvm(max_heap_size='4G'):
     # TODO - include check for the OS, so that the file paths are always working
 
     jars = jv.JARS + [BFPATH]
-    #jars = jv.JARS
     jv.start_vm(class_path=jars, max_heap_size=max_heap_size)
     VM_STARTED = True
 
@@ -125,7 +124,7 @@ def get_OMEXML(imagefile):
     # get OME-XML and change the encoding to UTF-8
     omexml = bioformats.get_omexml_metadata(imagefile)
     omexml = omexml.encode('utf-8')
-    #omexml = unidecode(omexml)
+    # omexml = unidecode(omexml)
 
     return omexml
 
@@ -156,7 +155,7 @@ def get_java_metadata_store(imagefile):
                 print('Resolution #', res, ' dimensions = ', rdr.getSizeX(), ' x ', rdr.getSizeY())
     except:
         print('Multi-Resolution API not enabled yet.')
-    
+
     series_dimensions = []
     # cycle through all the series and check the dimensions
     for sc in range(0, totalseries):
@@ -172,7 +171,7 @@ def get_java_metadata_store(imagefile):
             multires = False
         if not series_dimensions[0] == series_dimensions[1]:
             multires = True
-    
+
     # rdr.rdr is the actual BioFormats reader. rdr handles its lifetime
     javametadata = jv.JWrapper(rdr.rdr.getMetadataStore())
     imagecount = javametadata.getImageCount()
@@ -202,8 +201,8 @@ def get_metainfo_dimension(jmd, MetaInfo, imageID=0):
     MetaInfo['DimOrder BF'] = jmd.getPixelsDimensionOrder(imageID).getValue()
 
     print('Retrieving Image Dimensions ...')
-    print('T: ', MetaInfo['SizeT'],  'Z: ', MetaInfo['SizeZ'],  'C: ', MetaInfo['SizeC'],  'X: ',\
-        MetaInfo['SizeX'],  'Y: ', MetaInfo['SizeY'])
+    print('T: ', MetaInfo['SizeT'], 'Z: ', MetaInfo['SizeZ'], 'C: ', MetaInfo['SizeC'], 'X: ', \
+        MetaInfo['SizeX'], 'Y: ', MetaInfo['SizeY'])
 
     return MetaInfo
 
@@ -268,7 +267,6 @@ def get_metainfo_objective(jmd, filename, imageID=0):
     # try to get immersion type -  # get the first objective record in the first Instrument record
     try:
         objimm = jmd.getObjectiveImmersion(instrumentID, objID).getValue()
-        #objimm = jmd.getObjectiveImmersion(instrumentID, objID)
     except:
         objimm = 'na'
 
@@ -392,7 +390,8 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
 
     # get JavaMetaDataStore and SeriesCount
     try:
-        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], MetaInfo['SeriesDimensions'], MetaInfo['MultiResolution'] = get_java_metadata_store(imagefile)
+        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], MetaInfo['SeriesDimensions'],
+            MetaInfo['MultiResolution'] = get_java_metadata_store(imagefile)
     except:
         print('Problem retrieving Java Metadata Store or Series size:', sys.exc_info()[0])
         raise
@@ -412,7 +411,7 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
 
     print('Start reading the plane data ...')
 
-    for imageIndex in range(0, max(MetaInfo['ImageIDs'])+1):
+    for imageIndex in range(0, max(MetaInfo['ImageIDs']) + 1):
         for planeIndex in range(0, MetaInfo['SizeZ'] * MetaInfo['SizeC'] * MetaInfo['SizeT']):
 
             id.append(imageIndex)
@@ -425,7 +424,7 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
             zpos.append(jmd.getPlanePositionZ(imageIndex, planeIndex).value().doubleValue())
             dt.append(jmd.getPlaneDeltaT(imageIndex, planeIndex).value().doubleValue())
             # optional detailed output
-            #print id[-1], plane[-1], planeIndex, theT[-1], theZ[-1], theC[-1], xpos[-1], ypos[-1], zpos[-1], dt[-1]
+            # print id[-1], plane[-1], planeIndex, theT[-1], theZ[-1], theC[-1], xpos[-1], ypos[-1], zpos[-1], dt[-1]
 
         # create some kind of progress bar
         print('\b.',)
@@ -517,7 +516,7 @@ def get_image6d_subset(imagefile, sizes,
     subsetSizeZ = zend - zstart
     subsetSizeC = chend - chstart
 
-    subsetsizes = [subsetSizeS,  subsetSizeT,  subsetSizeZ,  subsetSizeC,  sizes[4], sizes[5]]
+    subsetsizes = [subsetSizeS, subsetSizeT, subsetSizeZ, subsetSizeC, sizes[4], sizes[5]]
 
     img6dsubset = np.zeros(subsetsizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
     readstate = 'OK'
@@ -633,7 +632,7 @@ def get_series_from_well(imagefile, sizes, seriesseq):
             for zplane in range(0, sizes[2]):
                 for channel in range(0, sizes[3]):
                     img6dwell[seriesID, timepoint, zplane, channel, :, :] =\
-                        rdr.read(series=seriesID, c=channel,z=zplane, t=timepoint, rescale=False)
+                        rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
 
     rdr.close()
 
@@ -686,7 +685,7 @@ def get_relevant_metainfo_wrapper(imagefile,
                                   showinfo=False):
 
     # set path to bioformats_apckage.jar
-    #set_bfpath(bfpath)
+    # set_bfpath(bfpath)
 
     MetaInfo = create_metainfo_dict()
     omexml = get_OMEXML(imagefile)
@@ -717,7 +716,8 @@ def get_relevant_metainfo_wrapper(imagefile,
 
     # use bioformats to get the objective information
     try:
-        MetaInfo['Immersion'], MetaInfo['NA'], MetaInfo['ObjMag'], MetaInfo['ObjModel'] = get_metainfo_objective(jmd, imagefile, imageID=0)
+        MetaInfo['Immersion'], MetaInfo['NA'], MetaInfo['ObjMag'],
+            MetaInfo['ObjModel'] = get_metainfo_objective(jmd, imagefile, imageID=0)
     except:
         print('Problem retrieving object information:', sys.exc_info()[0])
 
@@ -764,7 +764,7 @@ def get_relevant_metainfo_wrapper(imagefile,
 
     if showinfo:
         showtypicalmetadata(MetaInfo, namespace=namespace, bfpath=bfpath)
-        
+
     return MetaInfo
 
 
@@ -782,7 +782,7 @@ def calc_series_range_well(wellnumber, imgperwell):
     per well is equal for every well
     The well numbers start with Zero and have nothing to do with the actual wellID, e.g. C2
     """
-    seriesseq = range(wellnumber * imgperwell,  wellnumber * imgperwell + imgperwell, 1)
+    seriesseq = range(wellnumber * imgperwell, wellnumber * imgperwell + imgperwell, 1)
 
     return seriesseq
 
@@ -849,7 +849,7 @@ def getinfofromOMEXML(omexml, nodenames, ns='http://www.openmicroscopy.org/Schem
     ------
 
     filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi
-    omexml = bf.createOMEXML(filename)
+    omexml = bf.get_OMEXML(filename)
     parseXML(omexml, 'Image', 'Pixel')
 
     # case 1
@@ -911,7 +911,7 @@ def parseXML(omexml, topchild, subchild, highdetail=False):
     for child in root:
         print('*   ', child.tag, '--> ', child.attrib)
         if topchild in child.tag:
-        #if child.tag == "{http://www.openmicroscopy.org/Schemas/OME/2015-01}Instrument":
+        # if child.tag == "{http://www.openmicroscopy.org/Schemas/OME/2015-01}Instrument":
             for step_child in child:
                 print('**  ', step_child.tag, '-->', step_child.attrib)
 
@@ -980,7 +980,7 @@ def getWelllNamesfromCZI(imagefile, namespace='{http://www.openmicroscopy.org/Sc
     omexml = get_OMEXML(imagefile)
     # Get the tree and define namespace
     tree = etl.fromstring(omexml)
-    #namespace = '{http://www.openmicroscopy.org/Schemas/SA/2015-01}'
+    # namespace = '{http://www.openmicroscopy.org/Schemas/SA/2015-01}'
 
     # find OriginalMetadata
     wellstring = ''
@@ -989,7 +989,7 @@ def getWelllNamesfromCZI(imagefile, namespace='{http://www.openmicroscopy.org/Sc
     for origin in origin_meta_datas:
         key = origin.find("{}Key".format(namespace)).text
         if key == wellkey:
-            wellstring= origin.find("{}Value".format(namespace)).text
+            wellstring = origin.find("{}Value".format(namespace)).text
             print("Value: {}".format(wellstring))
 
     return wellstring
@@ -1098,13 +1098,12 @@ def getPlanesAndPixelsFromCZI(imagefile):
     namespace = "{http://www.openmicroscopy.org/Schemas/OME/2015-01}"
     planes = []
     pixels = []
-    #for child in root:
+    # for child in root:
     #    m = re.match('.*Image.*', child.tag)
     #    if m:
     #        first_tag = m.group(0)
     for element in tree.iter():
-    #for element in tree:
-        #print element.tag
+        # print element.tag
         if "{}Plane".format(namespace) in element.tag:
             tmpdict = dict(zip(element.keys(), element.values()))
             planes.append(tmpdict)
@@ -1148,8 +1147,8 @@ def showtypicalmetadata(MetaInfo, namespace='n.a.', bfpath='n.a.'):
     print('Dimension Order CZI  : ', MetaInfo['OrderCZI'])
     print('Shape CZI            : ', MetaInfo['ShapeCZI'])
     print('Total Series Number  : ', MetaInfo['TotalSeries'])
-    print('Image Dimensions     : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'], MetaInfo['SizeC'],\
-                                       MetaInfo['SizeX'], MetaInfo['SizeY'])
+    print('Image Dimensions     : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'],\
+            MetaInfo['SizeZ'], MetaInfo['SizeC'], MetaInfo['SizeX'], MetaInfo['SizeY'])
     print('Scaling XYZ [micron] : ', MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale'])
     print('Objective M-NA-Imm   : ', MetaInfo['ObjMag'], MetaInfo['NA'], MetaInfo['Immersion'])
     print('Objective Name       : ', MetaInfo['ObjModel'])
