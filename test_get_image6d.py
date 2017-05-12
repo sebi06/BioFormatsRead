@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 @author: Sebi
-
 File: test_get_image6d.py
 Date: 02.05.2017
 Version. 1.7
