@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 @author: Sebi
-
 File: write_OME-XML_from_file.py
 Date: 11.05.2015
 Version. 1.1
@@ -17,7 +16,7 @@ import bftools as bf
 urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 
 # specify bioformats_package.jar to use if required
-bfpackage = r'bioformats_package/5.4.1/bioformats_package.jar'
+bfpackage = r'bfpackage/5.4.1/bioformats_package.jar'
 bf.set_bfpath(bfpackage)
 
 # INSERT THE FILES INSIDE THE LIST BELOW
