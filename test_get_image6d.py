@@ -22,7 +22,7 @@ filename = r'/home/sebi06/Dokumente/Image_Datasets/2x2_SNAP_CH=2_Z=5.czi'
 urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 
 # specify bioformats_package.jar to use if required
-bfpackage = r'bioformats_package/5.4.1/bioformats_package.jar'
+bfpackage = r'bfpackage/5.4.1/bioformats_package.jar'
 bf.set_bfpath(bfpackage)
 
 # get image meta-information
