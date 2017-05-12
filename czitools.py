@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: czitools.py
-Date: 03.05.2017
-Version. 0.9
+Date: 11.05.2017
+Version. 1.0
 """
 
 from __future__ import print_function
@@ -200,3 +200,27 @@ def getWellInfofromCZI(wellstring):
     numwells = len(welllist)
 
     return welllist, cols, rows, welldict, numwells
+
+
+def getXMLnodes(filename_czi, searchpath, showoutput=False):
+
+    czi = CziFile(filename_czi)
+    tree = czi.metadata.getroottree()
+
+    tag = []
+    attribute = []
+    text = []
+
+    for elem in tree.iterfind(searchpath):
+
+        tag.append(elem.tag)
+        attribute.append(elem.attrib)
+        text.append(elem.text)
+
+        if showoutput:
+            print('Tag       : ', elem.tag)
+            print('Attribute : ', elem.attrib)
+            print('Text      : ', elem.text)
+
+    return tag, attribute, text
+
