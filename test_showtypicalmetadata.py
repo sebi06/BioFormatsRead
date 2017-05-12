@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 @author: Sebi
-
 File: test_showtypicalmetadata.py
 Date: 02.05.2017
 Version. 1.1
@@ -19,7 +18,7 @@ import sys
 filename = r'/home/sebi06/Dokumente/Image_Datasets/2x2_SNAP_CH=2_Z=5.czi'
 
 # specify bioformats_package.jar to use if required
-bfpackage = r'bioformats_package/5.4.1/bioformats_package.jar'
+bfpackage = r'bfpackage/5.4.1/bioformats_package.jar'
 bf.set_bfpath(bfpackage)
 
 # use for BioFormtas <= 5.1.10
