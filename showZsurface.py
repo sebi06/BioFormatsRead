@@ -55,9 +55,6 @@ bf.set_bfpath(bfpackage)
 # create plane info from CZI image file and write CSV file (optional)
 planetable, filenamecsv = bf.get_planetable(filenameczi, writecsv=wcsv, separator=separator)
 
-# or use the CSV file directly once it was created
-#planetable = pd.read_csv(filenamecsv, sep=separator)
-
 # show the dataframe
 print(planetable[:10])
 print(planetable.shape[0])
