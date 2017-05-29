@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 @author: Sebi
-
 File: test_get_XML_nodes.py
 Date: 28.05.2017
 Version. 0.2
@@ -35,15 +34,27 @@ print(attribute)
 
 path = 'Metadata/Information/Image/Dimensions/S/Scenes/Scene/ArrayName'
 tag, attribute, text = czt.getXMLnodes(filename, path)
-print(tag)
-print(attribute)
-print(text)
+arraynames = text
+
+
+path = 'Metadata/Information/Image/Dimensions/S/Scenes/Scene'
+tag, attribute, text = czt.getXMLnodes(filename, path)
+posnames = []
+sceneindex = []
+for at in attribute:
+    posnames.append(at['Name'])
+    sceneindex.append(at['Index'])
 
 path = 'Metadata/Information/Image/Dimensions/S/Scenes/Scene/Shape'
 tag, attribute, text = czt.getXMLnodes(filename, path)
-print(tag)
-print(attribute)
-print(attribute[0]['Name'])
+wellID = []
+for at in attribute:
+    wellID.append(at['Name'])
+
+print(posnames)
+print(sceneindex)
+print(wellID)
+
 
 path = 'Metadata/Scaling/AutoScaling/ObjectiveName'
 tag, attribute, text = czt.getXMLnodes(filename, path)
@@ -90,3 +101,4 @@ for k, v in dims.items():
         dims[k] = 1
 
 print(dims)
+
