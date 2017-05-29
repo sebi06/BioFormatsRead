@@ -18,6 +18,8 @@ parser = argparse.ArgumentParser(description='Read Filename and Parameters.')
 parser.add_argument('-f', action="store", dest='filename')
 parser.add_argument('-csv', action="store", dest='writecsv')
 parser.add_argument('-sep', action="store", dest='separator')
+parser.add_argument('-save', action="store", dest='savefigure')
+parser.add_argument('-show', action="store", dest='showsurface')
 # get the arguments
 args = parser.parse_args()
 
@@ -35,7 +37,6 @@ elif args.separator == 'Comma':
 elif args.sparator == 'semicolon':
     separator = ';'
 
-
 # get CSV write option
 #csv = True
 if args.writecsv == 'True':
@@ -43,10 +44,19 @@ if args.writecsv == 'True':
 elif args.writecsv == 'False':
     wcsv = False
 
-# use for BioFormtas <= 5.1.10
-#urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
-# use for BioFormtas > 5.2.0
-urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
+# get save option
+#save = True
+if args.savefigure == 'True':
+    save = True
+elif args.savefigure == 'False':
+    save = False
+
+# get show surface option
+#surface = True
+if args.showsurface == 'True':
+    surface = True
+elif args.showsurface == 'False':
+    surface = False
 
 # specify bioformats_package.jar to use if required
 bfpackage = r'bfpackage/5.5.0/bioformats_package.jar'
@@ -57,11 +67,10 @@ planetable, filenamecsv = bf.get_planetable(filenameczi, writecsv=wcsv, separato
 
 # show the dataframe
 print(planetable[:10])
-print(planetable.shape[0])
 
 # display the XYZ positions
 dsp.scatterplot(planetable, ImageID=0, T=0, CH=0, Z=0, size=250,
-                savefigure=True, figsavename=filenamecsv, showsurface=True)
+                savefigure=save, figsavename=filenamecsv, showsurface=surface)
 
 # show the plot
 plt.show()
