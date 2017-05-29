@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: bftools.py
-Date: 02.05.2017
-Version. 2.3.0
+Date: 29.05.2017
+Version. 2.3.1
 """
 
 from __future__ import print_function
