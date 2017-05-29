@@ -92,9 +92,6 @@ for k, v in dims.items():
 
     path = 'Metadata/Information/Image/' + k
     tag, attribute, text = czt.getXMLnodes(filename, path)
-    #print(tag)
-    #print(attribute)
-    #print(text)
     dims[k] = text
     # check for empty entries
     if dims[k] == []:
