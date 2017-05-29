@@ -411,6 +411,11 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
 
     print('Start reading the plane data ...')
 
+    import progressbar
+    widgets = [progressbar.Percentage(), progressbar.Bar()]
+    bar = progressbar.ProgressBar(widgets=widgets, max_value=max(MetaInfo['ImageIDs']) + 1).start()
+    #bar = progressbar.ProgressBar().start()
+    
     for imageIndex in range(0, max(MetaInfo['ImageIDs']) + 1):
         for planeIndex in range(0, MetaInfo['SizeZ'] * MetaInfo['SizeC'] * MetaInfo['SizeT']):
 
@@ -438,13 +443,7 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
             #print(id[-1], plane[-1], planeIndex, theT[-1], theZ[-1], theC[-1], xpos[-1], ypos[-1], zpos[-1], dt[-1])
         
         # create some kind of progress bar
-        print('\b.',)
-        sys.stdout.flush()
-        if np.mod(imageIndex, 50) == 0:
-            print('\n')
-
-    # just print an empty line
-    print('Done.\n')
+        bar.update(imageIndex)
 
     # round the data
     xpos = np.round(xpos, 1)
@@ -464,7 +463,7 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
         csvfile = imagefile[:-4] + '_planetable.csv'
         # use tab as separator and do not write the index to the CSV data table
         df.to_csv(csvfile, sep=separator, index=False)
-        print('Writing CSV file: ', csvfile)
+        print('\nWriting CSV file: ', csvfile)
 
     return df, csvfile
 
