@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: czitools.py
-Date: 11.05.2017
-Version. 1.0
+Date: 29.05.2017
+Version. 1.1
 """
 
 from __future__ import print_function
@@ -46,7 +46,7 @@ def writexml_czi(filename):
     czi = CziFile(filename)
 
     # Change File name and write XML file to same folder
-    xmlfile = filename.replace('.czi', '_MetaData.xml')
+    xmlfile = filename.replace('.czi', '_CZI_MetaData.xml')
     tree = czi.metadata.getroottree()
     tree.write(xmlfile, encoding='utf-8', method='xml')
     print('Write special CZI XML metainformation for: ', xmlfile)
