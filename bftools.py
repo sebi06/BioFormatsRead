@@ -164,13 +164,13 @@ def get_java_metadata_store(imagefile):
         dimy = rdr.rdr.getSizeY()
         series_dimensions.append((dimx, dimy))
 
-    if len(series_dimensions) == 1:
+        if len(series_dimensions) == 1:
         multires = False
     elif len(series_dimensions) > 1:
-        if series_dimensions[0] == series_dimensions[1]:
-            multires = False
-        if not series_dimensions[0] == series_dimensions[1]:
+        if len(set(series_dimensions)) > 1:
             multires = True
+        elif len(set(series_dimensions)) == 1:
+            multires = False
 
     # rdr.rdr is the actual BioFormats reader. rdr handles its lifetime
     javametadata = jv.JWrapper(rdr.rdr.getMetadataStore())
