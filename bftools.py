@@ -416,16 +416,27 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
 
             id.append(imageIndex)
             plane.append(planeIndex)
-            theC.append(jmd.getPlaneTheC(imageIndex, planeIndex).getValue().intValue())
-            theZ.append(jmd.getPlaneTheZ(imageIndex, planeIndex).getValue().intValue())
-            theT.append(jmd.getPlaneTheT(imageIndex, planeIndex).getValue().intValue())
-            xpos.append(jmd.getPlanePositionX(imageIndex, planeIndex).value().doubleValue())
-            ypos.append(jmd.getPlanePositionY(imageIndex, planeIndex).value().doubleValue())
-            zpos.append(jmd.getPlanePositionZ(imageIndex, planeIndex).value().doubleValue())
-            dt.append(jmd.getPlaneDeltaT(imageIndex, planeIndex).value().doubleValue())
-            # optional detailed output
-            # print id[-1], plane[-1], planeIndex, theT[-1], theZ[-1], theC[-1], xpos[-1], ypos[-1], zpos[-1], dt[-1]
+            try:
+                theC.append(jmd.getPlaneTheC(imageIndex, planeIndex).getValue().intValue())
+                theZ.append(jmd.getPlaneTheZ(imageIndex, planeIndex).getValue().intValue())
+                theT.append(jmd.getPlaneTheT(imageIndex, planeIndex).getValue().intValue())
+                xpos.append(jmd.getPlanePositionX(imageIndex, planeIndex).value().doubleValue())
+                ypos.append(jmd.getPlanePositionY(imageIndex, planeIndex).value().doubleValue())
+                zpos.append(jmd.getPlanePositionZ(imageIndex, planeIndex).value().doubleValue())
+                dt.append(jmd.getPlaneDeltaT(imageIndex, planeIndex).value().doubleValue())
+            except:
+                print('Could not retrieve plane data for imageIndex, PlaneIndex:', imageIndex, planeIndex)
+                theC.append(np.nan)
+                theZ.append(np.nan)
+                theT.append(np.nan)
+                xpos.append(np.nan)
+                ypos.append(np.nan)
+                zpos.append(np.nan)
+                dt.append(np.nan)
 
+            # optional detailed output
+            #print(id[-1], plane[-1], planeIndex, theT[-1], theZ[-1], theC[-1], xpos[-1], ypos[-1], zpos[-1], dt[-1])
+        
         # create some kind of progress bar
         print('\b.',)
         sys.stdout.flush()
