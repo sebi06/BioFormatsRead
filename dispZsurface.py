@@ -112,7 +112,7 @@ def scatterplot(planetable, ImageID=0, T=0, Z=0, CH=0, size=35,
     # optional save figure as PNG
     if savefigure:
         fig1.savefig(figsavename, dpi=100)
-        print('Saved.')
+        print('Saved: ', figsavename)
 
     # optional 3D plot of surface
     if showsurface:
