@@ -12,6 +12,7 @@ from mpl_toolkits.mplot3d import axes3d
 from matplotlib import cm
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 
 def filterplanetable(planetable, ImageID=0, T=0, Z=0, CH=0):
@@ -46,7 +47,8 @@ def filterplanetable(planetable, ImageID=0, T=0, Z=0, CH=0):
     return pt
 
 
-def scatterplot(planetable, ImageID=0, T=0, Z=0, CH=0, size=35, savefigure=False, figsavename='test.png', showsurface=True):
+def scatterplot(planetable, ImageID=0, T=0, Z=0, CH=0, size=35,
+                savefigure=False, figsavename='test.png', showsurface=True):
     """
 
     This function can be used to visualize al XYZ positions from an image file for
@@ -61,7 +63,7 @@ def scatterplot(planetable, ImageID=0, T=0, Z=0, CH=0, size=35, savefigure=False
     :param savefigure: boolean
     :param filename: filename to save the figure as PNG
     :param showsurface: displays the surface as 3D plot
-    :return: Plot and optional save figure as PNG
+    :return: Plot and optional save figure as ...
     """
 
     ptf = filterplanetable(planetable, ImageID=0, T=0, Z=0, CH=0)
@@ -109,10 +111,8 @@ def scatterplot(planetable, ImageID=0, T=0, Z=0, CH=0, size=35, savefigure=False
 
     # optional save figure as PNG
     if savefigure:
-        #savename = figsavename[:-4] + '_XYZ-Pos' + '.png'
-        savename = figsavename[:-4] + '_XYZ-Pos' + '.tiff'
-        fig1.savefig(savename, dpi=100)
-        print('Saved Figure: ', savename)
+        fig1.savefig(figsavename, dpi=100)
+        print('Saved.')
 
     # optional 3D plot of surface
     if showsurface:
