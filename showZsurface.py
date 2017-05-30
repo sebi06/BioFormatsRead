@@ -73,7 +73,6 @@ print(planetable[:10])
 
 # define name for figure to be saved
 figuresavename = os.path.splitext(filenamecsv)[0] + '_XYZ-Pos' + '.' + saveformat
-print('Figure Savename: ', figuresavename)
 
 # display the XYZ positions
 fig1, fig2 = dsp.scatterplot(planetable, ImageID=0, T=0, CH=0, Z=0, size=250,
