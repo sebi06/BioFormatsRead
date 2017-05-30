@@ -16,16 +16,19 @@ import os
 
 # setup commandline parameters
 parser = argparse.ArgumentParser(description='Read Filename and Parameters.')
-parser.add_argument('-f', action="store", dest='filename')
+parser.add_argument('-file', action="store", dest='filename')
 parser.add_argument('-csv', action="store", dest='writecsv')
 parser.add_argument('-sep', action="store", dest='separator')
 parser.add_argument('-save', action="store", dest='savefigure')
 parser.add_argument('-show', action="store", dest='showsurface')
+parser.add_argument('-format', action="store", dest='saveformat')
+
 # get the arguments
 args = parser.parse_args()
 
 # get the filename
 filenameczi = args.filename
+saveformat = args.saveformat
 
 # get separator
 #separator = '\t'
@@ -68,9 +71,13 @@ planetable, filenamecsv = bf.get_planetable(filenameczi, writecsv=wcsv, separato
 # show the dataframe
 print(planetable[:10])
 
+# define name for figure to be saved
+figuresavename = os.path.splitext(filenamecsv)[0] + '_XYZ-Pos' + '.' + saveformat
+print('Figure Savename: ', figuresavename)
+
 # display the XYZ positions
 fig1, fig2 = dsp.scatterplot(planetable, ImageID=0, T=0, CH=0, Z=0, size=250,
-                savefigure=save, figsavename=filenamecsv, showsurface=surface)
+                savefigure=save, figsavename=figuresavename, showsurface=surface)
 
 # show the plot
 plt.show()
