@@ -3,15 +3,16 @@
 @author: Sebi
 
 File: showZsurface.py
-Date: 29.05.2017
-Version. 0.1
+Date: 30.05.2017
+Version. 0.2
 """
 
 import bftools as bf
 import dispZsurface as dsp
 import matplotlib.pyplot as plt
 import argparse
-
+import sys
+import os
 
 # setup commandline parameters
 parser = argparse.ArgumentParser(description='Read Filename and Parameters.')
@@ -25,14 +26,13 @@ args = parser.parse_args()
 
 # get the filename
 filenameczi = args.filename
-#filenameczi = r'testdata/testwell96.czi'
 
 # get separator
 #separator = '\t'
 separator = args.separator
-if args.separator == 'Tab':
+if args.separator == 'tab':
     separator = '\t'
-elif args.separator == 'Comma':
+elif args.separator == 'comma':
     separator = ','
 elif args.sparator == 'semicolon':
     separator = ';'
@@ -51,7 +51,7 @@ if args.savefigure == 'True':
 elif args.savefigure == 'False':
     save = False
 
-# get show surface option
+# get show surface options
 #surface = True
 if args.showsurface == 'True':
     surface = True
@@ -69,8 +69,10 @@ planetable, filenamecsv = bf.get_planetable(filenameczi, writecsv=wcsv, separato
 print(planetable[:10])
 
 # display the XYZ positions
-dsp.scatterplot(planetable, ImageID=0, T=0, CH=0, Z=0, size=250,
+fig1, fig2 = dsp.scatterplot(planetable, ImageID=0, T=0, CH=0, Z=0, size=250,
                 savefigure=save, figsavename=filenamecsv, showsurface=surface)
 
 # show the plot
 plt.show()
+print('Exiting ...')
+os._exit(42)
