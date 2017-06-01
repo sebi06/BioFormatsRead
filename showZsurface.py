@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: showZsurface.py
-Date: 30.05.2017
-Version. 0.2
+Date: 01.06.2017
+Version. 0.3
 """
 
 import bftools as bf
@@ -31,7 +31,6 @@ filenameczi = args.filename
 saveformat = args.saveformat
 
 # get separator
-#separator = '\t'
 separator = args.separator
 if args.separator == 'tab':
     separator = '\t'
@@ -48,21 +47,21 @@ elif args.writecsv == 'False':
     wcsv = False
 
 # get save option
-#save = True
 if args.savefigure == 'True':
     save = True
 elif args.savefigure == 'False':
     save = False
 
 # get show surface options
-#surface = True
 if args.showsurface == 'True':
     surface = True
 elif args.showsurface == 'False':
     surface = False
 
 # specify bioformats_package.jar to use if required
-bfpackage = r'bfpackage/5.5.0/bioformats_package.jar'
+# Attention: for larger CZI tile images containing an image pyramid one must still use 5.1.10
+# since the latest version is not fully supported by python-bioformats yet
+bfpackage = r'bfpackage/5.1.10/bioformats_package.jar'
 bf.set_bfpath(bfpackage)
 
 # create plane info from CZI image file and write CSV file (optional)
