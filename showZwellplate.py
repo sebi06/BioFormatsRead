@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: showZwellplate.py
-Date: 30.05.2017
-Version. 1.3
+Date: 01.06.2017
+Version. 1.4
 """
 
 from __future__ import print_function
@@ -21,13 +21,10 @@ saveformat = '.png'
 filenameczi = r'testdata/testwell96.czi'
 #filenamecsv = r'testdata/testwell96_planetable.csv'
 
-# use for BioFormtas <= 5.1.10
-#urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
-# use for BioFormtas > 5.2.0
-urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
-
 # specify bioformats_package.jar to use if required
-bfpackage = r'bfpackage/5.5.0/bioformats_package.jar'
+# Attention: for larger CZI tile images containing an image pyramid one must still use 5.1.10
+# since the latest version is not fully supported by python-bioformats yet
+bfpackage = r'bfpackage/5.1.10/bioformats_package.jar'
 bf.set_bfpath(bfpackage)
 
 # define separator
