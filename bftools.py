@@ -165,12 +165,12 @@ def get_java_metadata_store(imagefile):
         series_dimensions.append((dimx, dimy))
 
         if len(series_dimensions) == 1:
-        multires = False
-    elif len(series_dimensions) > 1:
-        if len(set(series_dimensions)) > 1:
-            multires = True
-        elif len(set(series_dimensions)) == 1:
             multires = False
+        elif len(series_dimensions) > 1:
+            if len(set(series_dimensions)) > 1:
+                multires = True
+            elif len(set(series_dimensions)) == 1:
+                multires = False
 
     # rdr.rdr is the actual BioFormats reader. rdr handles its lifetime
     javametadata = jv.JWrapper(rdr.rdr.getMetadataStore())
@@ -390,8 +390,7 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
 
     # get JavaMetaDataStore and SeriesCount
     try:
-        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], MetaInfo['SeriesDimensions'],
-            MetaInfo['MultiResolution'] = get_java_metadata_store(imagefile)
+        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], MetaInfo['SeriesDimensions'], MetaInfo['MultiResolution'] = get_java_metadata_store(imagefile)
     except:
         print('Problem retrieving Java Metadata Store or Series size:', sys.exc_info()[0])
         raise
@@ -726,8 +725,7 @@ def get_relevant_metainfo_wrapper(imagefile,
 
     # use bioformats to get the objective information
     try:
-        MetaInfo['Immersion'], MetaInfo['NA'], MetaInfo['ObjMag'],
-            MetaInfo['ObjModel'] = get_metainfo_objective(jmd, imagefile, imageID=0)
+        MetaInfo['Immersion'], MetaInfo['NA'], MetaInfo['ObjMag'], MetaInfo['ObjModel'] = get_metainfo_objective(jmd, imagefile, imageID=0)
     except:
         print('Problem retrieving object information:', sys.exc_info()[0])
 
@@ -1081,7 +1079,6 @@ def getImageSeriesIDforWell(welllist, wellID):
     imageseriesindices = [i for i, x in enumerate(welllist) if x == wellID]
 
     return imageseriesindices
-
 
 
 def getPlanesAndPixelsFromCZI(imagefile):
