@@ -1,19 +1,27 @@
-===============================
-bfimage
-===============================
+==================================
+BioFormatsRead - Scripts and Tools
+==================================
 
-This package can be used to read image data using BioFormats into numpy arrays.
+This collection of scripts can be used to read image data using BioFormats into numpy arrays.
 It was initially created to simplify reading CZI image files, but should work with many more
 image data files thanks to BioFormats.
 
+The main scripts are:
+
+*   bftools.py
+*   czitools.py
+*   misctools.py
+*   czifile.py
+
 :Author: Sebastian Rhode
 
-:Version: 2016.07.21
+:Version: 2017.05.02
 
-Requirements
-------------
-* `CPython 2.7 <http://www.python.org>`_
-* `Numpy 1.8.2 <http://www.numpy.org>`_
+Important Requirements
+----------------------
+* `Python 2 or 3 <http://www.python.org>`_
+* `Numpy <http://www.numpy.org>`_
+* `Matplotlib <http://www.matplotlib.org>`_
 * `python-bioformats <https://github.com/CellProfiler/python-bioformats>`_
 * `BioFormats package <http://downloads.openmicroscopy.org/bio-formats/>`_
 * `javabridge <https://pypi.python.org/pypi/javabridge>`_
@@ -25,9 +33,14 @@ Notes
 The package is still under development and was mainly tested with CZI files.
 
 The python-bioformats package includes loci_tool.jar but it is also possible to use the latest bioformats_package.jar.
-Currently the 5.1.10 version of bioformats_package.jar is used. Update it to your needs.
+Currently the 5.1.10 or the 5.4.1 version of bioformats_package.jar is used.
 
-Some more infos can be found at: `python-and-bioformats <http://slides.com/sebastianrhode/python-and-bioformats/fullscreen>`_
+The new 5.4.1 version of the BioFormats library offers various new features for reading especially CZI images,
+which are currently not fully supported by python-bioformats. But most of the functionality should work without any problems.
+
+Some more information can be found at: `python-and-bioformats <http://slides.com/sebastianrhode/python-and-bioformats/fullscreen>`_
+
+Important Remark: Not all function where tested to work with Python 3 yet.
 
 Acknowledgements
 ----------------
@@ -49,8 +62,6 @@ Additional Tools
 *   Read image series, z-stacks, time series or single planes.
 *   Retrieve all important meta-information.
 *   Write OME-XML Metadata to XML file.
-*   Create and write plane info table.
-*   Create PlaneTable with containing als XYZ Positions.
 *   Display XYZ data from PlaneTable.
 *   Extract Well Information form Scenes (CZI only).
 

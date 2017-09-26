@@ -1,46 +1,39 @@
 # -*- coding: utf-8 -*-
 """
 @author: Sebi
-
 File: test_get_image6d.py
-Date: 03.02.2016
-Version. 1.0
+Date: 02.05.2017
+Version. 1.7
 """
 
+from __future__ import print_function
 import numpy as np
-import os
-import bfimage as bf
+import bftools as bf
 
 #filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
 #filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
-filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
+#filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
+filename = r'/home/sebi06/Dokumente/Image_Datasets/2x2_SNAP_CH=2_Z=5.czi'
+
+# use for BioFormtas <= 5.1.10
+#urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
+# use for BioFormtas > 5.2.0
+urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 
 # specify bioformats_package.jar to use if required
-#bf.set_bfpath(insert path to bioformats_package.jar here)
+bfpackage = r'bfpackage/5.4.1/bioformats_package.jar'
+bf.set_bfpath(bfpackage)
 
 # get image meta-information
-MetaInfo = bf.bftools.get_relevant_metainfo_wrapper(filename)
-img6d = bf.bftools.get_image6d(filename, MetaInfo['Sizes'])
+MetaInfo = bf.get_relevant_metainfo_wrapper(filename, namespace=urlnamespace, bfpath=bfpackage, showinfo=False)
+
+try:
+    img6d, readstate = bf.get_image6d(filename, MetaInfo['Sizes'])
+    arrayshape = np.shape(img6d)
+except:
+    arrayshape = []
+    print('Could not read image data into NumPy array.')
 
 # show relevant image Meta-Information
-print '\n'
-print 'Image Directory      : ', MetaInfo['Directory']
-print 'Image Filename       : ', MetaInfo['Filename']
-print 'Images Dim Sizes     : ', MetaInfo['Sizes']
-print 'Dimension Order*     : ', MetaInfo['DimOrder BF']
-print 'Dimension Order CZI  : ', MetaInfo['OrderCZI']
-print 'Shape CZI            : ', MetaInfo['ShapeCZI']
-print 'Total Series Number  : ', MetaInfo['TotalSeries']
-print 'Image Dimensions     : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'], MetaInfo['SizeC'],\
-                                    MetaInfo['SizeY'], MetaInfo['SizeX']
-print 'Scaling XYZ [micron] : ', MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale']
-print 'Objective M-NA-Imm   : ', MetaInfo['ObjMag'], MetaInfo['NA'], MetaInfo['Immersion']
-print 'Objective Name       : ', MetaInfo['ObjModel']
-print 'Ex. Wavelengths [nm] : ', MetaInfo['WLEx']
-print 'Em. Wavelengths [nm] : ', MetaInfo['WLEm']
-print 'Dyes                 : ', MetaInfo['Dyes']
-print 'Detector Model       : ', MetaInfo['Detector Model']
-print 'Detector Name        : ', MetaInfo['Detector Name']
-print 'Channels             : ', MetaInfo['Channels']
-print 'Channel Description  : ', MetaInfo['ChDesc']
-print 'Array Shape 6D       : ', np.shape(img6d)
+bf.showtypicalmetadata(MetaInfo, namespace=urlnamespace, bfpath=bfpackage)
+print('Array Shape          : ', arrayshape)

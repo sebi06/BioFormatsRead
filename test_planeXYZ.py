@@ -3,21 +3,28 @@
 @author: Sebi
 
 File: test_planeXYZ.py
-Date: 21.03.2016
-Version. 0.1
+Date: 26.03.2017
+Version. 0.3
 """
 
-import bfimage as bf
+from __future__ import print_function
+import bftools as bf
 
 # define filename
 filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
 
+# use for BioFormtas <= 5.1.10
+urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
+# use for BioFormtas > 5.2.0
+#urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
+
 # specify bioformats_package.jar to use if required
-#bf.set_bfpath(insert path to bioformats_package.jar here)
+bfpackage = r'bfpackage/5.4.1/bioformats_package.jar'
+bf.set_bfpath(bfpackage)
 
 # create plane info and write into dataframe
-df = bf.get_planetable(filename, writecsv=True, separator='\t')
+df, csvfile = bf.get_planetable(filename, writecsv=True, separator='\t')
 
 # show the dataframe
-print df[:5]
-print df.shape[0]
+print(df[:5])
+print(df.shape[0])
