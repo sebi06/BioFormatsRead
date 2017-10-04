@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: bftools.py
-Date: 29.05.2017
-Version. 2.3.1
+Date: 04.10.2017
+Version. 2.3.2
 """
 
 from __future__ import print_function
@@ -25,7 +25,7 @@ VM_STARTED = False
 VM_KILLED = False
 
 # define default path to bioformats_package.jar globally
-BFPATH = r'bfpackage/5.5.0/bioformats_package.jar'
+BFPATH = r'bfpackage/5.7.0/bioformats_package.jar'
 
 BF2NP_DTYPE = {
     0: np.int8,
@@ -684,9 +684,6 @@ def get_relevant_metainfo_wrapper(imagefile,
                                   namespace='http://www.openmicroscopy.org/Schemas/OME/2016-01',
                                   bfpath=r'bfpackage/5.4.1/bioformats_package.jar',
                                   showinfo=False):
-
-    # set path to bioformats_apckage.jar
-    # set_bfpath(bfpath)
 
     MetaInfo = create_metainfo_dict()
     omexml = get_OMEXML(imagefile)
