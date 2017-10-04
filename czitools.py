@@ -74,7 +74,7 @@ def get_objective_name_cziread(filename):
         objname = 'n.a.'
 
     czi.close()
-
+    return objname
 
 def read_dimensions_czi(filename):
 
