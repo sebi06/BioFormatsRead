@@ -430,16 +430,6 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
                 dt.append(jmd.getPlaneDeltaT(imageIndex, planeIndex).value().doubleValue())
             except:
                 print('Could not retrieve plane data for imageIndex, PlaneIndex:', imageIndex, planeIndex)
-                theC.append(np.nan)
-                theZ.append(np.nan)
-                theT.append(np.nan)
-                xpos.append(np.nan)
-                ypos.append(np.nan)
-                zpos.append(np.nan)
-                dt.append(np.nan)
-
-            # optional detailed output
-            #print(id[-1], plane[-1], planeIndex, theT[-1], theZ[-1], theC[-1], xpos[-1], ypos[-1], zpos[-1], dt[-1])
         
         # create some kind of progress bar
         bar.update(imageIndex)
