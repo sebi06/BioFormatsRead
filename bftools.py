@@ -418,8 +418,6 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
     for imageIndex in range(0, max(MetaInfo['ImageIDs']) + 1):
         for planeIndex in range(0, MetaInfo['SizeZ'] * MetaInfo['SizeC'] * MetaInfo['SizeT']):
 
-            id.append(imageIndex)
-            plane.append(planeIndex)
             try:
                 theC.append(jmd.getPlaneTheC(imageIndex, planeIndex).getValue().intValue())
                 theZ.append(jmd.getPlaneTheZ(imageIndex, planeIndex).getValue().intValue())
@@ -428,6 +426,8 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
                 ypos.append(jmd.getPlanePositionY(imageIndex, planeIndex).value().doubleValue())
                 zpos.append(jmd.getPlanePositionZ(imageIndex, planeIndex).value().doubleValue())
                 dt.append(jmd.getPlaneDeltaT(imageIndex, planeIndex).value().doubleValue())
+                id.append(imageIndex)
+                plane.append(planeIndex)
             except:
                 print('Could not retrieve plane data for imageIndex, PlaneIndex:', imageIndex, planeIndex)
         
@@ -453,6 +453,8 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
         # use tab as separator and do not write the index to the CSV data table
         df.to_csv(csvfile, sep=separator, index=False)
         print('\nWriting CSV file: ', csvfile)
+    if not writecsv:
+        csvfile = None
 
     return df, csvfile
 
@@ -744,14 +746,20 @@ def get_relevant_metainfo_wrapper(imagefile,
     # try to get detector information - 1
     try:
         MetaInfo['Detector Model'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'], namespace)[0]['Model']
-    except IndexError as e:
-        print('Problem reading Detector Model. IndexError:', e.message)
+    #except IndexError as e:
+    #    print('Problem reading Detector Model. IndexError:', e.message)
+    #    MetaInfo['Detector Model'] = 'n.a.'
+    except:
+        print('Problem reading Detector Model.')
         MetaInfo['Detector Model'] = 'n.a.'
 
     try:
         MetaInfo['Detector Name'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'], namespace)[0]['ID']
-    except IndexError as e:
-        print('Problem reading Detector Name. Index Error:', e.message)
+    #except IndexError as e:
+    #    print('Problem reading Detector Name. Index Error:', e.message)
+    #    MetaInfo['Detector Name'] = 'n.a.'
+    except:
+        print('Problem reading Detector Name.')
         MetaInfo['Detector Name'] = 'n.a.'
 
     # try to get detector information - 2
