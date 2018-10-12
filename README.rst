@@ -14,7 +14,7 @@ The main scripts are:
 
 :Author: Sebastian Rhode
 
-:Version: 2017.10.04
+:Version: 2018.10.12
 
 Important Requirements
 ----------------------
@@ -29,19 +29,14 @@ Notes
 -----
 The package is still under development and was mainly tested with CZI files.
 
-The python-bioformats package includes loci_tool.jar but it is also possible to use the latest bioformats_package.jar.
-
-
-The newest version of the BioFormats library offers various new features for reading especially CZI images,
+The newer versions of the BioFormats library offers various new features for reading especially CZI images,
 which are currently not fully supported by python-bioformats. But most of the functionality should work without any problems.
 
-Some more information can be found at: `python-and-bioformats <http://slides.com/sebastianrhode/python-and-bioformats/fullscreen>`_
-
-Important Remark: Not all function where tested to work with Python 3 yet.
+More information can be found at: `python-and-bioformats <http://slides.com/sebastianrhode/python-and-bioformats/fullscreen>`_
 
 Acknowledgements
 ----------------
-*   Christoph Gohlke from providing the czifile.py and tifffile.py.
+*   Christoph Gohlke from providing the zisraw package.
 *   The Cellprofiler team for providing python-bioformats.
 *   The OME people for creating BioFormats.
 
