@@ -40,7 +40,6 @@ elif args.sparator == 'semicolon':
     separator = ';'
 
 # get CSV write option
-#csv = True
 if args.writecsv == 'True':
     wcsv = True
 elif args.writecsv == 'False':
@@ -61,7 +60,8 @@ elif args.showsurface == 'False':
 # specify bioformats_package.jar to use if required
 # Attention: for larger CZI tile images containing an image pyramid one must still use 5.1.10
 # since the latest version is not fully supported by python-bioformats yet
-bfpackage = r'bfpackage/5.1.10/bioformats_package.jar'
+#bfpackage = r'bfpackage/5.1.10/bioformats_package.jar'
+bfpackage = r'c:\Users\m1srh\Documents\Software\Bioformats\5.1.10\bioformats_package.jar'
 bf.set_bfpath(bfpackage)
 
 # create plane info from CZI image file and write CSV file (optional)

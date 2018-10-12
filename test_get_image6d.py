@@ -2,8 +2,8 @@
 """
 @author: Sebi
 File: test_get_image6d.py
-Date: 02.05.2017
-Version. 1.7
+Date: 01.07.2018
+Version. 1.8
 """
 
 from __future__ import print_function
@@ -21,11 +21,14 @@ filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
 urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 
 # specify bioformats_package.jar to use if required
-bfpackage = r'bfpackage/5.7.0/bioformats_package.jar'
+bfpackage = r'bfpackage/5.8.2/bioformats_package.jar'
 bf.set_bfpath(bfpackage)
 
 # get image meta-information
-MetaInfo = bf.get_relevant_metainfo_wrapper(filename, namespace=urlnamespace, bfpath=bfpackage, showinfo=False)
+MetaInfo = bf.get_relevant_metainfo_wrapper(filename,
+                                            namespace=urlnamespace,
+                                            bfpath=bfpackage,
+                                            showinfo=False)
 
 try:
     img6d, readstate = bf.get_image6d(filename, MetaInfo['Sizes'])

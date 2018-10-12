@@ -11,7 +11,6 @@ The main scripts are:
 *   bftools.py
 *   czitools.py
 *   misctools.py
-*   czifile.py
 
 :Author: Sebastian Rhode
 
@@ -19,14 +18,12 @@ The main scripts are:
 
 Important Requirements
 ----------------------
-* `Python 2 or 3 <http://www.python.org>`_
+* `Python 3 <http://www.python.org>`_
 * `Numpy <http://www.numpy.org>`_
 * `Matplotlib <http://www.matplotlib.org>`_
 * `python-bioformats <https://github.com/CellProfiler/python-bioformats>`_
 * `BioFormats package <http://downloads.openmicroscopy.org/bio-formats/>`_
-* `javabridge <https://pypi.python.org/pypi/javabridge>`_
-* `czifile <http://www.lfd.uci.edu/~gohlke/code/czifile.py.html>`_
-* `tifffile <http://www.lfd.uci.edu/~gohlke/code/tifffile.py.html>`_
+* `zisraw <https://pypi.org/project/zisraw/>`_
 
 Notes
 -----
@@ -35,7 +32,7 @@ The package is still under development and was mainly tested with CZI files.
 The python-bioformats package includes loci_tool.jar but it is also possible to use the latest bioformats_package.jar.
 
 
-The newest version of the BioFormats library (5.7.1) offers various new features for reading especially CZI images,
+The newest version of the BioFormats library offers various new features for reading especially CZI images,
 which are currently not fully supported by python-bioformats. But most of the functionality should work without any problems.
 
 Some more information can be found at: `python-and-bioformats <http://slides.com/sebastianrhode/python-and-bioformats/fullscreen>`_
