@@ -36,8 +36,10 @@ if args.separator == 'tab':
     separator = '\t'
 elif args.separator == 'comma':
     separator = ','
-elif args.sparator == 'semicolon':
+elif args.separator == 'semicolon':
     separator = ';'
+
+print('Write CSV Option : ', args.writecsv)
 
 # get CSV write option
 if args.writecsv == 'True':
@@ -65,7 +67,9 @@ bfpackage = r'c:\Users\m1srh\Documents\Software\Bioformats\5.1.10\bioformats_pac
 bf.set_bfpath(bfpackage)
 
 # create plane info from CZI image file and write CSV file (optional)
-planetable, filenamecsv = bf.get_planetable(filenameczi, writecsv=wcsv, separator=separator)
+planetable, filenamecsv = bf.get_planetable(filenameczi,
+                                            writecsv=wcsv,
+                                            separator=separator)
 
 # show the dataframe
 print(planetable[:10])
@@ -74,8 +78,15 @@ print(planetable[:10])
 figuresavename = os.path.splitext(filenamecsv)[0] + '_XYZ-Pos' + '.' + saveformat
 
 # display the XYZ positions
-fig1, fig2 = dsp.scatterplot(planetable, ImageID=0, T=0, CH=0, Z=0, size=250,
-                savefigure=save, figsavename=figuresavename, showsurface=surface)
+fig1, fig2 = dsp.scatterplot(planetable,
+                             ImageID=0,
+                             T=0,
+                             CH=0,
+                             Z=0,
+                             size=250,
+                             savefigure=save,
+                             figsavename=figuresavename,
+                             showsurface=surface)
 
 # show the plot
 plt.show()
