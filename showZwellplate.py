@@ -22,7 +22,8 @@ saveformat = '.png'
 filenameczi = r'c:\Users\m1srh\OneDrive - Carl Zeiss AG\Python_Projects\BioFormatsRead\testdata\testwell96.czi'
 #filenameczi = r'c:\Users\M1SRH\Documents\Testdata_Zeiss\RareEvent_Test_Wizard\OverViewScan_Test_raw.czi'
 #filenamecsv = r'testdata/testwell96_planetable.csv'
-#filenameczi = r'c:\Users\M1SRH\Downloads\Focus_map\Dan.czi'
+#filenameczi = r'c:\Output\Guided_Acquisition\DTScan_ID4.czi'
+#filenameczi= r'c:\Users\m1srh\Documents\Testdata_Zeiss\Castor\fixed endpoint 3C 2_5 384well.czi'
 
 # specify bioformats_package.jar to use if required
 # Attention: for larger CZI tile images containing an image pyramid one must still use 5.1.10
@@ -47,8 +48,16 @@ print(planetable.shape[0])
 figuresavename = os.path.splitext(filenamecsv)[0] + '_XYZ-Pos' + saveformat
 
 # display the XYZ positions
-fig1, fig2 = dsp.scatterplot(planetable, ImageID=0, T=0, CH=0, Z=0, size=250,
-                savefigure=True, figsavename=figuresavename, showsurface=True)
+fig1, fig2 = dsp.scatterplot(planetable,
+                             ImageID=0,
+                             T=0,
+                             CH=0, Z=0, size=250,
+                             savefigure=True,
+                             figsavename=figuresavename,
+                             showsurface=True)
 
 # show the plot
 plt.show()
+
+# exit
+os._exit(0)
