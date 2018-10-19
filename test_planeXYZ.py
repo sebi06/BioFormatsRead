@@ -19,7 +19,7 @@ urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
 #urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 
 # specify bioformats_package.jar to use if required
-bfpackage = r'bfpackage/5.4.1/bioformats_package.jar'
+bfpackage = r'bfpackage/5.8.2/bioformats_package.jar'
 bf.set_bfpath(bfpackage)
 
 # create plane info and write into dataframe
