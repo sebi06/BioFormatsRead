@@ -9,7 +9,8 @@ Version. 1.1
 
 from __future__ import print_function
 import misctools as misc
-from czifile import *
+#from czifile import *
+import zisraw as zis
 import numpy as np
 import re
 from collections import Counter
@@ -18,7 +19,7 @@ from collections import Counter
 def get_metainfo_channel_description(filename):
 
     try:
-        czi = CziFile(filename)
+        czi = zis.CziFile(filename)
         namelst = []
         valuelst = []
         # get root tree of CZI metadata (uses ElementTree)
@@ -43,7 +44,7 @@ def get_metainfo_channel_description(filename):
 def writexml_czi(filename):
 
     # write xml file to disk
-    czi = CziFile(filename)
+    czi = zis.CziFile(filename)
 
     # Change File name and write XML file to same folder
     xmlfile = filename.replace('.czi', '_CZI_MetaData.xml')
@@ -56,7 +57,7 @@ def writexml_czi(filename):
 
 def get_objective_name_cziread(filename):
 
-    czi = CziFile(filename)
+    czi = zis.CziFile(filename)
     namelst = []
     valuelst = []
     # get root tree of CZI metadata (uses ElementTree)
@@ -74,12 +75,12 @@ def get_objective_name_cziread(filename):
         objname = 'n.a.'
 
     czi.close()
-    return objname
+
 
 def read_dimensions_czi(filename):
 
     # Read the dimensions of the image stack and their order
-    czi = CziFile(filename)
+    czi = zis.CziFile(filename)
     czishape = czi.shape
     cziorder = czi.axes
     czi.close()
@@ -91,7 +92,7 @@ def get_shapeinfo_cziread(filename):
     # get CZI shape and dimension order using czifile.py
 
     try:
-        czi = CziFile(filename)
+        czi = zis.CziFile(filename)
         czishape = czi.shape
         cziorder = czi.axes
 
@@ -117,7 +118,7 @@ def get_metainfo_cziread(filename):
     totalMag = np.NaN
 
     try:
-        czi = CziFile(filename)
+        czi = zis.CziFile(filename)
 
         # Iterate over the metadata
         for elem in czi.metadata.getiterator():
@@ -155,7 +156,7 @@ def get_metainfo_cziread(filename):
 
 def get_metainfo_cziread_camera(filename):
 
-    czi = CziFile(filename)
+    czi = zis.CziFile(filename)
 
     # Iterate over the metadata
     for elem in czi.metadata.getiterator():
@@ -204,12 +205,15 @@ def getWellInfofromCZI(wellstring):
 
 def getXMLnodes(filename_czi, searchpath, showoutput=False):
 
-    czi = CziFile(filename_czi)
+    czi = zis.CziFile(filename_czi)
     tree = czi.metadata.getroottree()
 
     tag = []
     attribute = []
     text = []
+
+    if showoutput:
+        print('Path      : ', searchpath)
 
     for elem in tree.iterfind(searchpath):
 
@@ -222,5 +226,7 @@ def getXMLnodes(filename_czi, searchpath, showoutput=False):
             print('Attribute : ', elem.attrib)
             print('Text      : ', elem.text)
 
-    return tag, attribute, text
+    if showoutput:
+        print('-----------------------------------------------------------------------------------------------')
 
+    return tag, attribute, text

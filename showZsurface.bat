@@ -7,7 +7,7 @@
 @REM C:\mydir>showZsurface.bat czifile True jpg tab True False
 @REM
 @REM Arguments:
-@REM %1 = Filename of CZI
+@REM %1 = Filename of CZI !!! No spaces inside filename are allowed !!!
 @REM %2 = Write plantable to CSV file
 @REM %3 = Define the used separator for the CSV file
 @REM %4 = Option to save the plot
@@ -16,7 +16,7 @@
 @REM #################################################################################
 
 @echo off
-set DEFAULT_SCRIPT_DIR=c:\Users\M1SRH\Documents\Python_Projects\BioFormatsRead
+set DEFAULT_SCRIPT_DIR=c:\Users\m1srh\OneDrive - Carl Zeiss AG\Python_Projects\BioFormatsRead\
 set DEFAULT_SCRIPT=showZsurface.py
 
 @REM Get the direcotry and options to be processed from the command line arguments

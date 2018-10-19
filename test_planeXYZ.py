@@ -12,14 +12,19 @@ import bftools as bf
 
 # define filename
 filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
+filename = r'c:\Output\Guided_Acquisition\DTScan_ID4.czi'
 
 # use for BioFormtas <= 5.1.10
-urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
+#urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
 # use for BioFormtas > 5.2.0
-#urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
+urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 
 # specify bioformats_package.jar to use if required
+<<<<<<< HEAD
 bfpackage = r'bfpackage/5.8.2/bioformats_package.jar'
+=======
+bfpackage = r'bfpackage/5.1.10/bioformats_package.jar'
+>>>>>>> e904a8d4351869e5dc6224d99865f66da1c81ccd
 bf.set_bfpath(bfpackage)
 
 # create plane info and write into dataframe
