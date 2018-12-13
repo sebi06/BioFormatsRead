@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: bftools.py
-Date: 04.10.2017
-Version. 2.3.2
+Date: 13.12.2018
+Version. 2.4.0
 """
 
 from __future__ import print_function
@@ -19,6 +19,7 @@ import sys
 import re
 from collections import Counter
 import subprocess
+import tifffile
 
 
 VM_STARTED = False
@@ -48,7 +49,6 @@ def set_bfpath(bfpackage_path=BFPATH):
 
 
 def start_jvm(max_heap_size='4G'):
-
     """
     Start the Java Virtual Machine, enabling BioFormats IO.
     Optional: Specify the path to the bioformats_package.jar to your needs by calling.
@@ -201,8 +201,8 @@ def get_metainfo_dimension(jmd, MetaInfo, imageID=0):
     MetaInfo['DimOrder BF'] = jmd.getPixelsDimensionOrder(imageID).getValue()
 
     print('Retrieving Image Dimensions ...')
-    print('T: ', MetaInfo['SizeT'], 'Z: ', MetaInfo['SizeZ'], 'C: ', MetaInfo['SizeC'], 'X: ', \
-        MetaInfo['SizeX'], 'Y: ', MetaInfo['SizeY'])
+    print('T: ', MetaInfo['SizeT'], 'Z: ', MetaInfo['SizeZ'], 'C: ', MetaInfo['SizeC'], 'X: ',
+          MetaInfo['SizeX'], 'Y: ', MetaInfo['SizeY'])
 
     return MetaInfo
 
@@ -245,7 +245,7 @@ def get_metainfo_instrument(jmd, instrumentindex=0):
     except:
         print('No suitable instrumentID found. Using default = 0.')
         instrumentIDstr = 'na'
-        instruementID = 0
+        instrumentID = 0
 
     return instrumentIDstr, instrumentID
 
@@ -285,7 +285,8 @@ def get_metainfo_objective(jmd, filename, imageID=0):
     # try to get objective model
     try:
         objmodel = jmd.getObjectiveModel(instrumentID, objID)
-        if len(objmodel) == 0:
+        if objmodel is None:
+            # if len(objmodel) == 0:
             objmodel = 'na'
             print('No objective model name found in metadata.')
     except:
@@ -293,7 +294,7 @@ def get_metainfo_objective(jmd, filename, imageID=0):
         # this is a fallback option --> use cziread.py to get the information
         if filename[-4:] == '.czi':
             objmodel = czt.get_objective_name_cziread(filename)
-            if objmodel == None:
+            if objmodel is None:
                 objmodel = 'na'
         else:
             objmodel = 'na'
@@ -313,7 +314,7 @@ def get_metainfo_numscenes(filename):
     Currently the number of scenes cannot be read directly using BioFormats so
     czifile.py is used to determine the number of scenes.
     """
-    czidim, cziorder = czt.readdimensions(filename)
+    czidim, cziorder = czt.read_dimensions(filename)
     numscenes = czidim[1]
 
     return numscenes
@@ -390,7 +391,8 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
 
     # get JavaMetaDataStore and SeriesCount
     try:
-        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], MetaInfo['SeriesDimensions'], MetaInfo['MultiResolution'] = get_java_metadata_store(imagefile)
+        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], MetaInfo['SeriesDimensions'], MetaInfo['MultiResolution'] = get_java_metadata_store(
+            imagefile)
     except:
         print('Problem retrieving Java Metadata Store or Series size:', sys.exc_info()[0])
         raise
@@ -414,7 +416,7 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
     widgets = [progressbar.Percentage(), progressbar.Bar()]
     bar = progressbar.ProgressBar(widgets=widgets, max_value=max(MetaInfo['ImageIDs']) + 1).start()
     #bar = progressbar.ProgressBar().start()
-    
+
     for imageIndex in range(0, max(MetaInfo['ImageIDs']) + 1):
         for planeIndex in range(0, MetaInfo['SizeZ'] * MetaInfo['SizeC'] * MetaInfo['SizeT']):
 
@@ -430,7 +432,7 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
                 plane.append(planeIndex)
             except:
                 print('Could not retrieve plane data for imageIndex, PlaneIndex:', imageIndex, planeIndex)
-        
+
         # create some kind of progress bar
         bar.update(imageIndex)
 
@@ -459,7 +461,7 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
     return df, csvfile
 
 
-def get_image6d(imagefile, sizes):
+def get_image6d(imagefile, sizes, output_order='STZCXY', arrayorder='STZCXY'):
     """
     This function will read the image data and store them into a 6D numpy array.
     The 6D array has the following dimension order: [Series, T, Z, C, X, Y].
@@ -471,7 +473,12 @@ def get_image6d(imagefile, sizes):
 
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
 
-    img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+    if output_order == 'STZCXY':
+        img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+    if output_order == 'XYCZTS':
+        img6d = np.zeros(sizes[::-1], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+
+    # img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
     readstate = 'OK'
     readproblems = []
 
@@ -481,8 +488,21 @@ def get_image6d(imagefile, sizes):
             for zplane in range(0, sizes[2]):
                 for channel in range(0, sizes[3]):
                     try:
-                        img6d[seriesID, timepoint, zplane, channel, :, :] =\
-                            rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+                        if output_order == 'STZCXY':
+                            img6d[seriesID, timepoint, zplane, channel, :, :] = rdr.read(series=seriesID,
+                                                                                         c=channel,
+                                                                                         z=zplane,
+                                                                                         t=timepoint,
+                                                                                         rescale=False)
+                        if output_order == 'XYCZTS':
+                            tmp = rdr.read(series=seriesID,
+                                           c=channel,
+                                           z=zplane,
+                                           t=timepoint,
+                                           rescale=False)
+
+                            img6d[:, :, channel, zplane, timepoint, seriesID] = np.swapaxes(tmp, 0, 1)
+
                     except:
                         print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
                         readstate = 'NOK'
@@ -490,7 +510,97 @@ def get_image6d(imagefile, sizes):
 
     rdr.close()
 
+    kill_jvm()
+
     return img6d, readstate
+
+
+def write_ometiff(filepath, dimensions={'Series': 1, 'SizeT': 1, 'SizeZ': 2, 'SizeC': 3, 'SizeX': 10, 'SizeY': 20},
+                  scalex=0.1,
+                  scaley=0.1,
+                  scalez=1.0,
+                  dimorder='TZCYX',
+                  pixeltype='uint16'):
+    """
+    This function will write an OME-TIFF file to disk.
+    The 5D array has the following dimension order: [Series, T, Z, C, Y, X].
+
+    Currently Series are not supported !!!
+    """
+
+    # Dimension TZCXY
+    SizeT = dimensions['SizeT']
+    SizeZ = dimensions['SizeZ']
+    SizeC = dimensions['SizeC']
+    SizeX = dimensions['SizeX']
+    SizeY = dimensions['SizeY']
+    Series = dimensions['Series']
+
+    # create numpy array with correct order
+    img5d = np.random.randn(SizeT, SizeZ, SizeC, SizeY, SizeX).astype(np.uint16)
+
+    # Getting metadata info
+    omexml = bioformats.omexml.OMEXML()
+    omexml.image(Series-1).Name = filepath
+    p = omexml.image(Series-1).Pixels
+    # p.ID = Series-1
+    p.SizeX = SizeX
+    p.SizeY = SizeY
+    p.SizeC = SizeC
+    p.SizeT = SizeT
+    p.SizeZ = SizeZ
+    p.PhysicalSizeX = np.float(scalex)
+    p.PhysicalSizeY = np.float(scaley)
+    p.PhysicalSizeZ = np.float(scalez)
+    p.PixelType = pixeltype
+    p.channel_count = SizeC
+    p.plane_count = SizeZ * SizeT * SizeC
+    p = writeOMETIFFplanes(p, SizeT=SizeT, SizeZ=SizeZ, SizeC=SizeC, order=dimorder)
+
+    for c in range(SizeC):
+        if pixeltype == 'unit8':
+            p.Channel(c).SamplesPerPixel = 1
+        if pixeltype == 'unit16':
+            p.Channel(c).SamplesPerPixel = 2
+
+    omexml.structured_annotations.add_original_metadata(bioformats.omexml.OM_SAMPLES_PER_PIXEL, str(SizeC))
+
+    # Converting to omexml
+    xml = omexml.to_xml()
+
+    # write file and save OME-XML as description
+    tifffile.imwrite(filepath, img5d, metadata={'axes': dimorder}, description=xml)
+
+    return filepath
+
+
+def care_getimages(imagefile, sizes):
+    """
+    Still experimental. Use at your own risk !!!
+    """
+    if not VM_STARTED:
+        start_jvm()
+    if VM_KILLED:
+        jvm_error()
+
+    rdr = bioformats.ImageReader(imagefile, perform_init=True)
+    img_care = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+    readstate = 'OK'
+    readproblems = []
+
+    # main loop to read the images from the data file
+    for seriesID in range(0, sizes[0]):
+        for channel in range(0, sizes[3]):
+            try:
+                img_care[seriesID, :, :, channel] = rdr.read(series=seriesID, c=channel, z=0, t=0, rescale=False)
+            except:
+                print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
+                readstate = 'NOK'
+                readproblems = sys.exc_info()[1]
+
+    rdr.close()
+
+    return img_care, readstate
 
 
 def get_image6d_subset(imagefile, sizes,
@@ -683,7 +793,8 @@ def create_metainfo_dict():
 def get_relevant_metainfo_wrapper(imagefile,
                                   namespace='http://www.openmicroscopy.org/Schemas/OME/2016-01',
                                   bfpath=r'bfpackage/5.4.1/bioformats_package.jar',
-                                  showinfo=False):
+                                  showinfo=False,
+                                  xyorder='YX'):
 
     MetaInfo = create_metainfo_dict()
     omexml = get_OMEXML(imagefile)
@@ -694,7 +805,7 @@ def get_relevant_metainfo_wrapper(imagefile,
     # get JavaMetaDataStore and SeriesCount
     try:
         jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], MetaInfo['SeriesDimensions'],\
-        MetaInfo['MultiResolution'] = get_java_metadata_store(imagefile)
+            MetaInfo['MultiResolution'] = get_java_metadata_store(imagefile)
     except:
         print('Problem retrieving Java Metadata Store or Series size:', sys.exc_info()[0])
         raise
@@ -737,13 +848,19 @@ def get_relevant_metainfo_wrapper(imagefile,
         print('Problem retrieving channel description:', sys.exc_info()[0])
 
     # summarize dimensions
-    MetaInfo['Sizes'] = [MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'],
-                         MetaInfo['SizeC'], MetaInfo['SizeX'], MetaInfo['SizeY']]
+    if xyorder == 'XY':
+        MetaInfo['Sizes'] = [MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'],
+                             MetaInfo['SizeC'], MetaInfo['SizeX'], MetaInfo['SizeY']]
+
+    # this is the default
+    if xyorder == 'YX':
+        MetaInfo['Sizes'] = [MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'],
+                             MetaInfo['SizeC'], MetaInfo['SizeY'], MetaInfo['SizeX']]
 
     # try to get detector information - 1
     try:
         MetaInfo['Detector Model'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'], namespace)[0]['Model']
-    #except IndexError as e:
+    # except IndexError as e:
     #    print('Problem reading Detector Model. IndexError:', e.message)
     #    MetaInfo['Detector Model'] = 'n.a.'
     except:
@@ -752,7 +869,7 @@ def get_relevant_metainfo_wrapper(imagefile,
 
     try:
         MetaInfo['Detector Name'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'], namespace)[0]['ID']
-    #except IndexError as e:
+    # except IndexError as e:
     #    print('Problem reading Detector Name. Index Error:', e.message)
     #    MetaInfo['Detector Name'] = 'n.a.'
     except:
@@ -914,7 +1031,7 @@ def parseXML(omexml, topchild, subchild, highdetail=False):
     for child in root:
         print('*   ', child.tag, '--> ', child.attrib)
         if topchild in child.tag:
-        # if child.tag == "{http://www.openmicroscopy.org/Schemas/OME/2015-01}Instrument":
+            # if child.tag == "{http://www.openmicroscopy.org/Schemas/OME/2015-01}Instrument":
             for step_child in child:
                 print('**  ', step_child.tag, '-->', step_child.attrib)
 
@@ -1150,8 +1267,8 @@ def showtypicalmetadata(MetaInfo, namespace='n.a.', bfpath='n.a.'):
     print('Dimension Order CZI  : ', MetaInfo['OrderCZI'])
     print('Shape CZI            : ', MetaInfo['ShapeCZI'])
     print('Total Series Number  : ', MetaInfo['TotalSeries'])
-    print('Image Dimensions     : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'],\
-            MetaInfo['SizeZ'], MetaInfo['SizeC'], MetaInfo['SizeX'], MetaInfo['SizeY'])
+    print('Image Dimensions     : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'],
+          MetaInfo['SizeZ'], MetaInfo['SizeC'], MetaInfo['SizeY'], MetaInfo['SizeX'])
     print('Scaling XYZ [micron] : ', MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale'])
     print('Objective M-NA-Imm   : ', MetaInfo['ObjMag'], MetaInfo['NA'], MetaInfo['Immersion'])
     print('Objective Name       : ', MetaInfo['ObjModel'])
@@ -1166,3 +1283,25 @@ def showtypicalmetadata(MetaInfo, namespace='n.a.', bfpath='n.a.'):
     print('ImageIDs             : ', MetaInfo['ImageIDs'])
 
     return None
+
+
+def writeOMETIFFplanes(pixel, SizeT=1, SizeZ=1, SizeC=1, order='TZCYX', verbose=False):
+    
+    if order == 'TZCYX':
+
+        pixel.DimensionOrder = bioformats.omexml.DO_XYCZT
+        counter = 0
+        for t in range(SizeT):
+            for z in range(SizeZ):
+                for c in range(SizeC):
+
+                    if verbose:
+                        print('Write PlaneTable: ', t, z, c),
+                        sys.stdout.flush()
+
+                    pixel.Plane(counter).TheT = t
+                    pixel.Plane(counter).TheZ = z
+                    pixel.Plane(counter).TheC = c
+                    counter = counter + 1
+
+    return pixel
