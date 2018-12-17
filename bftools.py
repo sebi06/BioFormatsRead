@@ -7,7 +7,7 @@ Date: 13.12.2018
 Version. 2.4.0
 """
 
-from __future__ import print_function
+#from __future__ import print_function
 import javabridge as jv
 import bioformats
 import numpy as np
@@ -461,7 +461,7 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
     return df, csvfile
 
 
-def get_image6d(imagefile, sizes, output_order='STZCXY', arrayorder='STZCXY'):
+def get_image6d(imagefile, sizes):
     """
     This function will read the image data and store them into a 6D numpy array.
     The 6D array has the following dimension order: [Series, T, Z, C, X, Y].
@@ -472,13 +472,8 @@ def get_image6d(imagefile, sizes, output_order='STZCXY', arrayorder='STZCXY'):
         jvm_error()
 
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
+    img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
 
-    if output_order == 'STZCXY':
-        img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
-    if output_order == 'XYCZTS':
-        img6d = np.zeros(sizes[::-1], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
-
-    # img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
     readstate = 'OK'
     readproblems = []
 
@@ -488,21 +483,11 @@ def get_image6d(imagefile, sizes, output_order='STZCXY', arrayorder='STZCXY'):
             for zplane in range(0, sizes[2]):
                 for channel in range(0, sizes[3]):
                     try:
-                        if output_order == 'STZCXY':
-                            img6d[seriesID, timepoint, zplane, channel, :, :] = rdr.read(series=seriesID,
-                                                                                         c=channel,
-                                                                                         z=zplane,
-                                                                                         t=timepoint,
-                                                                                         rescale=False)
-                        if output_order == 'XYCZTS':
-                            tmp = rdr.read(series=seriesID,
-                                           c=channel,
-                                           z=zplane,
-                                           t=timepoint,
-                                           rescale=False)
-
-                            img6d[:, :, channel, zplane, timepoint, seriesID] = np.swapaxes(tmp, 0, 1)
-
+                        img6d[seriesID, timepoint, zplane, channel, :, :] = rdr.read(series=seriesID,
+                                                                                     c=channel,
+                                                                                     z=zplane,
+                                                                                     t=timepoint,
+                                                                                     rescale=False)
                     except:
                         print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
                         readstate = 'NOK'
@@ -515,61 +500,80 @@ def get_image6d(imagefile, sizes, output_order='STZCXY', arrayorder='STZCXY'):
     return img6d, readstate
 
 
-def write_ometiff(filepath, dimensions={'Series': 1, 'SizeT': 1, 'SizeZ': 2, 'SizeC': 3, 'SizeX': 10, 'SizeY': 20},
+def write_ometiff(filepath, img6d,
                   scalex=0.1,
                   scaley=0.1,
                   scalez=1.0,
-                  dimorder='TZCYX',
-                  pixeltype='uint16'):
+                  dimorder='STZCYX',
+                  pixeltype='uint16',
+                  swapxyaxes=True):
     """
     This function will write an OME-TIFF file to disk.
-    The 5D array has the following dimension order: [Series, T, Z, C, Y, X].
+    The out 6D array has the following dimension order:
 
-    Currently Series are not supported !!!
+    [Series, T, Z, C, Y, X] if swapxyaxes = True
+
+    [Series, T, Z, C, Y, X] if swapxyaxes = False
     """
 
-    # Dimension TZCXY
-    SizeT = dimensions['SizeT']
-    SizeZ = dimensions['SizeZ']
-    SizeC = dimensions['SizeC']
-    SizeX = dimensions['SizeX']
-    SizeY = dimensions['SizeY']
-    Series = dimensions['Series']
+    # Dimension STZCXY
+    if not swapxyaxes:
+        Series = img6d.shape[0]
+        SizeT = img6d.shape[1]
+        SizeZ = img6d.shape[2]
+        SizeC = img6d.shape[3]
+        SizeX = img6d.shape[4]
+        SizeY = img6d.shape[5]
+
+    if swapxyaxes:
+        Series = img6d.shape[0]
+        SizeT = img6d.shape[1]
+        SizeZ = img6d.shape[2]
+        SizeC = img6d.shape[3]
+        SizeX = img6d.shape[5]
+        SizeY = img6d.shape[4]
+
 
     # create numpy array with correct order
-    img5d = np.random.randn(SizeT, SizeZ, SizeC, SizeY, SizeX).astype(np.uint16)
+    #img5d = np.shape(SizeT, SizeZ, SizeC, SizeY, SizeX).astype(np.uint16)
+    #img6d = np.zeros([Series, SizeT, SizeZ, SizeC, SizeY, SizeX]).astype(np.uint16)
 
     # Getting metadata info
     omexml = bioformats.omexml.OMEXML()
     omexml.image(Series-1).Name = filepath
-    p = omexml.image(Series-1).Pixels
-    # p.ID = Series-1
-    p.SizeX = SizeX
-    p.SizeY = SizeY
-    p.SizeC = SizeC
-    p.SizeT = SizeT
-    p.SizeZ = SizeZ
-    p.PhysicalSizeX = np.float(scalex)
-    p.PhysicalSizeY = np.float(scaley)
-    p.PhysicalSizeZ = np.float(scalez)
-    p.PixelType = pixeltype
-    p.channel_count = SizeC
-    p.plane_count = SizeZ * SizeT * SizeC
-    p = writeOMETIFFplanes(p, SizeT=SizeT, SizeZ=SizeZ, SizeC=SizeC, order=dimorder)
 
-    for c in range(SizeC):
-        if pixeltype == 'unit8':
-            p.Channel(c).SamplesPerPixel = 1
-        if pixeltype == 'unit16':
-            p.Channel(c).SamplesPerPixel = 2
+    for series in range(Series):
+        p = omexml.image(series).Pixels
+        p.ID = str(series)
+        p.SizeX = SizeX
+        p.SizeY = SizeY
+        p.SizeC = SizeC
+        p.SizeT = SizeT
+        p.SizeZ = SizeZ
+        p.PhysicalSizeX = np.float(scalex)
+        p.PhysicalSizeY = np.float(scaley)
+        p.PhysicalSizeZ = np.float(scalez)
+        p.PixelType = pixeltype
+        p.channel_count = SizeC
+        p.plane_count = SizeZ * SizeT * SizeC
+        p = writeOMETIFFplanes(p, SizeT=SizeT, SizeZ=SizeZ, SizeC=SizeC, order=dimorder)
 
-    omexml.structured_annotations.add_original_metadata(bioformats.omexml.OM_SAMPLES_PER_PIXEL, str(SizeC))
+        for c in range(SizeC):
+            if pixeltype == 'unit8':
+                p.Channel(c).SamplesPerPixel = 1
+            if pixeltype == 'unit16':
+                p.Channel(c).SamplesPerPixel = 2
+
+        omexml.structured_annotations.add_original_metadata(bioformats.omexml.OM_SAMPLES_PER_PIXEL, str(SizeC))
 
     # Converting to omexml
     xml = omexml.to_xml()
 
     # write file and save OME-XML as description
-    tifffile.imwrite(filepath, img5d, metadata={'axes': dimorder}, description=xml)
+    if swapaxes:
+        tifffile.imwrite(filepath, np.swapaxes(img6d, 4, 5), metadata={'axes': dimorder}, description=xml)
+    if not swapaxes:
+        tifffile.imwrite(filepath, img6d, metadata={'axes': dimorder}, description=xml)
 
     return filepath
 
@@ -856,6 +860,9 @@ def get_relevant_metainfo_wrapper(imagefile,
     if xyorder == 'YX':
         MetaInfo['Sizes'] = [MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'],
                              MetaInfo['SizeC'], MetaInfo['SizeY'], MetaInfo['SizeX']]
+
+    #MetaInfo['Sizes'] = [MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'],
+    #                     MetaInfo['SizeC'], MetaInfo['SizeX'], MetaInfo['SizeY']]
 
     # try to get detector information - 1
     try:
@@ -1285,9 +1292,9 @@ def showtypicalmetadata(MetaInfo, namespace='n.a.', bfpath='n.a.'):
     return None
 
 
-def writeOMETIFFplanes(pixel, SizeT=1, SizeZ=1, SizeC=1, order='TZCYX', verbose=False):
+def writeOMETIFFplanes(pixel, SizeT=1, SizeZ=1, SizeC=1, order='STZCXY', verbose=False):
     
-    if order == 'TZCYX':
+    if order == 'STZCXY':
 
         pixel.DimensionOrder = bioformats.omexml.DO_XYCZT
         counter = 0

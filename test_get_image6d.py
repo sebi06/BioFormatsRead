@@ -11,7 +11,8 @@ import bftools as bf
 from matplotlib import pyplot as plt, cm
 import dispvalues as dsv
 
-filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
+#filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
+filename = r'c:\Users\m1srh\Documents\Testdata_Zeiss\BioFormats_DimOrder_Test\T=30_Z=23_C=2_x=217_Y=94.czi'
 #filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
 #filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
 #filename = r'l:\Data\BioFormats_CZI_Test\20170419\20170419_BioFormats_CZI_Test_small_384chamber_5X_2X.czi'
@@ -24,15 +25,12 @@ filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
 urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 
 # specify bioformats_package.jar to use if required
-# bfpackage = r'bfpackage/5.8.2/bioformats_package.jar'
-#bfpackage = r'bfpackage/5.7.2/bioformats_package.jar'
-#bfpackage = r'c:\Users\M1SRH\Documents\Software\BioFormats_Package\5.1.10\bioformats_package.jar'
-bfpackage = r'c:\Users\m1srh\Documents\Software\Bioformats\5.9.2\bioformats_package.jar'
+#bfpackage = r'bfpackage/5.1.10/bioformats_package.jar'
+bfpackage = r'bfpackage/5.9.2/bioformats_package.jar'
 
 bf.set_bfpath(bfpackage)
 
-output_order = 'XYCZTS'
-#output_order = 'STZCYX'
+#output_order = 'YXCZTS'
 
 # get image meta-information
 MetaInfo = bf.get_relevant_metainfo_wrapper(filename,
@@ -42,7 +40,7 @@ MetaInfo = bf.get_relevant_metainfo_wrapper(filename,
                                             xyorder='YX')
 
 try:
-    img6d, readstate = bf.get_image6d(filename, MetaInfo['Sizes'], output_order=output_order)
+    img6d, readstate = bf.get_image6d(filename, MetaInfo['Sizes'])
     arrayshape = np.shape(img6d)
 except:
     arrayshape = []
@@ -52,15 +50,21 @@ except:
 bf.showtypicalmetadata(MetaInfo, namespace=urlnamespace, bfpath=bfpackage)
 print('Array Shape          : ', arrayshape)
 
-T = 16
+T = 15
 C = 1
-Z = 10
+Z = 1
 S = 1
 
-if output_order == 'STZCYX':
-    img2show = img6d[S-1, T-1, Z-1, C-1, :, :]
-if output_order == 'XYCZTS':
-    img2show = img6d[:, :, C-1, Z-1, T-1, S-1]
+img2show = img6d[S - 1, T - 1, Z - 1, C - 1, :, :]
+
+# write OME-TIFF
+filepath = r'stack.ome.tiff'
+fp = bf.write_ometiff(filepath, img6d,
+                      scalex=MetaInfo['XScale'],
+                      scaley=MetaInfo['YScale'],
+                      scalez=MetaInfo['ZScale'],
+                      dimorder='STZCXY',
+                      pixeltype='uint16')
 
 fig = plt.figure(figsize=(10, 8), dpi=100)
 ax = fig.add_subplot(111)
