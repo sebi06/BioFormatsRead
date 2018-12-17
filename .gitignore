@@ -104,7 +104,7 @@ venv.bak/
 .mypy_cache/
 
 # vscode
-.vscode/
+#.vscode/
 
 # files
 /.idea/*
