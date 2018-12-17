@@ -27,12 +27,10 @@ urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 # specify bioformats_package.jar to use if required
 #bfpackage = r'bfpackage/5.1.10/bioformats_package.jar'
 bfpackage = r'bfpackage/5.9.2/bioformats_package.jar'
-
+# set path the bioformats_package.jar
 bf.set_bfpath(bfpackage)
 
-#output_order = 'YXCZTS'
-
-# get image meta-information
+# get image meta-information using bioformats
 MetaInfo = bf.get_relevant_metainfo_wrapper(filename,
                                             namespace=urlnamespace,
                                             bfpath=bfpackage,
@@ -66,6 +64,7 @@ fp = bf.write_ometiff(filepath, img6d,
                       dimorder='STZCXY',
                       pixeltype='uint16')
 
+# plot one image plane to check results
 fig = plt.figure(figsize=(10, 8), dpi=100)
 ax = fig.add_subplot(111)
 cax = ax.imshow(img2show, interpolation='nearest', cmap=cm.hot)

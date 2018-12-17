@@ -473,6 +473,7 @@ def get_image6d(imagefile, sizes):
 
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
     img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+    #img6d = np.moveaxis(np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()]), 4, 5)
 
     readstate = 'OK'
     readproblems = []
@@ -492,6 +493,8 @@ def get_image6d(imagefile, sizes):
                         print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
                         readstate = 'NOK'
                         readproblems = sys.exc_info()[1]
+
+
 
     rdr.close()
 
@@ -517,6 +520,15 @@ def write_ometiff(filepath, img6d,
     """
 
     # Dimension STZCXY
+    if swapxyaxes:
+        # sway xy to write the OME-Stack with the correct shape
+        Series = img6d.shape[0]
+        SizeT = img6d.shape[1]
+        SizeZ = img6d.shape[2]
+        SizeC = img6d.shape[3]
+        SizeX = img6d.shape[5]
+        SizeY = img6d.shape[4]
+
     if not swapxyaxes:
         Series = img6d.shape[0]
         SizeT = img6d.shape[1]
@@ -525,18 +537,8 @@ def write_ometiff(filepath, img6d,
         SizeX = img6d.shape[4]
         SizeY = img6d.shape[5]
 
-    if swapxyaxes:
-        Series = img6d.shape[0]
-        SizeT = img6d.shape[1]
-        SizeZ = img6d.shape[2]
-        SizeC = img6d.shape[3]
-        SizeX = img6d.shape[5]
-        SizeY = img6d.shape[4]
 
 
-    # create numpy array with correct order
-    #img5d = np.shape(SizeT, SizeZ, SizeC, SizeY, SizeX).astype(np.uint16)
-    #img6d = np.zeros([Series, SizeT, SizeZ, SizeC, SizeY, SizeX]).astype(np.uint16)
 
     # Getting metadata info
     omexml = bioformats.omexml.OMEXML()
@@ -570,10 +572,7 @@ def write_ometiff(filepath, img6d,
     xml = omexml.to_xml()
 
     # write file and save OME-XML as description
-    if swapaxes:
-        tifffile.imwrite(filepath, np.swapaxes(img6d, 4, 5), metadata={'axes': dimorder}, description=xml)
-    if not swapaxes:
-        tifffile.imwrite(filepath, img6d, metadata={'axes': dimorder}, description=xml)
+    tifffile.imwrite(filepath, img6d, metadata={'axes': dimorder}, description=xml)
 
     return filepath
 
@@ -860,9 +859,6 @@ def get_relevant_metainfo_wrapper(imagefile,
     if xyorder == 'YX':
         MetaInfo['Sizes'] = [MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'],
                              MetaInfo['SizeC'], MetaInfo['SizeY'], MetaInfo['SizeX']]
-
-    #MetaInfo['Sizes'] = [MetaInfo['TotalSeries'], MetaInfo['SizeT'], MetaInfo['SizeZ'],
-    #                     MetaInfo['SizeC'], MetaInfo['SizeX'], MetaInfo['SizeY']]
 
     # try to get detector information - 1
     try:
