@@ -14,7 +14,7 @@ The main scripts are:
 
 :Author: Sebastian Rhode
 
-:Version: 2018.10.12
+:Version: 2018.12.16
 
 Important Requirements
 ----------------------

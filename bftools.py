@@ -7,7 +7,6 @@ Date: 13.12.2018
 Version. 2.4.0
 """
 
-#from __future__ import print_function
 import javabridge as jv
 import bioformats
 import numpy as np
@@ -20,7 +19,6 @@ import re
 from collections import Counter
 import subprocess
 import tifffile
-
 
 VM_STARTED = False
 VM_KILLED = False
@@ -537,9 +535,6 @@ def write_ometiff(filepath, img6d,
         SizeX = img6d.shape[4]
         SizeY = img6d.shape[5]
 
-
-
-
     # Getting metadata info
     omexml = bioformats.omexml.OMEXML()
     omexml.image(Series-1).Name = filepath
@@ -795,7 +790,7 @@ def create_metainfo_dict():
 
 def get_relevant_metainfo_wrapper(imagefile,
                                   namespace='http://www.openmicroscopy.org/Schemas/OME/2016-01',
-                                  bfpath=r'bfpackage/5.4.1/bioformats_package.jar',
+                                  bfpath=r'bfpackage/5.9.2/bioformats_package.jar',
                                   showinfo=False,
                                   xyorder='YX'):
 

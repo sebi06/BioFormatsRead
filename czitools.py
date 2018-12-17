@@ -7,9 +7,7 @@ Date: 29.05.2017
 Version. 1.1
 """
 
-from __future__ import print_function
 import misctools as misc
-#from czifile import *
 import zisraw as zis
 import numpy as np
 import re
