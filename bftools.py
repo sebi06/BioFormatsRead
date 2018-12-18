@@ -702,7 +702,59 @@ def get_image6d_multires(imagefile, MetaInfo):
 
     rdr.close()
 
+    kill_jvm()
+
     return series_list, readstate
+
+
+def get_image6d_pylevel(imagefile, MetaInfo, pylevel=0):
+    """
+    This function will read the image data only at a specific pyramid level.
+    Every series will be stored inside a tuple as a 5D numpy array.
+    The 6D array has the following dimension order: [T, Z, C, X, Y].
+    """
+    if not VM_STARTED:
+        start_jvm()
+    if VM_KILLED:
+        jvm_error()
+
+    rdr = bioformats.ImageReader(imagefile, perform_init=True)
+
+    print('Reading MultiRes File.')
+    readstate = 'OK'
+    readproblems = []
+
+    seriesID = pylevel
+    sizeT = MetaInfo['Sizes'][1]
+    sizeZ = MetaInfo['Sizes'][2]
+    sizeC = MetaInfo['Sizes'][3]
+
+    # read the XY dimension of the first series
+    current_sizeX = MetaInfo['SeriesDimensions'][seriesID][0]
+    current_sizeY = MetaInfo['SeriesDimensions'][seriesID][1]
+
+    newsize = [1, sizeT, sizeZ, sizeC, current_sizeX, current_sizeY]
+
+    # create the 6D numpy array
+    img6d = np.zeros(newsize, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+
+    # main loop to read the images from the data file
+    for timepoint in range(0, sizeT):
+        for zplane in range(0, sizeZ):
+            for channel in range(0, sizeC):
+                try:
+                    img6d[seriesID, timepoint, zplane, channel, :, :] =\
+                        rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+                except:
+                    print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
+                    readstate = 'NOK'
+                    readproblems = sys.exc_info()[1]
+
+    rdr.close()
+
+    kill_jvm()
+
+    return img6d, readstate
 
 
 def get_image2d(imagefile, seriesID, channel, zplane, timepoint):

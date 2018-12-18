@@ -2,17 +2,14 @@
 """
 @author: Sebi
 
-File: test_get_image6d_multires.py
-Date: 02.05.2017
+File: test_get_image6d_pylevel.py
+Date: 16.12.2018
 Version. 0.1
 """
 
 import bftools as bf
+import numpy as np
 
-#filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
-#filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
-#filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
-#filename = r'testdata/2x2_SNAP_CH=2_Z=5_T=2.czi'
 filename = r'c:\Users\m1srh\OneDrive - Carl Zeiss AG\Projects\Apeer\ZenCore_Workflows\ParticleAnalysis\Filtertest1_POL.czi'
 
 # use for BioFormtas <= 5.1.10
@@ -21,21 +18,21 @@ filename = r'c:\Users\m1srh\OneDrive - Carl Zeiss AG\Projects\Apeer\ZenCore_Work
 urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 
 # specify bioformats_package.jar to use if required
+#bfpackage = r'bfpackage/5.1.10/bioformats_package.jar'
 bfpackage = r'bfpackage/5.9.2/bioformats_package.jar'
+# set path the bioformats_package.jar
 bf.set_bfpath(bfpackage)
 
 # get image meta-information
 MetaInfo = bf.get_relevant_metainfo_wrapper(filename, namespace=urlnamespace, bfpath=bfpackage, showinfo=False)
 
 try:
-    series_list, readstate = bf.get_image6d_multires(filename, MetaInfo)
+    img6d, readstate = bf.get_image6d_pylevel(filename, MetaInfo, pylevel=0)
+    arrayshape = np.shape(img6d)
 except:
+    arrayshape = []
     print('Could not read image data into NumPy array.')
 
 # show relevant image Meta-Information
 bf.showtypicalmetadata(MetaInfo, namespace=urlnamespace, bfpath=bfpackage)
-# show dimensions of individual series
-print('Image Directory      : ', MetaInfo['Directory'])
-print('-----  Individal Series Dimensions  -----')
-for s in range(0, MetaInfo['TotalSeries']):
-    print('SeriesID:', s, series_list[s].shape)
+print('Array Shape          : ', arrayshape)

@@ -11,8 +11,11 @@ import bftools as bf
 from matplotlib import pyplot as plt, cm
 import dispvalues as dsv
 
+showimage = False
+
 #filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
-filename = r'c:\Users\m1srh\Documents\Testdata_Zeiss\BioFormats_DimOrder_Test\T=30_Z=23_C=2_x=217_Y=94.czi'
+#filename = r'c:\Users\m1srh\Documents\Testdata_Zeiss\BioFormats_DimOrder_Test\T=30_Z=23_C=2_x=217_Y=94.czi'
+filename = r'c:\Users\m1srh\OneDrive - Carl Zeiss AG\Projects\Apeer\ZenCore_Workflows\ParticleAnalysis\Filtertest1_POL.czi'
 #filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
 #filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
 #filename = r'l:\Data\BioFormats_CZI_Test\20170419\20170419_BioFormats_CZI_Test_small_384chamber_5X_2X.czi'
@@ -48,30 +51,32 @@ except:
 bf.showtypicalmetadata(MetaInfo, namespace=urlnamespace, bfpath=bfpackage)
 print('Array Shape          : ', arrayshape)
 
-T = 15
-C = 1
-Z = 1
-S = 1
+if showimage:
 
-img2show = img6d[S - 1, T - 1, Z - 1, C - 1, :, :]
+    T = 15
+    C = 1
+    Z = 1
+    S = 1
 
-# write OME-TIFF
-filepath = r'stack.ome.tiff'
-fp = bf.write_ometiff(filepath, img6d,
-                      scalex=MetaInfo['XScale'],
-                      scaley=MetaInfo['YScale'],
-                      scalez=MetaInfo['ZScale'],
-                      dimorder='STZCXY',
-                      pixeltype='uint16')
+    img2show = img6d[S - 1, T - 1, Z - 1, C - 1, :, :]
 
-# plot one image plane to check results
-fig = plt.figure(figsize=(10, 8), dpi=100)
-ax = fig.add_subplot(111)
-cax = ax.imshow(img2show, interpolation='nearest', cmap=cm.hot)
-ax.set_title('S=' + str(S) + 'T=' + str(T) + ' Z=' + str(Z) + ' CH=' + str(C), fontsize=12)
-ax.set_xlabel('X-dimension [pixel]', fontsize=10)
-ax.set_ylabel('Y-dimension [pixel]', fontsize=10)
-cbar = fig.colorbar(cax)
-ax.format_coord = dsv.Formatter(cax)
-# show plots
-plt.show()
+    # write OME-TIFF
+    filepath = r'stack.ome.tiff'
+    fp = bf.write_ometiff(filepath, img6d,
+                          scalex=MetaInfo['XScale'],
+                          scaley=MetaInfo['YScale'],
+                          scalez=MetaInfo['ZScale'],
+                          dimorder='STZCXY',
+                          pixeltype='uint16')
+
+    # plot one image plane to check results
+    fig = plt.figure(figsize=(10, 8), dpi=100)
+    ax = fig.add_subplot(111)
+    cax = ax.imshow(img2show, interpolation='nearest', cmap=cm.hot)
+    ax.set_title('S=' + str(S) + 'T=' + str(T) + ' Z=' + str(Z) + ' CH=' + str(C), fontsize=12)
+    ax.set_xlabel('X-dimension [pixel]', fontsize=10)
+    ax.set_ylabel('Y-dimension [pixel]', fontsize=10)
+    cbar = fig.colorbar(cax)
+    ax.format_coord = dsv.Formatter(cax)
+    # show plots
+    plt.show()
