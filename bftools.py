@@ -459,7 +459,8 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
     return df, csvfile
 
 
-def get_image6d(imagefile, sizes):
+def get_image6d(imagefile, sizes, pyramid='single',
+                                  pylevel=0):
     """
     This function will read the image data and store them into a 6D numpy array.
     The 6D array has the following dimension order: [Series, T, Z, C, X, Y].
@@ -470,29 +471,62 @@ def get_image6d(imagefile, sizes):
         jvm_error()
 
     rdr = bioformats.ImageReader(imagefile, perform_init=True)
-    img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
-    #img6d = np.moveaxis(np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()]), 4, 5)
+    # img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+    # img6d = np.moveaxis(np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()]), 4, 5)
 
     readstate = 'OK'
     readproblems = []
 
-    # main loop to read the images from the data file
-    for seriesID in range(0, sizes[0]):
-        for timepoint in range(0, sizes[1]):
-            for zplane in range(0, sizes[2]):
-                for channel in range(0, sizes[3]):
-                    try:
-                        img6d[seriesID, timepoint, zplane, channel, :, :] = rdr.read(series=seriesID,
-                                                                                     c=channel,
-                                                                                     z=zplane,
-                                                                                     t=timepoint,
-                                                                                     rescale=False)
-                    except:
-                        print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
-                        readstate = 'NOK'
-                        readproblems = sys.exc_info()[1]
+    if pyramid == 'single':
 
+        sizes[0] =  1 # adapt the sizes to reflect that only one pyramid level will be read
+        img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
 
+        # main loop to read the images from the data file
+        for seriesID in range(pylevel, pylevel + 1):
+            for timepoint in range(0, sizes[1]):
+                for zplane in range(0, sizes[2]):
+                    for channel in range(0, sizes[3]):
+                        try:
+                            img6d[seriesID, timepoint, zplane, channel, :, :] = \
+                                rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+                        except:
+                            print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
+                            readstate = 'NOK'
+                            readproblems = sys.exc_info()[1]
+
+    if pyramid == 'all':
+
+        img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+
+        # main loop to read the images from the data file
+        for seriesID in range(0, sizes[0]):
+            for timepoint in range(0, sizes[1]):
+                for zplane in range(0, sizes[2]):
+                    for channel in range(0, sizes[3]):
+                        try:
+                            img6d[seriesID, timepoint, zplane, channel, :, :] = \
+                                rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+                        except:
+                            print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
+                            readstate = 'NOK'
+                            readproblems = sys.exc_info()[1]
+
+    # # main loop to read the images from the data file
+    # for seriesID in range(0, sizes[0]):
+    #     for timepoint in range(0, sizes[1]):
+    #         for zplane in range(0, sizes[2]):
+    #             for channel in range(0, sizes[3]):
+    #                 try:
+    #                     img6d[seriesID, timepoint, zplane, channel, :, :] = rdr.read(series=seriesID,
+    #                                                                                  c=channel,
+    #                                                                                  z=zplane,
+    #                                                                                  t=timepoint,
+    #                                                                                  rescale=False)
+    #                 except:
+    #                     print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
+    #                     readstate = 'NOK'
+    #                     readproblems = sys.exc_info()[1]
 
     rdr.close()
 
@@ -730,8 +764,11 @@ def get_image6d_pylevel(imagefile, MetaInfo, pylevel=0):
     sizeC = MetaInfo['Sizes'][3]
 
     # read the XY dimension of the first series
-    current_sizeX = MetaInfo['SeriesDimensions'][seriesID][0]
-    current_sizeY = MetaInfo['SeriesDimensions'][seriesID][1]
+    #current_sizeX = MetaInfo['SeriesDimensions'][seriesID][0]
+    #current_sizeY = MetaInfo['SeriesDimensions'][seriesID][1]
+
+    current_sizeX = MetaInfo['SeriesDimensions'][seriesID][1]
+    current_sizeY = MetaInfo['SeriesDimensions'][seriesID][0]
 
     newsize = [1, sizeT, sizeZ, sizeC, current_sizeX, current_sizeY]
 
