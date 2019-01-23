@@ -24,7 +24,7 @@ VM_STARTED = False
 VM_KILLED = False
 
 # define default path to bioformats_package.jar globally
-BFPATH = r'bfpackage/5.7.0/bioformats_package.jar'
+BFPATH = r'bfpackage/5.9.2/bioformats_package.jar'
 
 BF2NP_DTYPE = {
     0: np.int8,
@@ -907,6 +907,9 @@ def get_relevant_metainfo_wrapper(imagefile,
         # get objective information using cziread
         print('Using czifile.py to get CZI Shape info.')
         MetaInfo['ShapeCZI'], MetaInfo['OrderCZI'] = czt.get_shapeinfo_cziread(imagefile)
+        MetaInfo['NumScenes'] = MetaInfo['ShapeCZI'][0]
+
+    MetaInfo['PyLevels'] = len(set(MetaInfo['SeriesDimensions']))
 
     print('Using BioFormats to get MetaInformation.')
 
@@ -1348,7 +1351,9 @@ def showtypicalmetadata(MetaInfo, namespace='n.a.', bfpath='n.a.'):
     print('Image Directory      : ', MetaInfo['Directory'])
     print('Image Filename       : ', MetaInfo['Filename'])
     print('MutiResolution       : ', MetaInfo['MultiResolution'])
+    print('Pyramid Levels       : ', MetaInfo['PyLevels'])
     print('Series Dimensions    : ', MetaInfo['SeriesDimensions'])
+    print('Number of Scenes     : ', MetaInfo['NumScenes'])
     print('Images Dim Sizes [0] : ', MetaInfo['Sizes'])
     print('Dimension Order BF   : ', MetaInfo['DimOrder BF'])
     print('Dimension Order CZI  : ', MetaInfo['OrderCZI'])
@@ -1392,3 +1397,10 @@ def writeOMETIFFplanes(pixel, SizeT=1, SizeZ=1, SizeC=1, order='STZCXY', verbose
                     counter = counter + 1
 
     return pixel
+
+
+def calcimageid(scene, numpylevels, pylevel=0):
+
+    id = numpylevels * scene + pylevel
+
+    return id
