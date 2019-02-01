@@ -4,7 +4,7 @@
 @REM File: showZsurface.bat
 @REM
 @REM Must be used from command line:
-@REM C:\mydir>showZsurface.bat czifile True jpg tab True False
+@REM C:\mydir>showZsurface.bat czifile True tab True png True
 @REM
 @REM Arguments:
 @REM %1 = Filename of CZI !!! No spaces inside filename are allowed !!!
@@ -16,7 +16,7 @@
 @REM #################################################################################
 
 @echo off
-set DEFAULT_SCRIPT_DIR=c:\Users\m1srh\OneDrive - Carl Zeiss AG\Python_Projects\BioFormatsRead\
+set DEFAULT_SCRIPT_DIR=c:\Users\m1srh\Documents\GitHub\open_application_development\Scripts\Data_Tools\
 set DEFAULT_SCRIPT=showZsurface.py
 
 @REM Get the direcotry and options to be processed from the command line arguments

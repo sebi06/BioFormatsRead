@@ -19,6 +19,10 @@ import re
 from collections import Counter
 import subprocess
 import tifffile
+from mpl_toolkits.mplot3d import axes3d
+from matplotlib import cm
+import matplotlib.pyplot as plt
+
 
 VM_STARTED = False
 VM_KILLED = False
@@ -180,6 +184,8 @@ def get_java_metadata_store(imagefile):
 
     rdr.close()
 
+    #kill_jvm()
+
     return javametadata, totalseries, imageIDs, series_dimensions, multires
 
 
@@ -307,13 +313,19 @@ def get_metainfo_pixeltype(jmd):
     return pixtype
 
 
-def get_metainfo_numscenes(filename):
+def get_metainfo_numscenes(czishape, cziorder):
     """
     Currently the number of scenes cannot be read directly using BioFormats so
     czifile.py is used to determine the number of scenes.
     """
-    czidim, cziorder = czt.read_dimensions(filename)
-    numscenes = czidim[1]
+
+    # find the index of the "S" inside the dimension string
+    try:
+        si = cziorder.index("S")
+        numscenes = czishape[si]
+    except:
+        # if no scene was found set to 1
+        numscenes = 1
 
     return numscenes
 
@@ -383,20 +395,38 @@ def get_dimension_only(imagefile, imageID=0):
     return sizes
 
 
-def get_planetable(imagefile, writecsv=False, separator='\t'):
+def get_planetable(imagefile, writecsv=False, separator='\t', imageID=0, showinfo=True):
 
     MetaInfo = create_metainfo_dict()
 
     # get JavaMetaDataStore and SeriesCount
     try:
-        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], MetaInfo['SeriesDimensions'], MetaInfo['MultiResolution'] = get_java_metadata_store(
-            imagefile)
+        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], MetaInfo['SeriesDimensions'], MetaInfo['MultiResolution'] = get_java_metadata_store(imagefile)
+        MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale'] = get_metainfo_scaling(jmd)
+        MetaInfo['SizeC'] = np.int(jmd.getPixelsSizeC(imageID).getValue().floatValue())
+        MetaInfo['SizeT'] = np.int(jmd.getPixelsSizeT(imageID).getValue().floatValue())
+        MetaInfo['SizeZ'] = np.int(jmd.getPixelsSizeZ(imageID).getValue().floatValue())
+        MetaInfo['SizeX'] = np.int(jmd.getPixelsSizeX(imageID).getValue().floatValue())
+        MetaInfo['SizeY'] = np.int(jmd.getPixelsSizeY(imageID).getValue().floatValue())
     except:
         print('Problem retrieving Java Metadata Store or Series size:', sys.exc_info()[0])
         raise
 
     # get dimension information and MetaInfo
     MetaInfo = get_metainfo_dimension(jmd, MetaInfo)
+
+    if showinfo:
+        # show relevant image Meta-Information
+        print('\n')
+        print('-------------------------------------------------------------')
+        print('MutiResolution       : ', MetaInfo['MultiResolution'])
+        print('Series Dimensions    : ', MetaInfo['SeriesDimensions'])
+        print('Images Dim Sizes [0] : ', MetaInfo['Sizes'])
+        print('Image Dimensions     : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'],
+              MetaInfo['SizeZ'], MetaInfo['SizeC'], MetaInfo['SizeY'], MetaInfo['SizeX'])
+        print('Scaling XYZ [micron] : ', MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale'])
+        print('ImageIDs             : ', MetaInfo['ImageIDs'])
+        print('\n')
 
     id = []
     plane = []
@@ -456,11 +486,11 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
     if not writecsv:
         csvfile = None
 
-    return df, csvfile
+    return df, csvfile, MetaInfo
 
 
 def get_image6d(imagefile, sizes, pyramid='single',
-                                  pylevel=0):
+                                  seriesIDsinglepylevel=0):
     """
     This function will read the image data and store them into a 6D numpy array.
     The 6D array has the following dimension order: [Series, T, Z, C, X, Y].
@@ -479,16 +509,20 @@ def get_image6d(imagefile, sizes, pyramid='single',
 
     if pyramid == 'single':
 
-        sizes[0] =  1 # adapt the sizes to reflect that only one pyramid level will be read
+        #sizes[0] = 1 # adapt the sizes to reflect that only one pyramid level will be read
+        #print(sizes)
         img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
 
         # main loop to read the images from the data file
-        for seriesID in range(pylevel, pylevel + 1):
+        for seriesID in range(seriesIDsinglepylevel, seriesIDsinglepylevel + 1):
+            print("Series = ", seriesID)
             for timepoint in range(0, sizes[1]):
                 for zplane in range(0, sizes[2]):
                     for channel in range(0, sizes[3]):
                         try:
-                            img6d[seriesID, timepoint, zplane, channel, :, :] = \
+                            # img6d[seriesID, timepoint, zplane, channel, :, :] = \
+                            #    rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+                            img6d[0, timepoint, zplane, channel, :, :] = \
                                 rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
                         except:
                             print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
@@ -865,14 +899,16 @@ def create_metainfo_dict():
                 'Detector Model': [],
                 'Detector Name': [],
                 'DetectorID': 'n.a.',
-                'InstrumentID': 0,
+                'InstrumentID': None,
                 'Dyes': [],
                 'Channels': [],
                 'ChDesc': 'n.a.',
-                'Sizes': 0,
+                'Sizes': None,
                 'ImageIDs': [],
                 'SeriesDimensions': [],
-                'MutiResolution': False}
+                'MutiResolution': False,
+                'PyLevels': None,
+                'NumScenes': None}
 
     return MetaInfo
 
@@ -907,7 +943,7 @@ def get_relevant_metainfo_wrapper(imagefile,
         # get objective information using cziread
         print('Using czifile.py to get CZI Shape info.')
         MetaInfo['ShapeCZI'], MetaInfo['OrderCZI'] = czt.get_shapeinfo_cziread(imagefile)
-        MetaInfo['NumScenes'] = MetaInfo['ShapeCZI'][0]
+        MetaInfo['NumScenes'] = get_metainfo_numscenes(MetaInfo['ShapeCZI'], MetaInfo['OrderCZI'])
 
     MetaInfo['PyLevels'] = len(set(MetaInfo['SeriesDimensions']))
 
@@ -950,21 +986,21 @@ def get_relevant_metainfo_wrapper(imagefile,
     # try to get detector information - 1
     try:
         MetaInfo['Detector Model'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'], namespace)[0]['Model']
-    # except IndexError as e:
-    #    print('Problem reading Detector Model. IndexError:', e.message)
-    #    MetaInfo['Detector Model'] = 'n.a.'
     except:
-        print('Problem reading Detector Model.')
-        MetaInfo['Detector Model'] = 'n.a.'
+        try:
+            MetaInfo['Detector Model'] = czt.get_metainfo_cziread_camera(imagefile)
+        except:
+            print('Problem reading Detector Model.')
+            MetaInfo['Detector Model'] = 'n.a.'
 
     try:
         MetaInfo['Detector Name'] = getinfofromOMEXML(omexml, ['Instrument', 'Detector'], namespace)[0]['ID']
-    # except IndexError as e:
-    #    print('Problem reading Detector Name. Index Error:', e.message)
-    #    MetaInfo['Detector Name'] = 'n.a.'
     except:
-        print('Problem reading Detector Name.')
-        MetaInfo['Detector Name'] = 'n.a.'
+        try:
+            MetaInfo['Detector Name'] = czt.get_metainfo_cziread_detetcor(imagefile)
+        except:
+            print('Problem reading Detector Name.')
+            MetaInfo['Detector Name'] = 'n.a.'
 
     # try to get detector information - 2
     try:
@@ -973,10 +1009,9 @@ def get_relevant_metainfo_wrapper(imagefile,
         print('Problem reading DetectorID from OME-XML.')
 
     if showinfo:
-        showtypicalmetadata(MetaInfo, namespace=namespace, bfpath=bfpath)
+        showtypicalmetadata(MetaInfo)
 
     return MetaInfo
-
 
 def calc_series_range(total_series, scenes, sceneID):
 
@@ -1291,10 +1326,10 @@ def getPlanesAndPixelsFromCZI(imagefile):
       Attention: works for CZI image data sets only!
       Added by Volker.Hilsenstein@embl.de
     """
-    if not VM_STARTED:
-        start_jvm()
-    if VM_KILLED:
-        jvm_error()
+    #if not VM_STARTED:
+    #    start_jvm()
+    #if VM_KILLED:
+    #    jvm_error()
 
     # Create OME-XML using BioFormats from CZI file
     omexml = get_OMEXML(imagefile)
@@ -1341,12 +1376,10 @@ def output2file(scriptname, output_name='output.txt', targetdir=os.getcwd()):
     return filepath_output
 
 
-def showtypicalmetadata(MetaInfo, namespace='n.a.', bfpath='n.a.'):
+def showtypicalmetadata(MetaInfo):
 
     # show relevant image Meta-Information
     print('\n')
-    print('OME NameSpace used   : ', namespace)
-    print('BF Version used      : ', bfpath)
     print('-------------------------------------------------------------')
     print('Image Directory      : ', MetaInfo['Directory'])
     print('Image Filename       : ', MetaInfo['Filename'])
@@ -1404,3 +1437,121 @@ def calcimageid(scene, numpylevels, pylevel=0):
     id = numpylevels * scene + pylevel
 
     return id
+
+
+def filterplanetable(planetable, ImageID=0, T=0, Z=0, CH=0):
+
+    # TODO - Implement smart filtering without creating an itermediate table
+
+    # filter planetable for specific imageID
+    if ImageID > planetable['ImageID'].max():
+        print('ImageID was invalid. Using ImageID = 0.')
+        CH = 0
+    pt = planetable[planetable['ImageID'] == ImageID]
+
+    # filter planetable for specific timepoint
+    if T > planetable['TheT'].max():
+        print('Time Index was invalid. Using T = 0.')
+        CH = 0
+    pt = planetable[planetable['TheT'] == T]
+
+    # filter resulting planetable pt for a specific z-plane
+    if Z > planetable['TheZ'].max():
+        print('Z-Plane Index was invalid. Using Z = 0.')
+        zplane = 0
+    pt = pt[pt['TheZ'] == Z]
+
+    # filter planetable for specific channel
+    if CH > planetable['TheC'].max():
+        print('Channel Index was invalid. Using CH = 0.')
+        CH = 0
+    pt = planetable[planetable['TheC'] == CH]
+
+    # return filtered planetable
+    return pt
+
+
+def scatterplot(planetable, ImageID=0, T=0, Z=0, CH=0, size=35,
+                savefigure=False, figsavename='test.png', showsurface=True):
+    """
+
+    This function can be used to visualize al XYZ positions from an image file for
+    the selcted channel and zplane as a scatterplot.
+
+    :param planetable: XYZ planetable generated by bftools.get_planetable
+    :param ImageID: zero-based ImageID indes (image series inside BioFormats)
+    :param T: zero-based timepoint Index
+    :param Z: zero-based zplane index
+    :param CH: zero-based channel index
+    :param size: maker size used to plot all YX positions
+    :param savefigure: boolean
+    :param filename: filename to save the figure as PNG
+    :param showsurface: displays the surface as 3D plot
+    :return: Plot and optional save figure as ...
+    """
+
+    ptf = filterplanetable(planetable, ImageID=0, T=0, Z=0, CH=0)
+
+    # extract XYZ position for the selected channel
+    xpos = ptf['XPos']
+    ypos = ptf['YPos']
+    zpos = ptf['ZPos']
+
+    # normalize z-data by substracting the minimum value
+    zpos_norm = zpos - zpos.min()
+
+    #fig1 = plt.figure(figsize=(10, 6), dpi=100)
+    fig1 = plt.figure()
+    ax1 = fig1.add_subplot(111)
+    ax1.grid(True)
+    plt.axis('equal')
+
+    # invert the Y-axis --> O,O = Top-Left
+    ax1.invert_yaxis()
+
+    ax1.autoscale(enable=True, axis='x', tight=True)
+    ax1.autoscale(enable=True, axis='y', tight=True)
+
+    # define the labels
+    ax1.set_title('XYZ-Positions (norm) : ' + 'ImageID=' + str(ImageID) + ' T=' + str(T) + ' Z='+ str(Z) + ' CH=' + str(CH))
+    ax1.set_xlabel('Stage X-Axis [micron]')
+    ax1.set_ylabel('Stage Y-Axis [micron]')
+
+    # plot data and label the colorbar
+    sc1 = plt.scatter(xpos, ypos, marker='s', c=zpos_norm, s=size, cmap=cm.coolwarm)
+    cb1 = plt.colorbar(sc1, fraction=0.046, shrink=0.8, pad=0.04)
+    cb1.set_label('Z-Offset [micron]', labelpad=20)
+
+    # optional save figure as PNG
+    if savefigure:
+        fig1.savefig(figsavename, dpi=100)
+        print('Saved: ', figsavename)
+
+    # optional 3D plot of surface
+    if showsurface:
+
+        fig2 = plt.figure(figsize=(10, 6), dpi=100)
+        ax2 = fig2.add_subplot(111, projection='3d')
+
+        # invert the Y-axis --> O,O = Top-Left
+        ax2.invert_yaxis()
+
+        ax1.autoscale(enable=True, axis='x', tight=True)
+        ax1.autoscale(enable=True, axis='y', tight=True)
+        ax1.autoscale(enable=True, axis='z', tight=True)
+
+        # define the labels
+        ax2.set_xlabel('Stage X-Axis [micron]')
+        ax2.set_ylabel('Stage Y-Axis [micron]')
+        ax2.set_zlabel('Z-Offset [micron]')
+
+        # plot data and label the colorbar
+        #sc2 = ax2.plot(xpos, ypos, zpos_norm, '.', markersize=10, cmap=plt.cm.coolwarm)
+        sc2 = ax2.scatter(xpos, ypos, zpos_norm, marker='.', s=200, c=zpos_norm, cmap=plt.cm.coolwarm, depthshade=False)
+        cb2 = plt.colorbar(sc2, shrink=0.8)
+        cb2.set_label('Z-Offset [micron]', labelpad=20)
+
+    if not showsurface:
+        fig2 = None
+
+    return fig1, fig2

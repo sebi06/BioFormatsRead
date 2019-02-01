@@ -6,10 +6,7 @@ File: showZwellplate.py
 Date: 01.06.2017
 Version. 1.4
 """
-
-#from __future__ import print_function
 import bftools as bf
-import dispZsurface as dsp
 import matplotlib.pyplot as plt
 import os
 
@@ -28,14 +25,14 @@ filenameczi = r'c:\Users\m1srh\OneDrive - Carl Zeiss AG\Python_Projects\BioForma
 # specify bioformats_package.jar to use if required
 # Attention: for larger CZI tile images containing an image pyramid one must still use 5.1.10
 # since the latest version is not fully supported by python-bioformats yet
-bfpackage = r'c:\Users\m1srh\Documents\Software\Bioformats\5.1.10\bioformats_package.jar'
+bfpackage = r'bfpackage\5.1.10\bioformats_package.jar'
 bf.set_bfpath(bfpackage)
 
 # define separator
 separator = '\t'
 
 # create plane info from CZI image file and write CSV file (optional)
-planetable, filenamecsv = bf.get_planetable(filenameczi, writecsv=True, separator=separator)
+planetable, filenamecsv, MetaInfo = bf.get_planetable(filenameczi, writecsv=True, separator=separator, showinfo=True)
 
 # or use the CSV file directly once it was created
 #planetable = pd.read_csv(filenamecsv, sep=separator)
@@ -48,13 +45,13 @@ print(planetable.shape[0])
 figuresavename = os.path.splitext(filenamecsv)[0] + '_XYZ-Pos' + saveformat
 
 # display the XYZ positions
-fig1, fig2 = dsp.scatterplot(planetable,
-                             ImageID=0,
-                             T=0,
-                             CH=0, Z=0, size=250,
-                             savefigure=True,
-                             figsavename=figuresavename,
-                             showsurface=True)
+fig1, fig2 = bf.scatterplot(planetable,
+                            ImageID=0,
+                            T=0,
+                            CH=0, Z=0, size=250,
+                            savefigure=True,
+                            figsavename=figuresavename,
+                            showsurface=True)
 
 # show the plot
 plt.show()

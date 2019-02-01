@@ -11,7 +11,7 @@ import bftools as bf
 from matplotlib import pyplot as plt, cm
 import dispvalues as dsv
 
-showimage = False
+showimage = True
 writeimage = False
 
 # filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
@@ -28,12 +28,12 @@ writeimage = False
 filename = r'c:\Users\M1SRH\OneDrive - Carl Zeiss AG\Projects\Apeer\image6d\S=2_5x5Tiles_T=2_Z=3_C=1.czi'
 
 # use for BioFormtas <= 5.1.10
-#urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
+# urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'
 # use for BioFormtas > 5.2.0
 urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 
 # specify bioformats_package.jar to use if required
-#bfpackage = r'bfpackage/5.1.10/bioformats_package.jar'
+# bfpackage = r'bfpackage/5.1.10/bioformats_package.jar'
 bfpackage = r'bfpackage/5.9.2/bioformats_package.jar'
 # set path the bioformats_package.jar
 bf.set_bfpath(bfpackage)
@@ -44,9 +44,28 @@ MetaInfo = bf.get_relevant_metainfo_wrapper(filename,
                                             bfpath=bfpackage,
                                             showinfo=False,
                                             xyorder='YX')
+# scene
+S = 2
+pylevel = 2
+seriesIDsinglepylevel = bf.calcimageid(S-1, 4, pylevel=pylevel)
+print(seriesIDsinglepylevel)
+print(MetaInfo['SeriesDimensions'][seriesIDsinglepylevel])
+MetaInfo['SizesPylevel'] = [1,
+                            MetaInfo['SizeT'],
+                            MetaInfo['SizeZ'],
+                            MetaInfo['SizeC'],
+                            MetaInfo['SeriesDimensions'][seriesIDsinglepylevel][0],
+                            MetaInfo['SeriesDimensions'][seriesIDsinglepylevel][1]]
+
+print('New Sizes : ', MetaInfo['SizesPylevel'])
 
 try:
-    img6d, readstate = bf.get_image6d(filename, MetaInfo['Sizes'], pyramid='single', pylevel=0)
+    img6d, readstate = bf.get_image6d(filename, MetaInfo['Sizes'],
+                                      pyramid='all',
+                                      seriesIDsinglepylevel=2)
+    # img6d, readstate = bf.get_image6d(filename, MetaInfo['SizesPylevel'],
+    #                                  pyramid='single',
+    #                                  seriesIDsinglepylevel=seriesIDsinglepylevel)
     arrayshape = np.shape(img6d)
 except:
     arrayshape = []
@@ -56,20 +75,13 @@ except:
 bf.showtypicalmetadata(MetaInfo, namespace=urlnamespace, bfpath=bfpackage)
 print('Array Shape          : ', arrayshape)
 
-S = 2
-out = bf.calcimageid(S-1, 4, pylevel=2)
-
-print(out)
-print(MetaInfo['SeriesDimensions'][out])
-
 if showimage:
 
-    T = 2
+    T = 1
     C = 1
-    Z = 2
-    S = 2
+    Z = 1
 
-    img2show = img6d[S - 1, T - 1, Z - 1, C - 1, :, :]
+    img2show = img6d[7, T - 1, Z - 1, C - 1, :, :]
 
     # plot one image plane to check results
     fig = plt.figure(figsize=(12, 12), dpi=100)
