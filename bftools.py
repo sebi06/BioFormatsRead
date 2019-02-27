@@ -569,6 +569,45 @@ def get_image6d(imagefile, sizes, pyramid='single',
     return img6d, readstate
 
 
+def get_zstack(imagefile, sizes, seriesID, timepoints='full', tindex=0):
+    """
+    This will read a single Z-Stack from an image data set for a specified image series.
+    """
+    if not VM_STARTED:
+        start_jvm()
+    if VM_KILLED:
+        jvm_error()
+
+    rdr = bioformats.ImageReader(imagefile, perform_init=True)
+
+    if timepoints == 'full':
+
+        # initialize array for specific series that only contains a mutichannel z-Stack
+        imgZStack = np.zeros([sizes[1], sizes[2], sizes[3], sizes[4], sizes[5]], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+
+        for timepoint in range(0, sizes[1]):
+            for zplane in range(0, sizes[2]):
+                for channel in range(0, sizes[3]):
+                    imgZStack[timepoint, zplane, channel, :, :] = rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+
+        dimorder_out = 'TZCXY'
+
+    elif timepoints == 'single':
+
+        # initialize array for specific series and time point that only contains a mutichannel z-Stack
+        imgZStack = np.zeros([sizes[2], sizes[3], sizes[4], sizes[5]], dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+
+        for zplane in range(0, sizes[2]):
+            for channel in range(0, sizes[3]):
+                imgZStack[zplane, channel, :, :] = rdr.read(series=seriesID, c=channel, z=zplane, t=tindex, rescale=False)
+
+        dimorder_out = 'ZCXY'
+
+    rdr.close()
+
+    return imgZStack, dimorder_out
+
+
 def write_ometiff(filepath, img6d,
                   scalex=0.1,
                   scaley=0.1,
@@ -1411,7 +1450,7 @@ def showtypicalmetadata(MetaInfo):
 
 
 def writeOMETIFFplanes(pixel, SizeT=1, SizeZ=1, SizeC=1, order='STZCXY', verbose=False):
-    
+
     if order == 'STZCXY':
 
         pixel.DimensionOrder = bioformats.omexml.DO_XYCZT

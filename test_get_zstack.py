@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: test_get_zstack.py
-Date: 17.04.2017
-Version. 0.3
+Date: 06.02.2019
+Version. 0.4
 """
 
 from __future__ import print_function
@@ -23,18 +23,18 @@ imgdir = os.path.dirname(filename)
 urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 
 # specify bioformats_package.jar to use if required
-bfpackage = r'bfpackage/5.4.1/bioformats_package.jar'
+bfpackage = r'bfpackage/5.9.2/bioformats_package.jar'
 bf.set_bfpath(bfpackage)
 
 # get image meta-information
-MetaInfo = bf.get_relevant_metainfo_wrapper(filename, namespace=urlnamespace, bfpackage=bfpackage, showinfo=False)
+MetaInfo = bf.get_relevant_metainfo_wrapper(filename, namespace=urlnamespace, bfpath=bfpackage, showinfo=False)
 
 seriesID = 0
 timepoint = 0
 channel = 0
 
 # get the actual z-stack from the data set
-zstack, dimorder_out = bf.get_zstack(filename, MetaInfo['Sizes'], seriesID, timepoint=timepoint)
+zstack, dimorder_out = bf.get_zstack(filename, MetaInfo['Sizes'], seriesID, timepoints='single', tindex=0)
 
 # get plane with the brightest pixel
 zplane = (zstack == zstack.max()).nonzero()[0][0]
