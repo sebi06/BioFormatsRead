@@ -11,7 +11,7 @@ import bftools as bf
 from matplotlib import pyplot as plt, cm
 import dispvalues as dsv
 
-showimage = False
+showimage = True
 writeimage = False
 
 # filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
@@ -34,7 +34,8 @@ urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 
 # specify bioformats_package.jar to use if required
 #bfpackage = r'bfpackage/5.1.10/bioformats_package.jar'
-bfpackage = r'bfpackage/5.9.2/bioformats_package.jar'
+#bfpackage = r'bfpackage/5.9.2/bioformats_package.jar'
+bfpackage = r'bfpackage/6.0.0/bioformats_package.jar'
 # set path the bioformats_package.jar
 bf.set_bfpath(bfpackage)
 
@@ -46,7 +47,10 @@ MetaInfo = bf.get_relevant_metainfo_wrapper(filename,
                                             xyorder='YX')
 
 try:
-    img6d, readstate = bf.get_image6d(filename, MetaInfo['Sizes'], pyramid='single', pylevel=0)
+    img6d, readstate = bf.get_image6d(filename, MetaInfo['Sizes'],
+                                      pyramid='single',
+                                      num_levels=MetaInfo['Pylevels'],
+                                      pylevel=0)
     arrayshape = np.shape(img6d)
 except:
     arrayshape = []

@@ -459,11 +459,14 @@ def get_planetable(imagefile, writecsv=False, separator='\t'):
     return df, csvfile
 
 
-def get_image6d(imagefile, sizes, pyramid='single',
-                                  pylevel=0):
+def get_image6d(imagefile, sizes,
+                pyramid='single',
+                num_levels=1,
+                pylevel=0):
     """
     This function will read the image data and store them into a 6D numpy array.
     The 6D array has the following dimension order: [Series, T, Z, C, X, Y].
+    Pyramid levels start with 0.
     """
     if not VM_STARTED:
         start_jvm()
@@ -479,11 +482,15 @@ def get_image6d(imagefile, sizes, pyramid='single',
 
     if pyramid == 'single':
 
-        sizes[0] =  1 # adapt the sizes to reflect that only one pyramid level will be read
-        img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+        series_ids = calc_series_pylevel(sizes[0], num_levels, pylevel=0)
+
+        #sizes[0] = 1  # adapt the sizes to reflect that only one pyramid level will be read
+        #img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+        img6d = np.zeros(len(series_ids), dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
 
         # main loop to read the images from the data file
-        for seriesID in range(pylevel, pylevel + 1):
+        for seriesID in series_ids:
+        #for seriesID in range(pylevel, pylevel + 1):
             for timepoint in range(0, sizes[1]):
                 for zplane in range(0, sizes[2]):
                     for channel in range(0, sizes[3]):
@@ -1378,7 +1385,7 @@ def showtypicalmetadata(MetaInfo, namespace='n.a.', bfpath='n.a.'):
 
 
 def writeOMETIFFplanes(pixel, SizeT=1, SizeZ=1, SizeC=1, order='STZCXY', verbose=False):
-    
+
     if order == 'STZCXY':
 
         pixel.DimensionOrder = bioformats.omexml.DO_XYCZT
@@ -1404,3 +1411,18 @@ def calcimageid(scene, numpylevels, pylevel=0):
     id = numpylevels * scene + pylevel
 
     return id
+
+
+def calc_series_pylevel(num_series, num_levels, pylevel=0):
+    series_per_level = int(num_series / num_levels)
+    print('Series per level', series_per_level)
+    series_ids = []
+
+    if num_levels == 1:
+        series_ids = list(range(0, num_series))
+
+    if num_levels > 1:
+        for p in range(0, series_per_level):
+            series_ids.append(p * num_levels + pylevel)
+
+    return series_ids
