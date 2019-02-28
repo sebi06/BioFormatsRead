@@ -7,13 +7,13 @@ Date: 30.05.2017
 Version. 1.2
 """
 
-from __future__ import print_function
+
+#from __future__ import print_function
 from mpl_toolkits.mplot3d import axes3d
 from matplotlib import cm
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-
 
 def filterplanetable(planetable, ImageID=0, T=0, Z=0, CH=0):
 

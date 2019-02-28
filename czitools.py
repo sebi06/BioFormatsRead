@@ -3,15 +3,16 @@
 @author: Sebi
 
 File: czitools.py
-Date: 29.05.2017
-Version. 1.1
+Date: 01.02.2019
+Version. 1.2
 """
 
 import misctools as misc
-import zisraw as zis
+import czifile as zis
 import numpy as np
 import re
 from collections import Counter
+import xml.etree.ElementTree as ET
 
 
 def get_metainfo_channel_description(filename):
@@ -86,6 +87,28 @@ def read_dimensions_czi(filename):
     return czishape, cziorder
 
 
+def get_numscenes(filename):
+    """
+    Currently the number of scenes cannot be read directly using BioFormats so
+    czifile.py is used to determine the number of scenes.
+    """
+
+    # Read the dimensions of the image stack and their order
+    czi = zis.CziFile(filename)
+
+    # find the index of the "S" inside the dimension string
+    try:
+        si = czi.axes.index("S")
+        numscenes = czi.shape[si]
+    except:
+        # if no scene was found set to 1
+        numscenes = 1
+
+    czi.close()
+
+    return numscenes
+
+
 def get_shapeinfo_cziread(filename):
     # get CZI shape and dimension order using czifile.py
 
@@ -146,8 +169,6 @@ def get_metainfo_cziread(filename):
     except:
 
         print('czifile.py did not detect an CZI file.')
-        czishape = 'unknown'
-        cziorder = 'unknown'
 
     return objNA, objMag, objName, objImm, CamName, totalMag
 
@@ -156,15 +177,36 @@ def get_metainfo_cziread_camera(filename):
 
     czi = zis.CziFile(filename)
 
-    # Iterate over the metadata
-    for elem in czi.metadata.getiterator():
+    md = czi.metadata
+    tree = ET.ElementTree(ET.fromstring(md))
+    root = ET.fromstring(md)
 
+    # Iterate over the metadata
+    for elem in tree.iter():
         if elem.tag == 'CameraName':
             cameraname = elem.text
 
     czi.close()
 
     return cameraname
+
+
+def get_metainfo_cziread_detetcor(filename):
+
+    czi = zis.CziFile(filename)
+
+    md = czi.metadata
+    tree = ET.ElementTree(ET.fromstring(md))
+    root = ET.fromstring(md)
+
+    # Iterate over the metadata
+    for elem in tree.iter():
+        if elem.tag == 'Detetctor':
+            detectorname = elem.text
+
+    czi.close()
+
+    return detectorname
 
 
 def getWellInfofromCZI(wellstring):

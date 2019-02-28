@@ -3,12 +3,11 @@
 @author: Sebi
 
 File: showZsurface.py
-Date: 01.06.2017
-Version. 0.3
+Date: 01.02.2019
+Version. 0.4
 """
 
 import bftools as bf
-import dispZsurface as dsp
 import matplotlib.pyplot as plt
 import argparse
 import sys
@@ -40,6 +39,7 @@ elif args.separator == 'semicolon':
     separator = ';'
 
 print('Write CSV Option : ', args.writecsv)
+print('Separator        : ', args.separator)
 
 # get CSV write option
 if args.writecsv == 'True':
@@ -62,8 +62,7 @@ elif args.showsurface == 'False':
 # specify bioformats_package.jar to use if required
 # Attention: for larger CZI tile images containing an image pyramid one must still use 5.1.10
 # since the latest version is not fully supported by python-bioformats yet
-#bfpackage = r'bfpackage/5.1.10/bioformats_package.jar'
-bfpackage = r'c:\Users\m1srh\Documents\Software\Bioformats\5.1.10\bioformats_package.jar'
+bfpackage = r'bfpackage/5.1.10/bioformats_package.jar'
 bf.set_bfpath(bfpackage)
 
 # create plane info from CZI image file and write CSV file (optional)
@@ -78,7 +77,7 @@ print(planetable[:10])
 figuresavename = os.path.splitext(filenamecsv)[0] + '_XYZ-Pos' + '.' + saveformat
 
 # display the XYZ positions
-fig1, fig2 = dsp.scatterplot(planetable,
+fig1, fig2 = bf.scatterplot(planetable,
                              ImageID=0,
                              T=0,
                              CH=0,
