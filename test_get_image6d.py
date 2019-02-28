@@ -33,14 +33,10 @@ filename = r'c:\Users\M1SRH\OneDrive - Carl Zeiss AG\Projects\Apeer\image6d\S=2_
 urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 
 # specify bioformats_package.jar to use if required
-<<<<<<< HEAD
-#bfpackage = r'bfpackage/5.1.10/bioformats_package.jar'
-#bfpackage = r'bfpackage/5.9.2/bioformats_package.jar'
-bfpackage = r'bfpackage/6.0.0/bioformats_package.jar'
-=======
 # bfpackage = r'bfpackage/5.1.10/bioformats_package.jar'
-bfpackage = r'bfpackage/5.9.2/bioformats_package.jar'
->>>>>>> 09b3a8c3bc0a3eb3021a2f4ebc1d105fb3e8917d
+# bfpackage = r'bfpackage/5.9.2/bioformats_package.jar'
+bfpackage = r'bfpackage/6.0.0/bioformats_package.jar'
+
 # set path the bioformats_package.jar
 bf.set_bfpath(bfpackage)
 
@@ -67,51 +63,48 @@ print('New Sizes : ', MetaInfo['SizesPylevel'])
 
 try:
     img6d, readstate = bf.get_image6d(filename, MetaInfo['Sizes'],
-<<<<<<< HEAD
                                       pyramid='single',
-                                      num_levels=MetaInfo['Pylevels'],
+                                      num_levels=MetaInfo['PyLevels'],
                                       pylevel=0)
-=======
-                                      pyramid='all',
-                                      seriesIDsinglepylevel=2)
+                                      pyramid = 'all',
+                                      seriesIDsinglepylevel = 2)
     # img6d, readstate = bf.get_image6d(filename, MetaInfo['SizesPylevel'],
     #                                  pyramid='single',
     #                                  seriesIDsinglepylevel=seriesIDsinglepylevel)
->>>>>>> 09b3a8c3bc0a3eb3021a2f4ebc1d105fb3e8917d
-    arrayshape = np.shape(img6d)
+    arrayshape=np.shape(img6d)
 except:
-    arrayshape = []
+    arrayshape=[]
     print('Could not read image data into NumPy array.')
 
 # show relevant image Meta-Information
-bf.showtypicalmetadata(MetaInfo, namespace=urlnamespace, bfpath=bfpackage)
+bf.showtypicalmetadata(MetaInfo, namespace = urlnamespace, bfpath = bfpackage)
 print('Array Shape          : ', arrayshape)
 
 if showimage:
 
-    T = 1
-    C = 1
-    Z = 1
+    T=1
+    C=1
+    Z=1
 
-    img2show = img6d[7, T - 1, Z - 1, C - 1, :, :]
+    img2show=img6d[7, T - 1, Z - 1, C - 1, :, :]
 
     # plot one image plane to check results
-    fig = plt.figure(figsize=(12, 12), dpi=100)
-    ax = fig.add_subplot(111)
-    cax = ax.imshow(img2show, interpolation='nearest', cmap=cm.hot)
-    ax.set_title('S=' + str(S) + 'T=' + str(T) + ' Z=' + str(Z) + ' CH=' + str(C), fontsize=12)
-    ax.set_xlabel('X-dimension [pixel]', fontsize=10)
-    ax.set_ylabel('Y-dimension [pixel]', fontsize=10)
-    cbar = fig.colorbar(cax)
-    ax.format_coord = dsv.Formatter(cax)
+    fig=plt.figure(figsize = (12, 12), dpi = 100)
+    ax=fig.add_subplot(111)
+    cax=ax.imshow(img2show, interpolation = 'nearest', cmap = cm.hot)
+    ax.set_title('S=' + str(S) + 'T=' + str(T) + ' Z=' + str(Z) + ' CH=' + str(C), fontsize = 12)
+    ax.set_xlabel('X-dimension [pixel]', fontsize = 10)
+    ax.set_ylabel('Y-dimension [pixel]', fontsize = 10)
+    cbar=fig.colorbar(cax)
+    ax.format_coord=dsv.Formatter(cax)
     # show plots
     plt.show()
 
 if writeimage:
 
     # write OME-TIFF
-    omefile = os.path.splitext(filename)[0] + '.ome.tiff'
-    fp = bf.write_ometiff(omefile, img6d,
+    omefile=os.path.splitext(filename)[0] + '.ome.tiff'
+    fp=bf.write_ometiff(omefile, img6d,
                           scalex=MetaInfo['XScale'],
                           scaley=MetaInfo['YScale'],
                           scalez=MetaInfo['ZScale'],

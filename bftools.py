@@ -488,16 +488,11 @@ def get_planetable(imagefile, writecsv=False, separator='\t', imageID=0, showinf
 
     return df, csvfile, MetaInfo
 
-
-<<<<<<< HEAD
 def get_image6d(imagefile, sizes,
                 pyramid='single',
                 num_levels=1,
                 pylevel=0):
-=======
-def get_image6d(imagefile, sizes, pyramid='single',
-                                  seriesIDsinglepylevel=0):
->>>>>>> 09b3a8c3bc0a3eb3021a2f4ebc1d105fb3e8917d
+
     """
     This function will read the image data and store them into a 6D numpy array.
     The 6D array has the following dimension order: [Series, T, Z, C, X, Y].
@@ -517,7 +512,6 @@ def get_image6d(imagefile, sizes, pyramid='single',
 
     if pyramid == 'single':
 
-<<<<<<< HEAD
         series_ids = calc_series_pylevel(sizes[0], num_levels, pylevel=0)
 
         #sizes[0] = 1  # adapt the sizes to reflect that only one pyramid level will be read
@@ -525,17 +519,16 @@ def get_image6d(imagefile, sizes, pyramid='single',
         img6d = np.zeros(len(series_ids), dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
 
         # main loop to read the images from the data file
-        for seriesID in series_ids:
+        #for seriesID in series_ids:
         #for seriesID in range(pylevel, pylevel + 1):
-=======
         #sizes[0] = 1 # adapt the sizes to reflect that only one pyramid level will be read
         #print(sizes)
         img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
 
         # main loop to read the images from the data file
-        for seriesID in range(seriesIDsinglepylevel, seriesIDsinglepylevel + 1):
+        for seriesID in series_ids:
+        #for seriesID in range(seriesIDsinglepylevel, seriesIDsinglepylevel + 1):
             print("Series = ", seriesID)
->>>>>>> 09b3a8c3bc0a3eb3021a2f4ebc1d105fb3e8917d
             for timepoint in range(0, sizes[1]):
                 for zplane in range(0, sizes[2]):
                     for channel in range(0, sizes[3]):
@@ -1498,7 +1491,6 @@ def calcimageid(scene, numpylevels, pylevel=0):
     return id
 
 
-<<<<<<< HEAD
 def calc_series_pylevel(num_series, num_levels, pylevel=0):
     series_per_level = int(num_series / num_levels)
     print('Series per level', series_per_level)
@@ -1512,7 +1504,8 @@ def calc_series_pylevel(num_series, num_levels, pylevel=0):
             series_ids.append(p * num_levels + pylevel)
 
     return series_ids
-=======
+
+
 def filterplanetable(planetable, ImageID=0, T=0, Z=0, CH=0):
 
     # TODO - Implement smart filtering without creating an itermediate table
@@ -1629,4 +1622,3 @@ def scatterplot(planetable, ImageID=0, T=0, Z=0, CH=0, size=35,
         fig2 = None
 
     return fig1, fig2
->>>>>>> 09b3a8c3bc0a3eb3021a2f4ebc1d105fb3e8917d
