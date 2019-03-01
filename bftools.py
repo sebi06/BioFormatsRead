@@ -184,7 +184,7 @@ def get_java_metadata_store(imagefile):
 
     rdr.close()
 
-    #kill_jvm()
+    # kill_jvm()
 
     return javametadata, totalseries, imageIDs, series_dimensions, multires
 
@@ -401,7 +401,8 @@ def get_planetable(imagefile, writecsv=False, separator='\t', imageID=0, showinf
 
     # get JavaMetaDataStore and SeriesCount
     try:
-        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], MetaInfo['SeriesDimensions'], MetaInfo['MultiResolution'] = get_java_metadata_store(imagefile)
+        jmd, MetaInfo['TotalSeries'], MetaInfo['ImageIDs'], MetaInfo['SeriesDimensions'], MetaInfo['MultiResolution'] = get_java_metadata_store(
+            imagefile)
         MetaInfo['XScale'], MetaInfo['YScale'], MetaInfo['ZScale'] = get_metainfo_scaling(jmd)
         MetaInfo['SizeC'] = np.int(jmd.getPixelsSizeC(imageID).getValue().floatValue())
         MetaInfo['SizeT'] = np.int(jmd.getPixelsSizeT(imageID).getValue().floatValue())
@@ -488,16 +489,18 @@ def get_planetable(imagefile, writecsv=False, separator='\t', imageID=0, showinf
 
     return df, csvfile, MetaInfo
 
-def get_image6d(imagefile, sizes,
-                pyramid='single',
-                num_levels=1,
-                pylevel=0):
 
+def get_image6d(imagefile, metainfo,
+                num_levels=1,
+                num_scenes=1,
+                pylevel2read=0):
+    
     """
     This function will read the image data and store them into a 6D numpy array.
     The 6D array has the following dimension order: [Series, T, Z, C, X, Y].
     Pyramid levels start with 0.
     """
+
     if not VM_STARTED:
         start_jvm()
     if VM_KILLED:
@@ -510,70 +513,44 @@ def get_image6d(imagefile, sizes,
     readstate = 'OK'
     readproblems = []
 
-    if pyramid == 'single':
+    xysizes_pylevel = metainfo['SeriesDimensions'][pylevel2read]
 
-        series_ids = calc_series_pylevel(sizes[0], num_levels, pylevel=0)
+    series_ids = calc_series_pylevel(metainfo['Sizes'][0],
+                                        num_levels=num_levels,
+                                        num_scenes=num_scenes,
+                                        pylevel=pylevel2read)
 
-        #sizes[0] = 1  # adapt the sizes to reflect that only one pyramid level will be read
-        #img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
-        img6d = np.zeros(len(series_ids), dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+    # adapt the sizes to reflect that only one pyramid level will be read
+    new_sizes = metainfo['Sizes']
+    new_sizes[0] = num_scenes
+    new_sizes[4] = xysizes_pylevel[1]
+    new_sizes[5] = xysizes_pylevel[0]
 
-        # main loop to read the images from the data file
-        #for seriesID in series_ids:
-        #for seriesID in range(pylevel, pylevel + 1):
-        #sizes[0] = 1 # adapt the sizes to reflect that only one pyramid level will be read
-        #print(sizes)
-        img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
+    img6d = np.zeros(new_sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
 
-        # main loop to read the images from the data file
-        for seriesID in series_ids:
-        #for seriesID in range(seriesIDsinglepylevel, seriesIDsinglepylevel + 1):
-            print("Series = ", seriesID)
-            for timepoint in range(0, sizes[1]):
-                for zplane in range(0, sizes[2]):
-                    for channel in range(0, sizes[3]):
-                        try:
-                            # img6d[seriesID, timepoint, zplane, channel, :, :] = \
-                            #    rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
-                            img6d[0, timepoint, zplane, channel, :, :] = \
-                                rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
-                        except:
-                            print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
-                            readstate = 'NOK'
-                            readproblems = sys.exc_info()[1]
+    # main loop to read the images from the data file
+    for seriesID in range(0, num_scenes):
 
-    if pyramid == 'all':
+        sid = series_ids[seriesID]
 
-        img6d = np.zeros(sizes, dtype=BF2NP_DTYPE[rdr.rdr.getPixelType()])
-
-        # main loop to read the images from the data file
-        for seriesID in range(0, sizes[0]):
-            for timepoint in range(0, sizes[1]):
-                for zplane in range(0, sizes[2]):
-                    for channel in range(0, sizes[3]):
-                        try:
-                            img6d[seriesID, timepoint, zplane, channel, :, :] = \
-                                rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
-                        except:
-                            print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
-                            readstate = 'NOK'
-                            readproblems = sys.exc_info()[1]
-
-    # # main loop to read the images from the data file
-    # for seriesID in range(0, sizes[0]):
-    #     for timepoint in range(0, sizes[1]):
-    #         for zplane in range(0, sizes[2]):
-    #             for channel in range(0, sizes[3]):
-    #                 try:
-    #                     img6d[seriesID, timepoint, zplane, channel, :, :] = rdr.read(series=seriesID,
-    #                                                                                  c=channel,
-    #                                                                                  z=zplane,
-    #                                                                                  t=timepoint,
-    #                                                                                  rescale=False)
-    #                 except:
-    #                     print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
-    #                     readstate = 'NOK'
-    #                     readproblems = sys.exc_info()[1]
+        # for seriesID in range(seriesIDsinglepylevel, seriesIDsinglepylevel + 1):
+        print("Series = ", seriesID)
+        for timepoint in range(0, new_sizes[1]):
+            for zplane in range(0, new_sizes[2]):
+                for channel in range(0, new_sizes[3]):
+                    try:
+                        # img6d[seriesID, timepoint, zplane, channel, :, :] = \
+                        #    rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
+                        
+                        img6d[seriesID, timepoint, zplane, channel, :, :] = rdr.read(series=sid,
+                                                                                        c=channel,
+                                                                                        z=zplane,
+                                                                                        t=timepoint,
+                                                                                        rescale=False)
+                    except:
+                        print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
+                        readstate = 'NOK'
+                        readproblems = sys.exc_info()[1]
 
     rdr.close()
 
@@ -657,7 +634,7 @@ def write_ometiff(filepath, img6d,
 
     # Getting metadata info
     omexml = bioformats.omexml.OMEXML()
-    omexml.image(Series-1).Name = filepath
+    omexml.image(Series - 1).Name = filepath
 
     for series in range(Series):
         p = omexml.image(series).Pixels
@@ -942,6 +919,7 @@ def create_metainfo_dict():
                 'ObjMag': 0,
                 'ObjModel': 'n.a.',
                 'ShapeCZI': 0,
+                'CZIhasPreview': None,
                 'OrderCZI': 0,
                 'XScale': 0,
                 'YScale': 0,
@@ -994,10 +972,8 @@ def get_relevant_metainfo_wrapper(imagefile,
     if imagefile[-4:] == '.czi':
         # get objective information using cziread
         print('Using czifile.py to get CZI Shape info.')
-        MetaInfo['ShapeCZI'], MetaInfo['OrderCZI'] = czt.get_shapeinfo_cziread(imagefile)
+        MetaInfo['ShapeCZI'], MetaInfo['OrderCZI'], MetaInfo['CZIhasPreview'] = czt.get_shapeinfo_cziread(imagefile)
         MetaInfo['NumScenes'] = get_metainfo_numscenes(MetaInfo['ShapeCZI'], MetaInfo['OrderCZI'])
-
-    MetaInfo['PyLevels'] = len(set(MetaInfo['SeriesDimensions']))
 
     print('Using BioFormats to get MetaInformation.')
 
@@ -1060,10 +1036,19 @@ def get_relevant_metainfo_wrapper(imagefile,
     except:
         print('Problem reading DetectorID from OME-XML.')
 
+    if not MetaInfo['CZIhasPreview'] or MetaInfo['CZIhasPreview'] is None:
+        MetaInfo['PyLevels'] = len(set(MetaInfo['SeriesDimensions']))
+    if MetaInfo['CZIhasPreview']:
+        # reduce the number because of the additional series due the attchment image
+        MetaInfo['PyLevels'] = len(set(MetaInfo['SeriesDimensions'])) - 1
+        MetaInfo['Sizes'][0] = MetaInfo['Sizes'][0] - 1
+        MetaInfo['TotalSeries'] = MetaInfo['TotalSeries'] - 1 
+
     if showinfo:
         showtypicalmetadata(MetaInfo)
 
     return MetaInfo
+
 
 def calc_series_range(total_series, scenes, sceneID):
 
@@ -1378,9 +1363,9 @@ def getPlanesAndPixelsFromCZI(imagefile):
       Attention: works for CZI image data sets only!
       Added by Volker.Hilsenstein@embl.de
     """
-    #if not VM_STARTED:
+    # if not VM_STARTED:
     #    start_jvm()
-    #if VM_KILLED:
+    # if VM_KILLED:
     #    jvm_error()
 
     # Create OME-XML using BioFormats from CZI file
@@ -1439,10 +1424,11 @@ def showtypicalmetadata(MetaInfo):
     print('Pyramid Levels       : ', MetaInfo['PyLevels'])
     print('Series Dimensions    : ', MetaInfo['SeriesDimensions'])
     print('Number of Scenes     : ', MetaInfo['NumScenes'])
-    print('Images Dim Sizes [0] : ', MetaInfo['Sizes'])
+    print('Dimension Sizes      : ', MetaInfo['Sizes'])
     print('Dimension Order BF   : ', MetaInfo['DimOrder BF'])
     print('Dimension Order CZI  : ', MetaInfo['OrderCZI'])
     print('Shape CZI            : ', MetaInfo['ShapeCZI'])
+    print('CZI Preview Image    : ', MetaInfo['CZIhasPreview'])
     print('Total Series Number  : ', MetaInfo['TotalSeries'])
     print('Image Dimensions     : ', MetaInfo['TotalSeries'], MetaInfo['SizeT'],
           MetaInfo['SizeZ'], MetaInfo['SizeC'], MetaInfo['SizeY'], MetaInfo['SizeX'])
@@ -1491,16 +1477,21 @@ def calcimageid(scene, numpylevels, pylevel=0):
     return id
 
 
-def calc_series_pylevel(num_series, num_levels, pylevel=0):
+def calc_series_pylevel(num_series,
+                        num_levels=1,
+                        num_scenes=1,
+                        pylevel=0):
+
     series_per_level = int(num_series / num_levels)
-    print('Series per level', series_per_level)
+    print('Series per Pyramid Level : ', series_per_level)
     series_ids = []
 
     if num_levels == 1:
         series_ids = list(range(0, num_series))
 
     if num_levels > 1:
-        for p in range(0, series_per_level):
+        # for p in range(0, series_per_level):
+        for p in range(0, num_scenes):
             series_ids.append(p * num_levels + pylevel)
 
     return series_ids
@@ -1580,7 +1571,7 @@ def scatterplot(planetable, ImageID=0, T=0, Z=0, CH=0, size=35,
     ax1.autoscale(enable=True, axis='y', tight=True)
 
     # define the labels
-    ax1.set_title('XYZ-Positions (norm) : ' + 'ImageID=' + str(ImageID) + ' T=' + str(T) + ' Z='+ str(Z) + ' CH=' + str(CH))
+    ax1.set_title('XYZ-Positions (norm) : ' + 'ImageID=' + str(ImageID) + ' T=' + str(T) + ' Z=' + str(Z) + ' CH=' + str(CH))
     ax1.set_xlabel('Stage X-Axis [micron]')
     ax1.set_ylabel('Stage Y-Axis [micron]')
 

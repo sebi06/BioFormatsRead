@@ -117,6 +117,12 @@ def get_shapeinfo_cziread(filename):
         czishape = czi.shape
         cziorder = czi.axes
 
+        try:
+            has_attimage = check_for_previewimage(czi)
+        except:
+            print('Could not check for attachments in CZI file.')
+            has_attimage = None
+
         czi.close()
 
     except:
@@ -125,7 +131,7 @@ def get_shapeinfo_cziread(filename):
         czishape = 'unknown'
         cziorder = 'unknown'
 
-    return czishape, cziorder
+    return czishape, cziorder, has_attimage
 
 
 def get_metainfo_cziread(filename):
@@ -270,3 +276,20 @@ def getXMLnodes(filename_czi, searchpath, showoutput=False):
         print('-----------------------------------------------------------------------------------------------')
 
     return tag, attribute, text
+
+
+def check_for_previewimage(czi):
+
+    att = []
+
+    for attachment in czi.attachments():
+        entry = attachment.attachment_entry
+        print(entry.name)
+        att.append(entry.name)
+
+    has_attimage = False
+
+    if 'SlidePreview' in att:
+        has_attimage = True
+
+    return has_attimage
