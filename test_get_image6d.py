@@ -2,8 +2,8 @@
 """
 @author: Sebi
 File: test_get_image6d.py
-Date: 16.12.2018
-Version. 1.8
+Date: 01.03.2019
+Version. 1.9
 """
 import os
 import numpy as np
@@ -15,18 +15,8 @@ showimage = True
 writeimage = False
 
 # filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
-# filename = r'c:\Users\m1srh\Documents\Testdata_Zeiss\BioFormats_DimOrder_Test\T=30_Z=23_C=2_x=217_Y=94.czi'
-# filename = r'c:\Users\m1srh\OneDrive - Carl Zeiss AG\Projects\Apeer\ZenCore_Workflows\ParticleAnalysis\Filtertest1_POLsm.czi'
-# filename = r'c:\Users\m1srh\OneDrive - Carl Zeiss AG\Projects\Apeer\ZenCore_Workflows\ParticleAnalysis\Filtertest1_POL.czi'
-# filename = r'testdata/T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
-# filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
-# filename = r'l:\Data\BioFormats_CZI_Test\20170419\20170419_BioFormats_CZI_Test_small_384chamber_5X_2X.czi'
-# filename = r'l:\Data\BioFormats_CZI_Test\20160425_BF_CZI.czi'
-# filename = r'c:\Users\M1SRH\Downloads\Raw-HR-NLM_segmented_C_PA_small.ome.tiff'
-# filename = r'c:\Users\m1srh\OneDrive - Carl Zeiss AG\Projects\Apeer\Converter\T=5_Z=3_CH=2_CZT_All_CH_per_Slice.czi'
-# filename = r'c:\Users\M1SRH\OneDrive - Carl Zeiss AG\Projects\Apeer\image6d\S=2_10x10Tiles_T=2_Z=3_C=1.czi'
-filename = r'c:\Temp\input\OverViewScan_8Brains.czi'
-#filename = r'c:\Users\M1SRH\OneDrive - Carl Zeiss AG\Projects\Apeer\image6d\S=2_5x5Tiles_T=2_Z=3_C=1.czi'
+filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
+
 
 # use for BioFormtas <= 5.1.10
 # urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2015-01'

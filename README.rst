@@ -23,7 +23,7 @@ Important Requirements
 * `Matplotlib <http://www.matplotlib.org>`_
 * `python-bioformats <https://github.com/CellProfiler/python-bioformats>`_
 * `BioFormats package <http://downloads.openmicroscopy.org/bio-formats/>`_
-* `zisraw <https://pypi.org/project/zisraw/>`_
+* `czifile <https://pypi.org/project/czifile/>`_
 
 Notes
 -----
