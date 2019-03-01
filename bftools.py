@@ -3,8 +3,8 @@
 @author: Sebi
 
 File: bftools.py
-Date: 13.12.2018
-Version. 2.4.0
+Date: 01.03.2019
+Version. 2.4.1
 """
 
 import javabridge as jv
