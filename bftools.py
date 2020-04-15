@@ -9,6 +9,7 @@ Version. 2.4.1
 
 import javabridge as jv
 import bioformats
+
 import numpy as np
 import czitools as czt
 import os
@@ -137,6 +138,11 @@ def get_java_metadata_store(imagefile):
         start_jvm()
     if VM_KILLED:
         jvm_error()
+
+    # get OME-XML and change the encoding to UTF-8
+    omexml = get_OMEXML(imagefile)
+    # get the metadata from the OME-XML
+    omexmlmetadata = bioformats.OMEXML(omexml)
 
     # get the actual image reader
     rdr = bioformats.get_image_reader(None, path=imagefile)
@@ -409,12 +415,13 @@ def get_planetable(imagefile, writecsv=False, separator='\t', imageID=0, showinf
         MetaInfo['SizeZ'] = np.int(jmd.getPixelsSizeZ(imageID).getValue().floatValue())
         MetaInfo['SizeX'] = np.int(jmd.getPixelsSizeX(imageID).getValue().floatValue())
         MetaInfo['SizeY'] = np.int(jmd.getPixelsSizeY(imageID).getValue().floatValue())
+        MetaInfo['DimOrder BF'] = jmd.getPixelsDimensionOrder(imageID).getValue()
     except:
         print('Problem retrieving Java Metadata Store or Series size:', sys.exc_info()[0])
         raise
 
     # get dimension information and MetaInfo
-    MetaInfo = get_metainfo_dimension(jmd, MetaInfo)
+    #MetaInfo = get_metainfo_dimension(jmd, MetaInfo)
 
     if showinfo:
         # show relevant image Meta-Information
@@ -456,7 +463,11 @@ def get_planetable(imagefile, writecsv=False, separator='\t', imageID=0, showinf
                 xpos.append(jmd.getPlanePositionX(imageIndex, planeIndex).value().doubleValue())
                 ypos.append(jmd.getPlanePositionY(imageIndex, planeIndex).value().doubleValue())
                 zpos.append(jmd.getPlanePositionZ(imageIndex, planeIndex).value().doubleValue())
-                dt.append(jmd.getPlaneDeltaT(imageIndex, planeIndex).value().doubleValue())
+
+                dttmp = jmd.getPlaneDeltaT(imageIndex, planeIndex).value().doubleValue()
+                # if dttmp.size == 0:
+                #    dttmp = 0.0
+                dt.append(dttmp)
                 id.append(imageIndex)
                 plane.append(planeIndex)
             except:
@@ -494,7 +505,6 @@ def get_image6d(imagefile, metainfo,
                 num_levels=1,
                 num_scenes=1,
                 pylevel2read=0):
-    
     """
     This function will read the image data and store them into a 6D numpy array.
     The 6D array has the following dimension order: [Series, T, Z, C, X, Y].
@@ -516,9 +526,9 @@ def get_image6d(imagefile, metainfo,
     xysizes_pylevel = metainfo['SeriesDimensions'][pylevel2read]
 
     series_ids = calc_series_pylevel(metainfo['Sizes'][0],
-                                        num_levels=num_levels,
-                                        num_scenes=num_scenes,
-                                        pylevel=pylevel2read)
+                                     num_levels=num_levels,
+                                     num_scenes=num_scenes,
+                                     pylevel=pylevel2read)
 
     # adapt the sizes to reflect that only one pyramid level will be read
     new_sizes = metainfo['Sizes']
@@ -541,12 +551,12 @@ def get_image6d(imagefile, metainfo,
                     try:
                         # img6d[seriesID, timepoint, zplane, channel, :, :] = \
                         #    rdr.read(series=seriesID, c=channel, z=zplane, t=timepoint, rescale=False)
-                        
+
                         img6d[seriesID, timepoint, zplane, channel, :, :] = rdr.read(series=sid,
-                                                                                        c=channel,
-                                                                                        z=zplane,
-                                                                                        t=timepoint,
-                                                                                        rescale=False)
+                                                                                     c=channel,
+                                                                                     z=zplane,
+                                                                                     t=timepoint,
+                                                                                     rescale=False)
                     except:
                         print('Problem reading data into Numpy Array for Series', seriesID, sys.exc_info()[1])
                         readstate = 'NOK'
@@ -611,7 +621,7 @@ def write_ometiff(filepath, img6d,
 
     [Series, T, Z, C, Y, X] if swapxyaxes = True
 
-    [Series, T, Z, C, Y, X] if swapxyaxes = False
+    [Series, T, Z, C, X, Y] if swapxyaxes = False
     """
 
     # Dimension STZCXY
@@ -1042,7 +1052,7 @@ def get_relevant_metainfo_wrapper(imagefile,
         # reduce the number because of the additional series due the attchment image
         MetaInfo['PyLevels'] = len(set(MetaInfo['SeriesDimensions'])) - 1
         MetaInfo['Sizes'][0] = MetaInfo['Sizes'][0] - 1
-        MetaInfo['TotalSeries'] = MetaInfo['TotalSeries'] - 1 
+        MetaInfo['TotalSeries'] = MetaInfo['TotalSeries'] - 1
 
     if showinfo:
         showtypicalmetadata(MetaInfo)

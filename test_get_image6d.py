@@ -14,8 +14,21 @@ import dispvalues as dsv
 showimage = True
 writeimage = False
 
+imgdict = {
+    1: r'C:\Users\m1srh\Documents\Testdata_Zeiss\Castor\Z-Stack_DCV\CellDivision_T=10_Z=15_CH=2_DCV_small.czi',
+    2: r'C:\Users\m1srh\Documents\Testdata_Zeiss\Castor\Z-Stack_DCV\CellDivision_T=10_Z=15_CH=2_DCV_small.ome.tiff',
+    3: r'C:\Users\m1srh\Documents\Testdata_Zeiss\Castor\Z-Stack_DCV\CellDivision_T=10_Z=15_CH=2_DCV_small_Fiji.ome.tiff',
+    4: r'C:\Users\m1srh\Documents\Testdata_Zeiss\Castor\Z-Stack_DCV\CellDivision_T=15_Z=20_CH=2_DCV.czi',
+    5: r'C:\Users\m1srh\Documents\Testdata_Zeiss\Castor\Z-Stack_DCV\NeuroSpheres_DCV_A635_A488_A405.czi',
+    6: r'C:\Users\m1srh\Documents\Testdata_Zeiss\Castor\Z-Stack_DCV\NeuroSpheres_DCV_A635_A488_A405.ome.tiff',
+    7: r'C:\Users\m1srh\Documents\Testdata_Zeiss\Castor\Z-Stack_DCV\NeuroSpheres_DCV_A635_A488_A405_fromFiji.ome.tiff',
+    8: r'C:\Users\m1srh\Documents\Testdata_Zeiss\Castor\Z-Stack_DCV\CZI_DimorderTZC.czi'
+}
+
+filename = imgdict[7]
+
 # filename = r'testdata/Beads_63X_NA1.35_xy=0.042_z=0.1.czi'
-filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
+#filename = r'testdata/B4_B5_S=8_4Pos_perWell_T=2_Z=1_CH=1.czi'
 
 
 # use for BioFormtas <= 5.1.10
@@ -26,7 +39,7 @@ urlnamespace = 'http://www.openmicroscopy.org/Schemas/OME/2016-06'
 # specify bioformats_package.jar to use if required
 # bfpackage = r'bfpackage/5.1.10/bioformats_package.jar'
 # bfpackage = r'bfpackage/5.9.2/bioformats_package.jar'
-bfpackage = r'bfpackage/6.0.0/bioformats_package.jar'
+bfpackage = r'bfpackage/6.3.0/bioformats_package.jar'
 
 # set path the bioformats_package.jar
 bf.set_bfpath(bfpackage)
@@ -80,7 +93,7 @@ if showimage:
     S = 1
     T = 1
     C = 1
-    Z = 1
+    Z = 40
 
     img2show = img6d[S - 1, T - 1, Z - 1, C - 1, :, :]
 
